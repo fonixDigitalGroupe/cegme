@@ -160,6 +160,94 @@ use Illuminate\Support\Facades\Storage;
         min-height: 50px;
         background-color: #f3f4f6;
     }
+    /* Styles pour l'alignement des images - Toujours centrées par défaut */
+    .ql-editor img {
+        cursor: move;
+        transition: opacity 0.2s;
+        user-select: none;
+        display: block !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        margin-top: 1em !important;
+        margin-bottom: 1em !important;
+    }
+    .ql-editor img:hover {
+        opacity: 0.9;
+    }
+    .ql-editor img.dragging {
+        opacity: 0.5;
+        cursor: grabbing;
+    }
+    .ql-editor img[style*="float: left"],
+    .ql-editor img[style*="margin-left: 0"] {
+        float: left;
+        margin-right: 1em;
+        margin-left: 0;
+    }
+    .ql-editor img[style*="float: right"],
+    .ql-editor img[style*="margin-right: 0"] {
+        float: right;
+        margin-left: 1em;
+        margin-right: 0;
+    }
+    .ql-editor img[style*="display: block"][style*="margin-left: auto"],
+    .ql-editor img[style*="margin: 0 auto"],
+    .ql-editor img.ql-align-center {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    /* Menu contextuel pour l'alignement des images */
+    .image-align-menu {
+        position: absolute;
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 10000;
+        display: none;
+        gap: 4px;
+        flex-direction: column;
+    }
+    .image-align-menu.show {
+        display: flex;
+    }
+    .image-align-menu .menu-row {
+        display: flex;
+        gap: 4px;
+    }
+    .image-align-menu button {
+        padding: 8px 12px;
+        border: 1px solid #d1d5db;
+        background: white;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .image-align-menu button:hover {
+        background: #f3f4f6;
+        border-color: #10b981;
+    }
+    .image-align-menu button.active {
+        background: #10b981;
+        color: white;
+        border-color: #10b981;
+    }
+    .image-align-menu button.delete {
+        background: #dc2626;
+        color: white;
+        border-color: #dc2626;
+        margin-top: 4px;
+    }
+    .image-align-menu button.delete:hover {
+        background: #b91c1c;
+        border-color: #b91c1c;
+    }
 </style>
 <script>
     // Configuration personnalisée pour le format Image dans Quill
@@ -184,6 +272,47 @@ use Illuminate\Support\Facades\Storage;
         },
         placeholder: 'Saisissez le contenu de votre article...'
     });
+    
+    // Système de taille standard pour les images
+    var standardImageSize = null;
+    var imageCount = 0;
+    
+    // Fonction pour appliquer la taille standard à une image
+    function applyStandardSize(img) {
+        if (standardImageSize && img) {
+            img.style.width = standardImageSize.width;
+            img.style.height = standardImageSize.height;
+            img.style.maxWidth = standardImageSize.width;
+            img.style.maxHeight = standardImageSize.height;
+        }
+    }
+    
+    // Fonction pour définir la taille standard à partir d'une image
+    function setStandardSizeFromImage(img) {
+        if (img && img.complete && img.naturalWidth > 0) {
+            // Calculer la taille en préservant le ratio, avec une largeur max de 800px
+            var maxWidth = 800;
+            var ratio = img.naturalWidth / img.naturalHeight;
+            var width = Math.min(img.naturalWidth, maxWidth);
+            var height = width / ratio;
+            
+            standardImageSize = {
+                width: width + 'px',
+                height: height + 'px'
+            };
+            
+            console.log('Taille standard définie:', standardImageSize);
+            
+            // Appliquer cette taille à toutes les images existantes
+            setTimeout(function() {
+                quill.root.querySelectorAll('img').forEach(function(existingImg) {
+                    if (existingImg !== img) {
+                        applyStandardSize(existingImg);
+                    }
+                });
+            }, 100);
+        }
+    }
 
     // Gestion de l'upload d'images
     var toolbar = quill.getModule('toolbar');
@@ -238,6 +367,9 @@ use Illuminate\Support\Facades\Storage;
                                 quill.insertEmbed(index, 'image', imageUrl);
                                 quill.setSelection(index + 1);
                                 
+                                // Compter les images
+                                imageCount++;
+                                
                                 // Vérifier que l'image s'est bien insérée
                                 setTimeout(function() {
                                     var insertedImages = quill.root.querySelectorAll('img[src="' + imageUrl + '"]');
@@ -252,6 +384,42 @@ use Illuminate\Support\Facades\Storage;
                                         });
                                     } else {
                                         console.log('Image insérée et trouvée dans l\'éditeur');
+                                        
+                                        var insertedImg = insertedImages[0];
+                                        
+                                        // Centrer automatiquement l'image
+                                        insertedImg.style.display = 'block';
+                                        insertedImg.style.marginLeft = 'auto';
+                                        insertedImg.style.marginRight = 'auto';
+                                        insertedImg.style.marginTop = '1em';
+                                        insertedImg.style.marginBottom = '1em';
+                                        insertedImg.style.float = '';
+                                        
+                                        // Synchroniser le contenu après insertion de l'image
+                                        setTimeout(function() {
+                                            syncContent();
+                                        }, 100);
+                                        
+                                        // Si c'est la deuxième image, définir la taille standard
+                                        if (imageCount === 2) {
+                                            insertedImg.onload = function() {
+                                                setStandardSizeFromImage(insertedImg);
+                                                // Recentrer après chargement
+                                                insertedImg.style.display = 'block';
+                                                insertedImg.style.marginLeft = 'auto';
+                                                insertedImg.style.marginRight = 'auto';
+                                                syncContent();
+                                            };
+                                            // Si l'image est déjà chargée
+                                            if (insertedImg.complete && insertedImg.naturalWidth > 0) {
+                                                setStandardSizeFromImage(insertedImg);
+                                                syncContent();
+                                            }
+                                        } else if (imageCount > 2 && standardImageSize) {
+                                            // Appliquer la taille standard aux images suivantes
+                                            applyStandardSize(insertedImg);
+                                            syncContent();
+                                        }
                                     }
                                 }, 200);
                                 
@@ -293,11 +461,21 @@ use Illuminate\Support\Facades\Storage;
         };
     });
 
-    // Synchroniser le contenu avec le textarea caché avant la soumission
-    var form = document.querySelector('form');
-    form.addEventListener('submit', function(e) {
+    // Synchroniser le contenu avec le textarea caché en temps réel
+    function syncContent() {
         var content = quill.root.innerHTML;
         document.querySelector('#content-hidden').value = content;
+    }
+    
+    // Écouter tous les changements dans Quill pour synchroniser automatiquement
+    quill.on('text-change', function() {
+        syncContent();
+    });
+    
+    // Synchroniser aussi avant la soumission du formulaire
+    var form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        syncContent();
     });
 
     // Charger le contenu existant si présent et convertir les URLs d'images relatives en absolues
@@ -319,6 +497,40 @@ use Illuminate\Support\Facades\Storage;
         });
         quill.root.innerHTML = tempDiv.innerHTML;
         
+        // Centrer toutes les images existantes et définir la taille standard
+        setTimeout(function() {
+            var images = quill.root.querySelectorAll('img');
+            images.forEach(function(img) {
+                img.style.display = 'block';
+                img.style.marginLeft = 'auto';
+                img.style.marginRight = 'auto';
+                img.style.marginTop = '1em';
+                img.style.marginBottom = '1em';
+                img.style.float = '';
+                img.classList.remove('ql-align-left', 'ql-align-right');
+                img.classList.add('ql-align-center');
+            });
+            
+            imageCount = images.length;
+            
+            // Si on a au moins 2 images, définir la taille standard à partir de la deuxième
+            if (images.length >= 2) {
+                var secondImage = images[1];
+                secondImage.onload = function() {
+                    setStandardSizeFromImage(secondImage);
+                };
+                // Si l'image est déjà chargée
+                if (secondImage.complete && secondImage.naturalWidth > 0) {
+                    setStandardSizeFromImage(secondImage);
+                } else {
+                    // Attendre que l'image se charge
+                    secondImage.addEventListener('load', function() {
+                        setStandardSizeFromImage(secondImage);
+                    });
+                }
+            }
+        }, 300);
+        
         // Forcer le rechargement des images après un court délai
         setTimeout(function() {
             var images = quill.root.querySelectorAll('img');
@@ -333,5 +545,311 @@ use Illuminate\Support\Facades\Storage;
             });
         }, 200);
     }
+    
+    // Système d'alignement des images
+    var imageAlignMenu = null;
+    var selectedImageForAlign = null;
+    
+    // Créer le menu d'alignement
+    function createAlignMenu() {
+        if (imageAlignMenu) return imageAlignMenu;
+        
+        var menu = document.createElement('div');
+        menu.className = 'image-align-menu';
+        menu.innerHTML = `
+            <button data-align="left" title="Aligner à gauche">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="12" x2="15" y2="12"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+            <button data-align="center" title="Centrer">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="6" y1="12" x2="18" y2="12"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+            <button data-align="right" title="Aligner à droite">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="9" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+        `;
+        document.body.appendChild(menu);
+        
+        // Ajouter les gestionnaires d'événements
+        menu.querySelectorAll('button').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var align = this.dataset.align;
+                alignImage(selectedImageForAlign, align);
+                hideAlignMenu();
+            });
+        });
+        
+        return menu;
+    }
+    
+    // Afficher le menu d'alignement
+    function showAlignMenu(img, x, y) {
+        selectedImageForAlign = img;
+        if (!imageAlignMenu) {
+            imageAlignMenu = createAlignMenu();
+        }
+        
+        // Positionner le menu
+        imageAlignMenu.style.left = x + 'px';
+        imageAlignMenu.style.top = (y - 50) + 'px';
+        imageAlignMenu.classList.add('show');
+        
+        // Mettre à jour l'état actif des boutons
+        var currentAlign = getImageAlign(img);
+        imageAlignMenu.querySelectorAll('button').forEach(function(btn) {
+            if (btn.dataset.align === currentAlign) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+    }
+    
+    // Cacher le menu d'alignement
+    function hideAlignMenu() {
+        if (imageAlignMenu) {
+            imageAlignMenu.classList.remove('show');
+            selectedImageForAlign = null;
+        }
+    }
+    
+    // Obtenir l'alignement actuel d'une image
+    function getImageAlign(img) {
+        var style = img.style.cssText || '';
+        if (style.includes('float: left') || img.style.float === 'left') {
+            return 'left';
+        } else if (style.includes('float: right') || img.style.float === 'right') {
+            return 'right';
+        } else if (style.includes('margin-left: auto') || style.includes('margin: 0 auto') || img.classList.contains('ql-align-center')) {
+            return 'center';
+        }
+        return 'center'; // Par défaut centré
+    }
+    
+    // Aligner une image - Toujours centrer
+    function alignImage(img, align) {
+        if (!img) return;
+        
+        // Toujours centrer l'image, peu importe le choix
+        img.style.float = '';
+        img.style.marginLeft = 'auto';
+        img.style.marginRight = 'auto';
+        img.style.display = 'block';
+        img.style.marginTop = '1em';
+        img.style.marginBottom = '1em';
+        img.classList.remove('ql-align-center', 'ql-align-left', 'ql-align-right');
+        img.classList.add('ql-align-center');
+        
+        // Mettre à jour le contenu Quill
+        updateQuillContent();
+    }
+    
+    // Fonction pour centrer automatiquement toutes les images
+    function centerAllImages() {
+        quill.root.querySelectorAll('img').forEach(function(img) {
+            img.style.float = '';
+            img.style.marginLeft = 'auto';
+            img.style.marginRight = 'auto';
+            img.style.display = 'block';
+            img.style.marginTop = '1em';
+            img.style.marginBottom = '1em';
+            img.classList.remove('ql-align-left', 'ql-align-right');
+            img.classList.add('ql-align-center');
+        });
+        updateQuillContent();
+    }
+    
+    // Fonction pour supprimer une image
+    function deleteImage(img) {
+        if (!img) return;
+        
+        if (confirm('Êtes-vous sûr de vouloir supprimer cette image ?')) {
+            // Supprimer l'image du DOM
+            if (img.parentNode) {
+                img.parentNode.removeChild(img);
+            } else {
+                img.remove();
+            }
+            
+            // Mettre à jour le contenu Quill
+            syncContent();
+        }
+    }
+    
+    // Mettre à jour le contenu Quill
+    function updateQuillContent() {
+        syncContent();
+    }
+    
+    // Système de déplacement d'images avec la souris
+    var isDraggingImage = false;
+    var draggedImage = null;
+    var dragStartX = 0;
+    var dragStartY = 0;
+    var imageStartX = 0;
+    var imageStartY = 0;
+    var placeholder = null;
+    
+    // Créer un placeholder pour indiquer où l'image sera déposée
+    function createPlaceholder() {
+        if (placeholder) return placeholder;
+        placeholder = document.createElement('div');
+        placeholder.style.border = '2px dashed #10b981';
+        placeholder.style.height = '50px';
+        placeholder.style.margin = '10px 0';
+        placeholder.style.borderRadius = '4px';
+        placeholder.style.backgroundColor = '#f0fdf4';
+        placeholder.style.display = 'none';
+        return placeholder;
+    }
+    
+    // Écouter les clics sur les images pour commencer le déplacement
+    quill.root.addEventListener('mousedown', function(e) {
+        if (e.target.tagName === 'IMG' && e.target.closest('.ql-editor')) {
+            // Si on clique sur le menu d'alignement, ne pas démarrer le drag
+            if (e.target.closest('.image-align-menu')) {
+                return;
+            }
+            
+            draggedImage = e.target;
+            isDraggingImage = true;
+            draggedImage.classList.add('dragging');
+            
+            var rect = draggedImage.getBoundingClientRect();
+            dragStartX = e.clientX;
+            dragStartY = e.clientY;
+            imageStartX = rect.left;
+            imageStartY = rect.top;
+            
+            // Créer le placeholder
+            placeholder = createPlaceholder();
+            placeholder.style.width = draggedImage.offsetWidth + 'px';
+            placeholder.style.height = draggedImage.offsetHeight + 'px';
+            
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    });
+    
+    // Gérer le mouvement de la souris pendant le drag
+    document.addEventListener('mousemove', function(e) {
+        if (!isDraggingImage || !draggedImage) return;
+        
+        var deltaX = e.clientX - dragStartX;
+        var deltaY = e.clientY - dragStartY;
+        
+        // Déplacer l'image visuellement
+        draggedImage.style.position = 'fixed';
+        draggedImage.style.left = (imageStartX + deltaX) + 'px';
+        draggedImage.style.top = (imageStartY + deltaY) + 'px';
+        draggedImage.style.zIndex = '10000';
+        draggedImage.style.pointerEvents = 'none';
+        
+        // Trouver la position d'insertion dans l'éditeur
+        var editorRect = quill.root.getBoundingClientRect();
+        var x = e.clientX - editorRect.left;
+        var y = e.clientY - editorRect.top;
+        
+        // Trouver le nœud le plus proche dans l'éditeur
+        var range = document.caretRangeFromPoint ? document.caretRangeFromPoint(e.clientX, e.clientY) : null;
+        if (range) {
+            var node = range.startContainer;
+            
+            // Trouver un élément parent approprié pour insérer le placeholder
+            while (node && node !== quill.root) {
+                if (node.nodeType === Node.ELEMENT_NODE) {
+                    var element = node;
+                    if (element.tagName !== 'IMG' && element !== draggedImage) {
+                        // Insérer le placeholder avant cet élément
+                        if (!placeholder.parentNode) {
+                            element.parentNode.insertBefore(placeholder, element);
+                        } else if (placeholder.nextSibling !== element) {
+                            element.parentNode.insertBefore(placeholder, element);
+                        }
+                        placeholder.style.display = 'block';
+                        break;
+                    }
+                }
+                node = node.parentNode;
+            }
+        }
+    });
+    
+    // Gérer la fin du drag
+    document.addEventListener('mouseup', function(e) {
+        if (!isDraggingImage || !draggedImage) return;
+        
+        isDraggingImage = false;
+        draggedImage.classList.remove('dragging');
+        
+        // Restaurer le style de l'image
+        draggedImage.style.position = '';
+        draggedImage.style.left = '';
+        draggedImage.style.top = '';
+        draggedImage.style.zIndex = '';
+        draggedImage.style.pointerEvents = '';
+        
+        // Si un placeholder existe, déplacer l'image à sa position
+        if (placeholder && placeholder.parentNode) {
+            placeholder.parentNode.insertBefore(draggedImage, placeholder);
+            placeholder.parentNode.removeChild(placeholder);
+            placeholder.style.display = 'none';
+        }
+        
+        // Recentrer l'image après déplacement
+        if (draggedImage) {
+            draggedImage.style.float = '';
+            draggedImage.style.marginLeft = 'auto';
+            draggedImage.style.marginRight = 'auto';
+            draggedImage.style.display = 'block';
+            draggedImage.style.marginTop = '1em';
+            draggedImage.style.marginBottom = '1em';
+        }
+        
+        // Mettre à jour le contenu Quill
+        updateQuillContent();
+        
+        draggedImage = null;
+    });
+    
+    // Écouter les clics simples sur les images pour afficher le menu d'alignement
+    var clickTimer = null;
+    quill.root.addEventListener('click', function(e) {
+        if (e.target.tagName === 'IMG' && e.target.closest('.ql-editor')) {
+            // Si on vient de faire un drag, ne pas afficher le menu
+            if (clickTimer) {
+                clearTimeout(clickTimer);
+            }
+            
+            clickTimer = setTimeout(function() {
+                if (!isDraggingImage) {
+                    var rect = e.target.getBoundingClientRect();
+                    var x = rect.left + (rect.width / 2);
+                    var y = rect.top;
+                    showAlignMenu(e.target, x, y);
+                }
+            }, 200);
+        } else if (!e.target.closest('.image-align-menu')) {
+            hideAlignMenu();
+        }
+    });
+    
+    // Fermer le menu en cliquant ailleurs
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.image-align-menu') && !e.target.closest('.ql-editor img')) {
+            hideAlignMenu();
+        }
+    });
 </script>
 @endsection

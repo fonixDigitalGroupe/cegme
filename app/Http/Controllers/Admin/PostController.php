@@ -102,6 +102,12 @@ class PostController extends Controller
             'tags' => ['nullable', 'array'],
             'tags.*' => ['exists:tags,id'],
         ]);
+        
+        // Vérifier que le contenu n'est pas vide (après nettoyage HTML)
+        $textContent = trim(strip_tags($validated['content']));
+        if (empty($textContent) || strlen($textContent) < 10) {
+            return back()->withErrors(['content' => 'Le contenu de l\'article doit contenir au moins quelques mots.'])->withInput();
+        }
 
         if ($request->hasFile('featured_image')) {
             $validated['featured_image'] = $request->file('featured_image')->store('posts', 'public');
@@ -168,6 +174,12 @@ class PostController extends Controller
             'tags' => ['nullable', 'array'],
             'tags.*' => ['exists:tags,id'],
         ]);
+        
+        // Vérifier que le contenu n'est pas vide (après nettoyage HTML)
+        $textContent = trim(strip_tags($validated['content']));
+        if (empty($textContent) || strlen($textContent) < 10) {
+            return back()->withErrors(['content' => 'Le contenu de l\'article doit contenir au moins quelques mots.'])->withInput();
+        }
 
         if ($request->hasFile('featured_image')) {
             if ($post->featured_image) {
