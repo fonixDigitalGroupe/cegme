@@ -42,8 +42,13 @@ class BlogController extends Controller
             });
         }
 
-        $posts = $query->paginate(12);
-        $categories = Category::withCount('posts')->get();
+        $posts = $query->paginate(12)->withQueryString();
+        
+        // Get categories with count of published posts only
+        $categories = Category::withCount(['posts' => function($q) {
+            $q->where('status', 'published')
+              ->whereNotNull('published_at');
+        }])->get();
 
         return view('blog', compact('posts', 'categories'));
     }

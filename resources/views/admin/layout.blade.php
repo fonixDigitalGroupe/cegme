@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Administration') - {{ config('app.name', 'Laravel') }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
@@ -207,7 +208,7 @@
     <header class="header">
         <div style="display: flex; align-items: center; justify-content: space-between;">
             <div style="display: flex; align-items: center; gap: 1rem;">
-                <img src="{{ asset('Image/logo_cegme.png') }}" alt="CEGME Logo" style="height: 48px; width: auto; object-fit: contain;">
+                <img src="{{ asset('Image/CEGME Logo.JPG') }}" alt="CEGME Logo" style="height: 48px; width: auto; object-fit: contain;">
                 <div>
                     <h1 style="font-size: 1.5rem; font-weight: 800; margin: 0; letter-spacing: -0.025em; background: linear-gradient(135deg, #10b981 0%, #059669 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2;">CEGME</h1>
                     <p style="font-size: 0.875rem; color: #64748b; margin: 0.25rem 0 0 0;">Géosciences • Mines • Environnement</p>
@@ -228,6 +229,13 @@
                     Utilisateurs
                 </a>
                 @endif
+                <span class="header-nav-separator"></span>
+                <a href="{{ route('home') }}" target="_blank" style="color: #2563eb;">
+                    <svg class="header-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                    </svg>
+                    Site public
+                </a>
                 <span class="header-nav-separator"></span>
                 <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
                     @csrf

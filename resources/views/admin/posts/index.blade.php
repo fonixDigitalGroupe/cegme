@@ -1,5 +1,9 @@
 @extends('admin.layout')
 
+@php
+use Illuminate\Support\Facades\Storage;
+@endphp
+
 @section('title', 'Gestion des articles')
 
 @section('content')
@@ -61,7 +65,8 @@
             <tr>
                 <td>
                     @if($post->featured_image)
-                        <img src="{{ asset('storage/' . $post->featured_image) }}" alt="{{ $post->title }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
+                        <img src="{{ asset('storage/' . $post->featured_image) }}" alt="{{ $post->title }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div style="display: none; width: 60px; height: 60px; background-color: #f3f4f6; border-radius: 4px; align-items: center; justify-content: center; color: #9ca3af; font-size: 0.75rem;">Erreur</div>
                     @else
                         <div style="width: 60px; height: 60px; background-color: #f3f4f6; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #9ca3af; font-size: 0.75rem;">
                             Pas d'image

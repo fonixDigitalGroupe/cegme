@@ -41,7 +41,7 @@
                     <nav class="py-4 flex items-center justify-between gap-4 flex-wrap">
                         <div class="flex items-center gap-4 flex-wrap" style="margin-left: -24px;">
                             <a href="/" class="flex items-center gap-3 shrink-0" style="text-decoration: none; color: inherit;">
-                                <img src="{{ asset('Image/logo_cegme.png') }}" alt="CEGME Logo" class="block h-16 w-auto" style="height: 64px; width: auto; object-fit: contain;">
+                                <img src="{{ asset('Image/CEGME Logo.JPG') }}" alt="CEGME Logo" class="block h-16 w-auto" style="height: 64px; width: auto; object-fit: contain;">
                                 <div class="flex flex-col" style="display: flex; flex-direction: column;">
                                     <span class="font-bold" style="font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #10b981 0%, #059669 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2;">CEGME</span>
                                     <span class="text-sm text-gray-600" style="font-size: 13px; color: rgb(75, 85, 99); line-height: 1.2; margin-top: 2px;">Géosciences • Mines • Environnement</span>
@@ -98,35 +98,78 @@
         </header>
 
         <!-- Hero Section - Article Header -->
-        <section class="relative w-full flex items-center justify-center overflow-hidden" style="min-height: 500px; padding-top: 100px; padding-bottom: 50px; background-color: rgb(245, 250, 248); position: relative;">
+        <section class="relative w-full flex items-center justify-center overflow-hidden" style="min-height: 60vh; padding-top: 100px; padding-bottom: 80px; background-color: rgb(245, 250, 248); position: relative;">
             @if($post->header_image ?? $post->featured_image)
                 <div class="absolute inset-0 z-0" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 0;">
-                    <img src="{{ asset('storage/' . ($post->header_image ?? $post->featured_image)) }}" alt="{{ $post->title }}" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.3;">
+                    <img src="{{ asset('storage/' . ($post->header_image ?? $post->featured_image)) }}" alt="{{ $post->title }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    <!-- Overlay sombre pour améliorer la lisibilité du texte -->
+                    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.6) 100%); z-index: 1;"></div>
                 </div>
             @endif
-            <div class="relative z-10 w-full max-w-4xl mx-auto px-4 text-center" style="position: relative; z-index: 10;">
-                <div style="margin-top: 80px; margin-bottom: 24px;">
-                    <a href="{{ route('blog.index') }}" style="color: rgb(55, 65, 81); text-decoration: none; font-size: 14px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+            <div class="relative z-10 w-full max-w-4xl mx-auto px-4" style="position: relative; z-index: 10; padding-left: 250px;">
+                <!-- Lien retour et Catégorie alignés à gauche avec le titre -->
+                <div style="margin-top: 80px; margin-bottom: 32px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+                    <a href="{{ route('blog.index') }}" style="color: rgb(255, 255, 255); text-decoration: none; font-size: 14px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; opacity: 0.9; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.9'">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
                             <polyline points="15 18 9 12 15 6"></polyline>
                         </svg>
                         Retour au blog
                     </a>
-                </div>
-                @if($post->category)
-                    <div style="display: inline-block; margin-bottom: 16px;">
-                        <span style="display: inline-block; padding: 6px 12px; background-color: rgb(31, 41, 55); color: rgb(255, 255, 255); border-radius: 4px; font-size: 13px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase;">
+                    @if($post->category)
+                        <span style="display: inline-block; padding: 8px 16px; background-color: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); color: rgb(255, 255, 255); border-radius: 6px; font-size: 13px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; border: 1px solid rgba(255, 255, 255, 0.3);">
                             {{ $post->category->name }}
                         </span>
-                    </div>
-                @endif
-                <h1 style="font-size: 48px; font-weight: 700; color: rgb(17, 24, 39); margin-bottom: 16px; line-height: 1.2; text-align: center;">
-                    {{ $post->title }}
-                </h1>
-                <div style="display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap; color: rgb(107, 114, 128); font-size: 14px; margin-top: 24px;">
-                    <span>{{ $post->published_at ? $post->published_at->format('d M Y') : $post->created_at->format('d M Y') }}</span>
-                    <span>•</span>
-                    <span>{{ $post->user->name ?? 'CEGME' }}</span>
+                    @endif
+                </div>
+                
+                <!-- Titre principal - aligné à gauche, deux lignes -->
+                <div style="margin-bottom: 24px;">
+                    @php
+                        // Diviser le titre en deux lignes si nécessaire
+                        $titleParts = explode(' dans les ', $post->title);
+                        if (count($titleParts) == 2) {
+                            $line1 = $titleParts[0];
+                            $line2 = 'dans les ' . $titleParts[1];
+                        } else {
+                            // Essayer avec une virgule
+                            $titleParts = explode(', ', $post->title);
+                            if (count($titleParts) == 2) {
+                                $line1 = $titleParts[0];
+                                $line2 = $titleParts[1];
+                            } else {
+                                // Diviser au milieu si le titre est long
+                                $words = explode(' ', $post->title);
+                                $midPoint = ceil(count($words) / 2);
+                                $line1 = implode(' ', array_slice($words, 0, $midPoint));
+                                $line2 = implode(' ', array_slice($words, $midPoint));
+                            }
+                        }
+                    @endphp
+                    <h1 style="font-size: clamp(28px, 4vw, 42px); font-weight: 800; color: rgb(255, 255, 255); line-height: 1.3; text-align: left; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); width: 100%; margin: 0;">
+                        <span style="display: block;">{{ $line1 }}</span>
+                        <span style="display: block;">{{ $line2 }}</span>
+                    </h1>
+                </div>
+                
+                <!-- Métadonnées (date et auteur) - alignées à gauche avec le titre -->
+                <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap; color: rgba(255, 255, 255, 0.95); font-size: 15px; margin-top: 24px; font-weight: 500;">
+                    <span style="display: inline-flex; align-items: center; gap: 6px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; opacity: 0.8;">
+                            <rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        {{ $post->published_at ? $post->published_at->format('d M Y') : $post->created_at->format('d M Y') }}
+                    </span>
+                    <span style="opacity: 0.6;">•</span>
+                    <span style="display: inline-flex; align-items: center; gap: 6px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; opacity: 0.8;">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        {{ $post->user->name ?? 'CEGME' }}
+                    </span>
                 </div>
             </div>
         </section>
@@ -148,11 +191,15 @@
                     <!-- Tags -->
                     @if($post->tags->count() > 0)
                         <div style="margin-top: 48px; padding-top: 32px; border-top: 1px solid rgb(229, 231, 235);">
-                            <h3 style="font-size: 14px; font-weight: 600; color: rgb(55, 65, 81); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px;">Mots-clés de l'article</h3>
+                            <h3 style="font-size: 14px; font-weight: 700; color: rgb(55, 65, 81); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px;">Tags</h3>
                             <div style="display: flex; flex-wrap: wrap; gap: 8px;">
                                 @foreach($post->tags as $tag)
-                                    <span style="display: inline-block; padding: 6px 12px; background-color: rgb(243, 244, 246); color: rgb(55, 65, 81); border: 1px solid rgb(229, 231, 235); border-radius: 4px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.3px;">
-                                        #{{ $tag->name }}
+                                    <span style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background-color: rgb(243, 244, 246); color: rgb(55, 65, 81); border: 1px solid rgb(229, 231, 235); border-radius: 4px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.3px;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;">
+                                            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                                            <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                                        </svg>
+                                        {{ $tag->name }}
                                     </span>
                                 @endforeach
                             </div>
@@ -163,25 +210,17 @@
                     <div style="margin-top: 48px; padding-top: 32px; border-top: 1px solid rgb(229, 231, 235);">
                         <h3 style="font-size: 14px; font-weight: 600; color: rgb(55, 65, 81); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px;">Partager cet article</h3>
                         <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(request()->fullUrl()) }}" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background-color: rgb(243, 244, 246); color: rgb(55, 65, 81); border: 1px solid rgb(229, 231, 235); border-radius: 4px; text-decoration: none; font-size: 14px; transition: all 0.2s;">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(request()->fullUrl()) }}" target="_blank" style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; background-color: #1877F2; color: rgb(255, 255, 255); border: none; border-radius: 4px; text-decoration: none; transition: all 0.2s;" onmouseover="this.style.backgroundColor='#166FE5'; this.style.transform='translateY(-1px)';" onmouseout="this.style.backgroundColor='#1877F2'; this.style.transform='translateY(0)';" title="Partager sur Facebook">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                                     <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
                                 </svg>
-                                Facebook
                             </a>
-                            <a href="https://twitter.com/intent/tweet?url={{ urlencode(request()->fullUrl()) }}&text={{ urlencode($post->title) }}" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background-color: rgb(243, 244, 246); color: rgb(55, 65, 81); border: 1px solid rgb(229, 231, 235); border-radius: 4px; text-decoration: none; font-size: 14px; transition: all 0.2s;">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path>
-                                </svg>
-                                Twitter
-                            </a>
-                            <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ urlencode(request()->fullUrl()) }}" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background-color: rgb(243, 244, 246); color: rgb(55, 65, 81); border: 1px solid rgb(229, 231, 235); border-radius: 4px; text-decoration: none; font-size: 14px; transition: all 0.2s;">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ urlencode(request()->fullUrl()) }}" target="_blank" style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; background-color: #0077B5; color: rgb(255, 255, 255); border: none; border-radius: 4px; text-decoration: none; transition: all 0.2s;" onmouseover="this.style.backgroundColor='#006399'; this.style.transform='translateY(-1px)';" onmouseout="this.style.backgroundColor='#0077B5'; this.style.transform='translateY(0)';" title="Partager sur LinkedIn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                                     <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
                                     <rect x="2" y="9" width="4" height="12"></rect>
                                     <circle cx="4" cy="4" r="2"></circle>
                                 </svg>
-                                LinkedIn
                             </a>
                         </div>
                     </div>
@@ -246,7 +285,7 @@
                     <!-- Company Info -->
                     <div>
                         <div class="flex items-center gap-3 mb-4" style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-                            <img src="{{ asset('Image/logo_cegme.png') }}" alt="CEGME Logo" class="block h-10 w-auto" style="height: 40px; width: auto; object-fit: contain;">
+                            <img src="{{ asset('Image/CEGME Logo.JPG') }}" alt="CEGME Logo" class="block h-10 w-auto" style="height: 40px; width: auto; object-fit: contain;">
                             <span class="text-xl font-bold" style="font-size: 20px; font-weight: 700; color: rgb(255, 255, 255);">CEGME</span>
                         </div>
                         <p class="text-white mb-4" style="font-size: 16px; color: rgb(255, 255, 255); margin-bottom: 16px; line-height: 26px;">

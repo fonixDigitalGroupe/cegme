@@ -55,6 +55,9 @@ Route::middleware(['auth', 'adminOrEditor'])->prefix('admin')->name('admin.')->g
     // Posts (Articles/Blog)
     Route::resource('posts', \App\Http\Controllers\Admin\PostController::class);
     
+    // Upload d'images pour l'éditeur
+    Route::post('/posts/upload-image', [\App\Http\Controllers\Admin\PostController::class, 'uploadImage'])->name('posts.upload-image');
+    
     // Categories
     Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
     

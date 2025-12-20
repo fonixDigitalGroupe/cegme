@@ -96,6 +96,7 @@ class PostController extends Controller
             'excerpt' => ['nullable', 'string', 'max:500'],
             'content' => ['required', 'string'],
             'featured_image' => ['nullable', 'image', 'max:2048'],
+            'header_image' => ['nullable', 'image', 'max:2048'],
             'status' => ['required', 'in:draft,published,archived'],
             'category_id' => ['nullable', 'exists:categories,id'],
             'tags' => ['nullable', 'array'],
@@ -104,6 +105,10 @@ class PostController extends Controller
 
         if ($request->hasFile('featured_image')) {
             $validated['featured_image'] = $request->file('featured_image')->store('posts', 'public');
+        }
+
+        if ($request->hasFile('header_image')) {
+            $validated['header_image'] = $request->file('header_image')->store('posts', 'public');
         }
 
         if (empty($validated['slug'])) {
@@ -157,6 +162,7 @@ class PostController extends Controller
             'excerpt' => ['nullable', 'string', 'max:500'],
             'content' => ['required', 'string'],
             'featured_image' => ['nullable', 'image', 'max:2048'],
+            'header_image' => ['nullable', 'image', 'max:2048'],
             'status' => ['required', 'in:draft,published,archived'],
             'category_id' => ['nullable', 'exists:categories,id'],
             'tags' => ['nullable', 'array'],
@@ -168,6 +174,13 @@ class PostController extends Controller
                 Storage::disk('public')->delete($post->featured_image);
             }
             $validated['featured_image'] = $request->file('featured_image')->store('posts', 'public');
+        }
+
+        if ($request->hasFile('header_image')) {
+            if ($post->header_image) {
+                Storage::disk('public')->delete($post->header_image);
+            }
+            $validated['header_image'] = $request->file('header_image')->store('posts', 'public');
         }
 
         if (empty($validated['slug'])) {
@@ -197,9 +210,103 @@ class PostController extends Controller
             Storage::disk('public')->delete($post->featured_image);
         }
 
+        if ($post->header_image) {
+            Storage::disk('public')->delete($post->header_image);
+        }
+
         $post->delete();
 
         return redirect()->route('admin.posts.index')
             ->with('success', 'Article supprimé avec succès.');
+    }
+
+    /**
+     * Upload image for editor content
+     */
+    public function uploadImage(Request $request)
+    {
+        try {
+            $request->validate([
+                'file' => 'required|image|max:5120', // Augmenté à 5MB
+            ]);
+
+            $path = $request->file('file')->store('posts/content', 'public');
+            
+            // Vérifier que le fichier existe
+            if (!Storage::disk('public')->exists($path)) {
+                return response()->json([
+                    'error' => 'Le fichier n\'a pas pu être sauvegardé',
+                    'success' => false
+                ], 500);
+            }
+            
+            // Utiliser asset() pour générer l'URL - plus simple et fiable
+            $url = asset('storage/' . $path);
+            
+            // S'assurer que c'est une URL absolue
+            if (!str_starts_with($url, 'http://') && !str_starts_with($url, 'https://')) {
+                $url = request()->getSchemeAndHttpHost() . '/' . ltrim($url, '/');
+            }
+
+            \Log::info('Image uploadée - Chemin: ' . $path . ', URL: ' . $url);
+
+            return response()->json([
+                'url' => $url,
+                'location' => $url,
+                'success' => true
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+                'success' => false
+            ], 500);
+        }
+    }
+    
+    public function serveImage($path)
+    {
+        try {
+            // Décoder le chemin URL (remplacer %2F par / et autres encodages)
+            $decodedPath = urldecode($path);
+            
+            // Nettoyer le chemin pour éviter les problèmes de sécurité
+            $decodedPath = str_replace('..', '', $decodedPath);
+            $decodedPath = ltrim($decodedPath, '/');
+            
+            \Log::info('Tentative de chargement image: ' . $decodedPath);
+            
+            // Vérifier que le fichier existe
+            if (!Storage::disk('public')->exists($decodedPath)) {
+                \Log::error('Image non trouvée: ' . $decodedPath);
+                // Essayer avec le chemin tel quel si le décodage ne fonctionne pas
+                if (!Storage::disk('public')->exists($path)) {
+                    abort(404, 'Image non trouvée');
+                }
+                $decodedPath = $path;
+            }
+            
+            $file = Storage::disk('public')->get($decodedPath);
+            $type = Storage::disk('public')->mimeType($decodedPath);
+            
+            if (!$type) {
+                // Déterminer le type MIME à partir de l'extension
+                $extension = pathinfo($decodedPath, PATHINFO_EXTENSION);
+                $mimeTypes = [
+                    'jpg' => 'image/jpeg',
+                    'jpeg' => 'image/jpeg',
+                    'png' => 'image/png',
+                    'gif' => 'image/gif',
+                    'webp' => 'image/webp',
+                ];
+                $type = $mimeTypes[strtolower($extension)] ?? 'image/jpeg';
+            }
+            
+            return response($file, 200)
+                ->header('Content-Type', $type)
+                ->header('Cache-Control', 'public, max-age=31536000');
+        } catch (\Exception $e) {
+            \Log::error('Erreur serveImage: ' . $e->getMessage() . ' - Chemin: ' . $path);
+            abort(404, 'Erreur lors du chargement de l\'image');
+        }
     }
 }
