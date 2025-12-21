@@ -26,6 +26,8 @@ Route::get('/actualites', function () {
 Route::get('/blog', [\App\Http\Controllers\BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{slug}', [\App\Http\Controllers\BlogController::class, 'show'])->name('blog.show');
 
+Route::get('/appels-offres', [\App\Http\Controllers\AppelOffreController::class, 'index'])->name('appels-offres.index');
+
 Route::get('/contact', function () {
     return view('contact');
 })->name('contact');
@@ -63,6 +65,10 @@ Route::middleware(['auth', 'adminOrEditor'])->prefix('admin')->name('admin.')->g
     
     // Tags
     Route::resource('tags', \App\Http\Controllers\Admin\TagController::class);
+    
+    // Configuration des appels d'offres
+    Route::resource('appel-offre-configs', \App\Http\Controllers\Admin\AppelOffreConfigController::class);
+    Route::post('appel-offre-configs/scrape', [\App\Http\Controllers\Admin\AppelOffreConfigController::class, 'scrape'])->name('appel-offre-configs.scrape');
 });
 
 // Admin Only Routes

@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Blog - {{ config('app.name', 'Laravel') }}</title>
+        <title>Nos offres - {{ config('app.name', 'Laravel') }}</title>
 
         <!-- Critical CSS to prevent white flash -->
         <style>
@@ -33,7 +33,7 @@
         <!-- Styles / Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="bg-white text-[#1b1b18] min-h-screen" x-data="{ activeFilter: 'all', searchQuery: '' }" style="background-color: #ffffff !important;">
+    <body class="bg-white text-[#1b1b18] min-h-screen" style="background-color: #ffffff !important;">
         <header class="w-full bg-white sticky top-0 z-50" style="position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000; background-color: rgb(255, 255, 255); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             @if (Route::has('login'))
@@ -103,19 +103,34 @@
         <section class="relative w-full flex items-center justify-center overflow-hidden" style="min-height: 45vh; padding: 60px 0; background: linear-gradient(135deg, rgb(15, 64, 62) 0%, rgb(10, 48, 46) 100%);">
             <div class="relative z-10 w-full max-w-4xl mx-auto px-4 text-center" style="margin-top: 60px;">
                 <h1 class="mb-6" style="font-size: 60px; font-weight: 700; color: rgb(255, 255, 255); margin-bottom: 24px; text-align: center; line-height: 72px;">
-                    Blog & Actualités
+                    Nos offres
                 </h1>
-                <p class="mx-auto max-w-3xl" style="font-size: 20px; color: rgb(229, 231, 235); text-align: center; line-height: 32.5px;">
-                    Découvrez nos dernières actualités, projets et expertises dans les domaines de l'environnement, des géosciences et des mines
+                <p class="mx-auto max-w-3xl" style="font-size: 20px; color: rgb(229, 231, 235); text-align: center; line-height: 32.5px; margin-bottom: 2rem;">
+                    Découvrez les opportunités d'appels d'offres récupérées automatiquement
                 </p>
+                <!-- Statistiques -->
+                <div style="display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; margin-top: 2rem;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 2.5rem; font-weight: 700; color: rgb(255, 255, 255); line-height: 1;">{{ $totalAppelsOffres }}</div>
+                        <div style="font-size: 0.875rem; color: rgb(229, 231, 235); margin-top: 0.5rem;">Appels d'offres</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 2.5rem; font-weight: 700; color: rgb(255, 255, 255); line-height: 1;">{{ $totalPublies }}</div>
+                        <div style="font-size: 0.875rem; color: rgb(229, 231, 235); margin-top: 0.5rem;">Publiés</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 2.5rem; font-weight: 700; color: rgb(255, 255, 255); line-height: 1;">{{ $sources->count() }}</div>
+                        <div style="font-size: 0.875rem; color: rgb(229, 231, 235); margin-top: 0.5rem;">Sources</div>
+                    </div>
+                </div>
             </div>
         </section>
 
         <!-- Search and Filters Section -->
         <section class="w-full bg-white px-4 sm:px-6 lg:px-8" style="padding: 48px 0;">
             <div class="max-w-7xl mx-auto">
-                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6" style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 24px;">
-                    <!-- Search Bar - Left -->
+                <form method="GET" action="{{ route('appels-offres.index') }}" class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6" style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 24px;">
+                    <!-- Search Bar -->
                     <div class="relative flex-1 md:flex-none" style="position: relative; flex: 1; min-width: 300px; max-width: 400px;">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" style="position: absolute; top: 0; bottom: 0; left: 0; padding-left: 12px; display: flex; align-items: center;">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px; color: rgb(156, 163, 175);">
@@ -123,146 +138,220 @@
                                 <path d="m21 21-4.35-4.35"></path>
                             </svg>
                         </div>
-                        <form method="GET" action="{{ route('blog.index') }}" class="w-full">
-                            <input
-                                type="text"
-                                name="search"
-                                value="{{ request()->get('search') }}"
-                                placeholder="Rechercher un article..."
-                                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                                style="width: 100%; padding-left: 40px; padding-right: 16px; padding-top: 8px; padding-bottom: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px; font-size: 14px;"
-                            >
-                            @if(request()->has('category'))
-                                <input type="hidden" name="category" value="{{ request()->get('category') }}">
-                            @endif
-                            @if(request()->has('tag'))
-                                <input type="hidden" name="tag" value="{{ request()->get('tag') }}">
-                            @endif
-                        </form>
+                        <input
+                            type="text"
+                            name="search"
+                            value="{{ request()->get('search') }}"
+                            placeholder="Rechercher par mot-clé..."
+                            class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                            style="width: 100%; padding-left: 40px; padding-right: 16px; padding-top: 8px; padding-bottom: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px; font-size: 14px;"
+                        >
                     </div>
 
-                    <!-- Filter Buttons - Right -->
-                    <div class="flex flex-wrap gap-3 justify-end" style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: flex-end;">
-                        <a href="{{ route('blog.index') }}" class="px-4 py-2 rounded-lg font-medium transition-colors {{ !request()->has('category') && !request()->has('tag') ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}" style="padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500; text-decoration: none; display: inline-block;">
-                            Tous
-                        </a>
-                        @foreach($categories as $category)
-                            @if($category->posts_count > 0)
-                                <a href="{{ route('blog.index', ['category' => $category->slug]) }}" class="px-4 py-2 rounded-lg font-medium transition-colors {{ request()->get('category') === $category->slug ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}" style="padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500; text-decoration: none; display: inline-block;">
-                                    {{ $category->name }}
-                                </a>
-                            @endif
-                        @endforeach
+                    <!-- Filters -->
+                    <div class="flex flex-wrap gap-3" style="display: flex; flex-wrap: wrap; gap: 12px;">
+                        <select name="source" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" style="padding: 8px 16px; border: 1px solid rgb(209, 213, 219); border-radius: 6px; font-size: 14px;">
+                            <option value="">Toutes les sources</option>
+                            @foreach($sources as $source)
+                                <option value="{{ $source }}" {{ request()->get('source') === $source ? 'selected' : '' }}>{{ $source }}</option>
+                            @endforeach
+                        </select>
+                        <select name="pays" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" style="padding: 8px 16px; border: 1px solid rgb(209, 213, 219); border-radius: 6px; font-size: 14px;">
+                            <option value="">Tous les pays</option>
+                            @foreach($pays as $paysItem)
+                                <option value="{{ $paysItem }}" {{ request()->get('pays') === $paysItem ? 'selected' : '' }}>{{ $paysItem }}</option>
+                            @endforeach
+                        </select>
+                        <input
+                            type="date"
+                            name="date_debut"
+                            value="{{ request()->get('date_debut') }}"
+                            placeholder="Date début"
+                            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                            style="padding: 8px 16px; border: 1px solid rgb(209, 213, 219); border-radius: 6px; font-size: 14px;"
+                        >
+                        <input
+                            type="date"
+                            name="date_fin"
+                            value="{{ request()->get('date_fin') }}"
+                            placeholder="Date fin"
+                            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                            style="padding: 8px 16px; border: 1px solid rgb(209, 213, 219); border-radius: 6px; font-size: 14px;"
+                        >
+                        <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors" style="padding: 8px 24px; background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); border-radius: 6px; font-size: 14px; font-weight: 500; border: none; cursor: pointer;">
+                            Rechercher
+                        </button>
+                        @if(request()->hasAny(['search', 'source', 'pays', 'date_debut', 'date_fin']))
+                            <a href="{{ route('appels-offres.index') }}" class="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors" style="padding: 8px 24px; background-color: rgb(243, 244, 246); color: rgb(55, 65, 81); border-radius: 6px; font-size: 14px; font-weight: 500; text-decoration: none; display: inline-block;">
+                                Réinitialiser
+                            </a>
+                        @endif
                     </div>
-                </div>
+                </form>
             </div>
         </section>
 
-        <!-- Articles Section -->
-        <section class="w-full bg-white px-4 sm:px-6 lg:px-8" style="padding: 0 0 96px 0;">
+        <!-- Statistiques par source -->
+        @if($totalParSource->count() > 0)
+        <section class="w-full bg-gray-50 px-4 sm:px-6 lg:px-8" style="padding: 32px 0;">
             <div class="max-w-7xl mx-auto">
-                @if($posts->count() > 0)
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px;">
-                        @foreach($posts as $post)
-                            <article class="bg-white rounded-2xl shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow" style="background-color: rgb(255, 255, 255); border-radius: 24px; padding: 0px; box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.1) 0px 4px 6px -4px; cursor: pointer;" onclick="window.location.href='{{ route('blog.show', $post->slug) }}'">
-                                <div class="relative" style="position: relative; border-radius: 24px; overflow: hidden;">
-                                    @if($post->featured_image)
-                                        <img src="{{ asset('storage/' . $post->featured_image) }}" alt="{{ $post->title }}" class="w-full h-48 object-cover" style="width: 100%; height: 240px; object-fit: cover;">
-                                    @else
-                                        <div class="w-full h-48 bg-gray-200" style="width: 100%; height: 240px; background-color: rgb(229, 231, 235);"></div>
-                                    @endif
-                                    @if($post->category)
-                                        <div class="absolute top-4 left-4 bg-gray-800 text-white px-3 py-1 rounded-full text-sm font-medium" style="position: absolute; top: 16px; left: 16px; background-color: rgb(31, 41, 55); color: rgb(255, 255, 255); padding: 4px 12px; border-radius: 9999px; font-size: 14px; font-weight: 500;">
-                                            {{ $post->category->name }}
-                                        </div>
-                                    @endif
+                <h2 style="font-size: 1.25rem; font-weight: 600; color: #1a1a1a; margin-bottom: 1.5rem; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">Répartition par source</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem;">
+                    @foreach($totalParSource as $stat)
+                    <div style="background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 6px; padding: 1rem; text-align: center;">
+                        <div style="font-size: 1.5rem; font-weight: 700; color: #059669; margin-bottom: 0.5rem;">{{ $stat->count }}</div>
+                        <div style="font-size: 0.875rem; color: #6b7280;">{{ $stat->source }}</div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+        @endif
+
+        <!-- Appels d'offres Section -->
+        <section class="w-full bg-white px-4 sm:px-6 lg:px-8" style="padding: 48px 0 96px 0;">
+            <div class="max-w-7xl mx-auto">
+                @if($appelsOffres->count() > 0)
+                    <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                        <p style="font-size: 0.875rem; color: #6b7280; margin: 0;">
+                            Affichage de <strong>{{ $appelsOffres->firstItem() }}</strong> à <strong>{{ $appelsOffres->lastItem() }}</strong> sur <strong>{{ $appelsOffres->total() }}</strong> appels d'offres
+                        </p>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem;">
+                        @foreach($appelsOffres as $appelOffre)
+                        <div style="background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0, 0, 0, 0.15)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.boxShadow='0 1px 3px rgba(0, 0, 0, 0.1)'; this.style.transform='translateY(0)';">
+                            <!-- Header avec source -->
+                            <div style="margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid #e5e7eb;">
+                                <p style="font-size: 0.75rem; color: #6b7280; margin: 0 0 0.5rem 0; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500;">{{ $appelOffre->source ?? 'Source non spécifiée' }}</p>
+                                @if($appelOffre->type_marche)
+                                <span style="display: inline-block; padding: 0.25rem 0.75rem; background-color: #eff6ff; color: #2563eb; border-radius: 4px; font-size: 0.75rem; font-weight: 500; margin-top: 0.5rem;">{{ $appelOffre->type_marche }}</span>
+                                @endif
+                            </div>
+
+                            <!-- Titre -->
+                            <h3 style="font-size: 1.125rem; font-weight: 600; color: #059669; margin: 0 0 1rem 0; line-height: 1.5; min-height: 3.375rem;">
+                                {{ $appelOffre->titre }}
+                            </h3>
+
+                            <!-- Description -->
+                            @if($appelOffre->description)
+                            <p style="font-size: 0.875rem; color: #6b7280; margin: 0 0 1rem 0; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                                {{ \Illuminate\Support\Str::limit($appelOffre->description, 150) }}
+                            </p>
+                            @endif
+
+                            <!-- Informations -->
+                            <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem;">
+                                @if($appelOffre->zone_geographique)
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #6b7280; flex-shrink: 0;">
+                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                        <circle cx="12" cy="10" r="3"></circle>
+                                    </svg>
+                                    <span style="font-size: 0.875rem; color: #374151;">{{ $appelOffre->zone_geographique }}</span>
                                 </div>
-                                <div class="p-6" style="padding: 24px;">
-                                    <h3 class="text-xl font-bold mb-3" style="font-size: 20px; font-weight: 700; color: rgb(17, 24, 39); margin-bottom: 12px; line-height: 28px;">
-                                        {{ $post->title }}
-                                    </h3>
-                                    @if($post->excerpt)
-                                        <p class="text-gray-600 mb-4" style="font-size: 16px; color: rgb(75, 85, 99); line-height: 26px; margin-bottom: 16px;">
-                                            {{ \Illuminate\Support\Str::limit($post->excerpt, 150) }}
-                                        </p>
-                                    @endif
-                                    <div class="flex items-center justify-between mb-4 text-sm text-gray-500" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; font-size: 14px; color: rgb(107, 114, 128);">
-                                        <div class="flex items-center gap-4" style="display: flex; align-items: center; gap: 16px;">
-                                            <div class="flex items-center gap-2" style="display: flex; align-items: center; gap: 8px;">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
-                                                    <rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect>
-                                                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                                                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                                                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                                                </svg>
-                                                <span>{{ $post->published_at ? $post->published_at->format('d M Y') : $post->created_at->format('d M Y') }}</span>
-                                            </div>
-                                            <div class="flex items-center gap-2" style="display: flex; align-items: center; gap: 8px;">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
-                                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                                    <circle cx="12" cy="7" r="4"></circle>
-                                                </svg>
-                                                <span>{{ $post->user->name ?? 'CEGME' }}</span>
-                                            </div>
-                                        </div>
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px; color: #10b981;">
-                                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                                            <polyline points="12 5 19 12 12 19"></polyline>
-                                        </svg>
-                                    </div>
-                                    @if($post->tags->count() > 0)
-                                        <div class="flex flex-wrap gap-2" style="display: flex; flex-wrap: wrap; gap: 8px;">
-                                            @foreach($post->tags->take(3) as $tag)
-                                                <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium flex items-center gap-1.5" style="padding: 4px 12px; background-color: rgb(243, 244, 246); color: rgb(55, 65, 81); border-radius: 9999px; font-size: 12px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px;">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;">
-                                                        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
-                                                        <line x1="7" y1="7" x2="7.01" y2="7"></line>
-                                                    </svg>
-                                                    {{ $tag->name }}
-                                                </span>
-                                            @endforeach
-                                        </div>
-                                    @endif
+                                @endif
+
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #6b7280; flex-shrink: 0;">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <polyline points="12 6 12 12 16 14"></polyline>
+                                    </svg>
+                                    <span style="font-size: 0.875rem; color: #374151;">
+                                        @if($isAuthenticated)
+                                            @if($appelOffre->date_limite)
+                                                Date limite : {{ $appelOffre->date_limite->format('d/m/Y') }}
+                                            @else
+                                                <span style="color: #9ca3af;">Date limite non spécifiée</span>
+                                            @endif
+                                        @else
+                                            <span style="color: #9ca3af;">Date limite : JJ/MM/AAAA</span>
+                                        @endif
+                                    </span>
                                 </div>
-                            </article>
+                            </div>
+
+                            <!-- Actions -->
+                            <div style="display: flex; gap: 0.75rem; align-items: center; padding-top: 1rem; border-top: 1px solid #e5e7eb;">
+                                @if($isAuthenticated && $appelOffre->lien_source)
+                                <a href="{{ $appelOffre->lien_source }}" target="_blank" rel="noopener noreferrer" style="flex: 1; padding: 0.625rem 1rem; background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white; border-radius: 6px; text-decoration: none; font-size: 0.875rem; font-weight: 500; text-align: center; transition: all 0.2s ease;" onmouseover="this.style.opacity='0.9';" onmouseout="this.style.opacity='1';">
+                                    Lire l'information
+                                </a>
+                                @else
+                                <div style="flex: 1; padding: 0.625rem 1rem; background-color: #f3f4f6; color: #9ca3af; border-radius: 6px; text-align: center; font-size: 0.875rem; font-weight: 500; cursor: not-allowed;">
+                                    [Lien]
+                                </div>
+                                @endif
+                            </div>
+
+                            <!-- Mots-clés -->
+                            @if($appelOffre->mots_cles)
+                            <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e5e7eb;">
+                                <p style="font-size: 0.75rem; color: #6b7280; margin: 0 0 0.5rem 0;">Mots-clés :</p>
+                                <div style="display: flex; flex-wrap: gap: 0.5rem;">
+                                    @foreach(explode(',', $appelOffre->mots_cles) as $motCle)
+                                    <span style="display: inline-block; padding: 0.25rem 0.5rem; background-color: #f3f4f6; color: #374151; border-radius: 4px; font-size: 0.75rem;">{{ trim($motCle) }}</span>
+                                    @endforeach
+                                </div>
+                            </div>
+                            @endif
+                        </div>
                         @endforeach
                     </div>
+                    
+                    @if(!$isAuthenticated)
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-6" style="background-color: rgb(254, 252, 232); border: 1px solid rgb(253, 230, 138); border-radius: 8px; padding: 16px; margin-top: 24px;">
+                            <div class="flex items-start gap-3" style="display: flex; align-items: flex-start; gap: 12px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px; color: rgb(217, 119, 6); flex-shrink: 0; margin-top: 2px;">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                </svg>
+                                <div style="flex: 1;">
+                                    <p class="text-yellow-800 font-medium mb-1" style="color: rgb(133, 77, 14); font-weight: 500; margin-bottom: 4px; font-size: 14px;">
+                                        Informations limitées
+                                    </p>
+                                    <p class="text-yellow-700 text-sm" style="color: rgb(161, 98, 7); font-size: 13px; line-height: 20px;">
+                                        Pour accéder aux informations complètes (Date Limite, Lien Source), veuillez vous <a href="{{ route('register') }}" class="underline font-semibold" style="text-decoration: underline; font-weight: 600; color: rgb(133, 77, 14);">inscrire</a> ou vous <a href="{{ route('login') }}" class="underline font-semibold" style="text-decoration: underline; font-weight: 600; color: rgb(133, 77, 14);">connecter</a>.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
 
                     <!-- Pagination -->
-                    @if($posts->hasPages())
+                    @if($appelsOffres->hasPages())
                         <div class="mt-12" style="margin-top: 48px;">
-                            {{ $posts->links() }}
+                            {{ $appelsOffres->links() }}
                         </div>
                     @endif
                 @else
                     <div class="text-center py-16" style="text-align: center; padding: 64px 0;">
-                        @if(request()->has('search') || request()->has('category') || request()->has('tag'))
+                        @if(request()->hasAny(['search', 'pays', 'date_debut', 'date_fin']))
                             <p style="font-size: 18px; color: rgb(107, 114, 128); margin-bottom: 16px;">
-                                Aucun article trouvé avec ces critères de recherche.
+                                Aucun appel d'offres trouvé avec ces critères de recherche.
                             </p>
-                            <a href="{{ route('blog.index') }}" style="display: inline-block; padding: 10px 20px; background-color: rgb(5, 150, 105); color: rgb(255, 255, 255); border-radius: 6px; text-decoration: none; font-weight: 500;">
-                                Voir tous les articles
+                            <a href="{{ route('appels-offres.index') }}" style="display: inline-block; padding: 10px 20px; background-color: rgb(5, 150, 105); color: rgb(255, 255, 255); border-radius: 6px; text-decoration: none; font-weight: 500;">
+                                Voir tous les appels d'offres
                             </a>
                         @else
-                        <p style="font-size: 18px; color: rgb(107, 114, 128);">Aucun article disponible pour le moment.</p>
+                            <p style="font-size: 18px; color: rgb(107, 114, 128);">Aucun appel d'offres disponible pour le moment.</p>
                         @endif
                     </div>
                 @endif
             </div>
         </section>
 
-        <!-- Footer - Exact from Site -->
+        <!-- Footer -->
         <footer class="w-full text-white px-4 sm:px-6 lg:px-8" style="background: linear-gradient(180deg, rgb(15, 64, 62) 0%, rgb(22, 78, 75) 50%, rgb(25, 85, 82) 100%); padding: 64px 0 32px; color: rgb(255, 255, 255);">
             <div class="max-w-7xl mx-auto" style="padding: 0px;">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-12" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 48px; margin-bottom: 32px; padding: 0px;">
                     <!-- Company Info -->
                     <div>
-                        <!-- Logo and Company Name -->
                         <div class="flex items-center gap-3 mb-4" style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
                             <img src="{{ asset('Image/CEGME Logo.JPG') }}" alt="CEGME Logo" class="block h-10 w-auto" style="height: 40px; width: auto; object-fit: contain;">
                             <span class="text-xl font-bold" style="font-size: 20px; font-weight: 700; color: rgb(255, 255, 255);">CEGME</span>
                         </div>
-                        <!-- Description -->
                         <p class="text-white mb-4" style="font-size: 16px; color: rgb(255, 255, 255); margin-bottom: 16px; line-height: 26px;">
                             Cabinet d'Études Géologiques, Minières et Environnementales
                         </p>

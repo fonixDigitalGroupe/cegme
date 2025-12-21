@@ -278,6 +278,9 @@
                 <a href="{{ route('admin.tags.index') }}" class="{{ request()->routeIs('admin.tags.*') ? 'active' : '' }}">
                     Tags
                 </a>
+                <a href="{{ route('admin.appel-offre-configs.index') }}" class="{{ request()->routeIs('admin.appel-offre-configs.*') ? 'active' : '' }}">
+                    Config Appels d'offres
+                </a>
                 @if(auth()->user()->isAdmin())
                 <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
                     Utilisateurs
