@@ -69,6 +69,15 @@ Route::middleware(['auth', 'adminOrEditor'])->prefix('admin')->name('admin.')->g
     // Configuration des appels d'offres
     Route::resource('appel-offre-configs', \App\Http\Controllers\Admin\AppelOffreConfigController::class);
     Route::post('appel-offre-configs/scrape', [\App\Http\Controllers\Admin\AppelOffreConfigController::class, 'scrape'])->name('appel-offre-configs.scrape');
+    
+    // Types de marché
+    Route::resource('type-marches', \App\Http\Controllers\Admin\TypeMarcheController::class);
+    
+    // Pôles d'activité
+    Route::resource('pole-activites', \App\Http\Controllers\Admin\PoleActiviteController::class);
+    
+    // Mots-clés
+    Route::resource('mots-cles', \App\Http\Controllers\Admin\MotCleController::class);
 });
 
 // Admin Only Routes

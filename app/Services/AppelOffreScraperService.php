@@ -12,11 +12,41 @@ use DOMXPath;
 class AppelOffreScraperService
 {
     /**
+     * Pays autorisés pour le scraping (utilisé comme fallback si zone_geographique n'est pas définie dans la config)
+     * Note: Les critères de recherche principaux viennent maintenant de la table appel_offre_configs
+     */
+    protected $allowedCountries = [
+        'Afrique',
+        'Cameroun',
+        'Congo',
+        'Gabon',
+        'Guinée',
+        'Guinée-Bissau',
+        'Guinée équatoriale',
+        'Guinée Equatoriale',
+        'République du Congo',
+        'République démocratique du Congo',
+        'RDC',
+        'RD Congo',
+        'République Centrafricaine',
+        'RCA',
+        'Tchad',
+        'Afrique centrale',
+        'Afrique de l\'Ouest',
+        'Afrique de l\'Est',
+        'Afrique subsaharienne',
+        'Central Africa',
+        'West Africa',
+        'East Africa',
+        'Sub-Saharan Africa',
+    ];
+
+    /**
      * Scrape les appels d'offres depuis toutes les configurations
      */
     public function scrapeAll()
     {
-        $configs = AppelOffreConfig::whereNotNull('site_officiel')->get();
+        $configs = AppelOffreConfig::with(['typeMarche', 'poleActivite'])->whereNotNull('site_officiel')->get();
         $totalScraped = 0;
 
         foreach ($configs as $config) {
@@ -264,6 +294,28 @@ class AppelOffreScraperService
                 // Valider les données avant de sauvegarder
                 if (empty($appelOffreData['titre']) || empty($appelOffreData['lien_source'])) {
                     Log::debug("Skipping invalid appel d'offres: missing titre or lien");
+                    continue;
+                }
+
+                // Utiliser la zone géographique de la config si elle est définie
+                if (!empty($config->zone_geographique) && empty($appelOffreData['zone_geographique'])) {
+                    $appelOffreData['zone_geographique'] = $config->zone_geographique;
+                }
+
+                // Utiliser le type de marché de la config si défini
+                if ($config->typeMarche && empty($appelOffreData['type_marche'])) {
+                    $appelOffreData['type_marche'] = $config->typeMarche->nom;
+                }
+
+                // Filtrer par zone géographique de la configuration (vérification optionnelle)
+                if (!empty($config->zone_geographique) && !$this->isAllowedCountry($appelOffreData, $config)) {
+                    Log::debug("Skipping appel d'offres - zone géographique not matching config: " . ($appelOffreData['zone_geographique'] ?? 'N/A') . " - " . $appelOffreData['titre']);
+                    continue;
+                }
+
+                // Filtrer par type de marché si spécifié dans la config (vérification optionnelle)
+                if ($config->typeMarche && !$this->matchesTypeMarche($appelOffreData, $config)) {
+                    Log::debug("Skipping appel d'offres - type de marché not matching config: " . ($appelOffreData['type_marche'] ?? 'N/A') . " - " . $appelOffreData['titre']);
                     continue;
                 }
 
@@ -769,7 +821,7 @@ class AppelOffreScraperService
         }
 
         // Extraire le type/thématique - AFD affiche les thématiques comme tags
-        $typeMarche = $config->type_marche;
+        $typeMarche = $config->typeMarche ? $config->typeMarche->nom : null;
         $typeNodes = $xpath->query('.//span[contains(@class, "category")] | .//div[contains(@class, "category")] | .//span[contains(@class, "tag")] | .//*[contains(@class, "thematic")]', $element);
         if ($typeNodes && $typeNodes->length > 0) {
             $types = [];
@@ -948,6 +1000,221 @@ class AppelOffreScraperService
         }
 
         return rtrim($base, '/') . '/' . ltrim($url, '/');
+    }
+
+    /**
+     * Vérifier si un appel d'offres concerne un pays autorisé selon la configuration
+     * Règle simple : Rechercher uniquement le(s) pays de la config dans le titre, description et zone géographique
+     */
+    protected function isAllowedCountry($appelOffreData, AppelOffreConfig $config)
+    {
+        // Si la config n'a pas de zone géographique spécifiée, rejeter
+        if (empty($config->zone_geographique)) {
+            Log::debug("No zone géographique in config, rejecting");
+            return false;
+        }
+
+        $configZone = $config->zone_geographique;
+        $zoneGeographique = $appelOffreData['zone_geographique'] ?? '';
+        $description = $appelOffreData['description'] ?? '';
+        $titre = $appelOffreData['titre'] ?? '';
+        
+        // Normaliser les textes (minuscules, sans accents pour comparaison)
+        $normalize = function($text) {
+            $text = mb_strtolower($text, 'UTF-8');
+            $text = str_replace(
+                ['é', 'è', 'ê', 'ë', 'à', 'â', 'ä', 'î', 'ï', 'ô', 'ö', 'ù', 'û', 'ü', 'ç'],
+                ['e', 'e', 'e', 'e', 'a', 'a', 'a', 'i', 'i', 'o', 'o', 'u', 'u', 'u', 'c'],
+                $text
+            );
+            return $text;
+        };
+        
+        // Combiner tous les textes de l'appel d'offres pour la recherche
+        $searchText = $normalize($zoneGeographique . ' ' . $description . ' ' . $titre);
+        
+        // Extraire tous les pays de la config (séparés par virgule)
+        $configPays = array_map('trim', explode(',', $configZone));
+        $configPays = array_filter($configPays, function($pays) {
+            return !empty($pays);
+        });
+        
+        // Si la config contient "Afrique" (mais pas "Afrique du Nord"), utiliser la liste des pays africains
+        $hasAfrique = false;
+        foreach ($configPays as $pays) {
+            if (stripos($pays, 'Afrique') !== false && stripos($pays, 'Afrique du Nord') === false) {
+                $hasAfrique = true;
+                // Ajouter tous les pays africains à la liste de recherche
+                $configPays = array_merge($configPays, $this->allowedCountries);
+                break;
+            }
+        }
+        
+        // Vérifier chaque pays de la config dans l'appel d'offres
+        // Si au moins un pays est trouvé, on accepte l'appel d'offres
+        foreach ($configPays as $pays) {
+            if (empty($pays)) continue;
+            
+            $paysNormalized = $normalize($pays);
+            
+            // Recherche exacte du pays dans le texte (mot entier)
+            if (preg_match('/\b' . preg_quote($paysNormalized, '/') . '\b/i', $searchText)) {
+                Log::debug("Pays match found: {$pays} in appel d'offres");
+                return true;
+            }
+            
+            // Gestion des variations de noms de pays
+            // Congo
+            if (stripos($pays, 'Congo') !== false) {
+                if (preg_match('/\b(congo|rdc|republique\s+du\s+congo|republique\s+democratique\s+du\s+congo)\b/i', $searchText)) {
+                    Log::debug("Congo variation match found: {$pays}");
+                    return true;
+                }
+            }
+            
+            // Guinée
+            if (stripos($pays, 'Guinée') !== false || stripos($pays, 'Guinee') !== false) {
+                if (preg_match('/\b(guinee|guinée|guinea)\b/i', $searchText)) {
+                    Log::debug("Guinée variation match found: {$pays}");
+                    return true;
+                }
+            }
+            
+            // Cameroun
+            if (stripos($pays, 'Cameroun') !== false) {
+                if (preg_match('/\b(cameroun|cameroon)\b/i', $searchText)) {
+                    Log::debug("Cameroun variation match found: {$pays}");
+                    return true;
+                }
+            }
+            
+            // Gabon
+            if (stripos($pays, 'Gabon') !== false) {
+                if (preg_match('/\b(gabon)\b/i', $searchText)) {
+                    Log::debug("Gabon variation match found: {$pays}");
+                    return true;
+                }
+            }
+        }
+        
+        // Si aucun pays de la config n'est trouvé, rejeter l'appel d'offres
+        // Vérifier aussi si le texte contient au moins un pays (même non configuré)
+        // Si aucun pays n'est mentionné du tout, rejeter
+        $allCountries = array_merge($this->allowedCountries, ['afrique', 'africa', 'europe', 'asie', 'amerique']);
+        $hasAnyCountry = false;
+        foreach ($allCountries as $country) {
+            $countryNormalized = $normalize($country);
+            if (preg_match('/\b' . preg_quote($countryNormalized, '/') . '\b/i', $searchText)) {
+                $hasAnyCountry = true;
+                break;
+            }
+        }
+        
+        // Si aucun pays n'est mentionné dans le texte, rejeter
+        if (!$hasAnyCountry) {
+            Log::debug("No country mentioned at all in appel d'offres, rejecting: " . substr($titre, 0, 80));
+            return false;
+        }
+        
+        // Si un pays est mentionné mais ce n'est pas un pays de la config, rejeter aussi
+        Log::debug("Country mentioned but not in config: config pays=" . implode(', ', array_unique($configPays)) . ", appel d'offres: " . substr($titre, 0, 80));
+        return false;
+    }
+
+    /**
+     * Fallback pour vérifier les pays autorisés (si pas de zone dans la config)
+     */
+    protected function isAllowedCountryFallback($appelOffreData)
+    {
+        $zoneGeographique = $appelOffreData['zone_geographique'] ?? '';
+        $description = $appelOffreData['description'] ?? '';
+        $titre = $appelOffreData['titre'] ?? '';
+        
+        // Normaliser les textes (minuscules, sans accents pour comparaison)
+        $normalize = function($text) {
+            $text = mb_strtolower($text, 'UTF-8');
+            $text = str_replace(
+                ['é', 'è', 'ê', 'ë', 'à', 'â', 'ä', 'î', 'ï', 'ô', 'ö', 'ù', 'û', 'ü', 'ç'],
+                ['e', 'e', 'e', 'e', 'a', 'a', 'a', 'i', 'i', 'o', 'o', 'u', 'u', 'u', 'c'],
+                $text
+            );
+            return $text;
+        };
+        
+        // Combiner tous les textes pour la recherche
+        $searchText = $normalize($zoneGeographique . ' ' . $description . ' ' . $titre);
+        
+        // Vérifier si le texte contient un des pays autorisés
+        foreach ($this->allowedCountries as $country) {
+            $countryNormalized = $normalize($country);
+            // Recherche exacte du mot (pour éviter les faux positifs)
+            if (preg_match('/\b' . preg_quote($countryNormalized, '/') . '\b/i', $searchText)) {
+                Log::debug("Country match found (fallback): {$country} in zone: {$zoneGeographique}");
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
+    /**
+     * Vérifier si un appel d'offres correspond au type de marché de la configuration
+     */
+    protected function matchesTypeMarche($appelOffreData, AppelOffreConfig $config)
+    {
+        // Si la config n'a pas de type de marché spécifié, accepter tous
+        if (empty($config->type_marche_id) || !$config->typeMarche) {
+            return true;
+        }
+
+        $configTypeMarche = $config->typeMarche->nom;
+        $appelOffreTypeMarche = $appelOffreData['type_marche'] ?? '';
+        $description = $appelOffreData['description'] ?? '';
+        $titre = $appelOffreData['titre'] ?? '';
+        
+        // Normaliser les textes (minuscules, sans accents pour comparaison)
+        $normalize = function($text) {
+            $text = mb_strtolower($text, 'UTF-8');
+            $text = str_replace(
+                ['é', 'è', 'ê', 'ë', 'à', 'â', 'ä', 'î', 'ï', 'ô', 'ö', 'ù', 'û', 'ü', 'ç'],
+                ['e', 'e', 'e', 'e', 'a', 'a', 'a', 'i', 'i', 'o', 'o', 'u', 'u', 'u', 'c'],
+                $text
+            );
+            return $text;
+        };
+        
+        // Normaliser le type de marché de la config
+        $configTypeNormalized = $normalize($configTypeMarche);
+        
+        // Combiner tous les textes pour la recherche
+        $searchText = $normalize($appelOffreTypeMarche . ' ' . $description . ' ' . $titre);
+        
+        // Recherche du type de marché dans le texte
+        if (preg_match('/\b' . preg_quote($configTypeNormalized, '/') . '\b/i', $searchText)) {
+            Log::debug("Type marché match found: {$configTypeMarche}");
+            return true;
+        }
+        
+        // Si le type de marché de l'appel d'offres correspond exactement
+        if (!empty($appelOffreTypeMarche)) {
+            $appelOffreTypeNormalized = $normalize($appelOffreTypeMarche);
+            if ($appelOffreTypeNormalized === $configTypeNormalized) {
+                Log::debug("Type marché exact match: {$configTypeMarche}");
+                return true;
+            }
+        }
+        
+        // Si aucun type n'est trouvé dans l'appel d'offres, accepter quand même
+        // (car certains sites ne spécifient pas clairement le type)
+        // On utilisera le type de la config
+        if (empty($appelOffreTypeMarche)) {
+            Log::debug("No type marché specified in appel d'offres, will use config type: {$configTypeMarche}");
+            return true;
+        }
+        
+        // Si on arrive ici, aucune correspondance n'a été trouvée
+        Log::debug("Type marché not matching: config={$configTypeMarche}, found={$appelOffreTypeMarche}");
+        return false;
     }
 
     /**

@@ -11,12 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('appel_offre_configs', function (Blueprint $table) {
+        Schema::create('type_marches', function (Blueprint $table) {
             $table->id();
-            $table->string('source_ptf'); // Source (PTF)
-            $table->string('type_marche')->nullable(); // Type de Marché
-            $table->string('zone_geographique')->nullable(); // Zone Géographique
-            $table->string('site_officiel'); // Site officiel
+            $table->string('nom');
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }
@@ -26,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('appel_offre_configs');
+        Schema::dropIfExists('type_marches');
     }
 };

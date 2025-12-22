@@ -58,13 +58,9 @@ class AppelOffreController extends Controller
         // Statistiques
         $totalAppelsOffres = AppelOffre::count();
         $totalPublies = AppelOffre::where('is_actif', true)->count();
-        $totalParSource = AppelOffre::selectRaw('source, COUNT(*) as count')
-            ->whereNotNull('source')
-            ->groupBy('source')
-            ->get();
 
         $isAuthenticated = auth()->check();
 
-        return view('appels-offres.index', compact('appelsOffres', 'pays', 'sources', 'totalAppelsOffres', 'totalPublies', 'totalParSource', 'isAuthenticated'));
+        return view('appels-offres.index', compact('appelsOffres', 'pays', 'sources', 'totalAppelsOffres', 'totalPublies', 'isAuthenticated'));
     }
 }

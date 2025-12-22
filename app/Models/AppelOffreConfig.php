@@ -11,8 +11,25 @@ class AppelOffreConfig extends Model
 
     protected $fillable = [
         'source_ptf',
-        'type_marche',
         'zone_geographique',
         'site_officiel',
+        'type_marche_id',
+        'pole_activite_id',
     ];
+
+    /**
+     * Le type de marché associé à cette configuration
+     */
+    public function typeMarche()
+    {
+        return $this->belongsTo(TypeMarche::class);
+    }
+
+    /**
+     * Le pôle d'activité associé à cette configuration
+     */
+    public function poleActivite()
+    {
+        return $this->belongsTo(PoleActivite::class);
+    }
 }

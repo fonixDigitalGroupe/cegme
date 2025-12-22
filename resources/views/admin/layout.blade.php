@@ -43,7 +43,7 @@
             padding: 0.5rem 0.875rem;
             border-radius: 3px;
             text-decoration: none;
-            font-size: 0.875rem;
+            font-size: 0.75rem;
             font-weight: 500;
             text-transform: uppercase;
             position: relative;
@@ -60,7 +60,7 @@
         .header-nav a.active,
         .header-nav button.active {
             color: #00C853;
-            background-color: rgba(0, 200, 83, 0.1);
+            background-color: transparent;
             font-weight: 600;
         }
         .header-nav-icon {
@@ -255,7 +255,83 @@
             background-color: #f3f4f6;
             cursor: not-allowed;
         }
+        
+        /* Dropdown Styles */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-toggle {
+            cursor: pointer;
+        }
+        .dropdown-arrow {
+            transition: transform 0.2s ease;
+        }
+        .dropdown.active .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            min-width: 200px;
+            z-index: 1000;
+            margin-top: 0.5rem;
+            padding: 0.5rem 0;
+        }
+        .dropdown.active .dropdown-menu {
+            display: block;
+        }
+        .dropdown-item {
+            display: block;
+            padding: 0.625rem 1rem;
+            color: #374151;
+            text-decoration: none;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            transition: background-color 0.2s ease;
+        }
+        .dropdown-item:hover {
+            background-color: #f9fafb;
+        }
+        .dropdown-item.active {
+            background-color: transparent;
+            color: #00C853;
+            font-weight: 600;
+        }
     </style>
+    <script>
+        function toggleDropdown(element) {
+            const dropdown = element.closest('.dropdown');
+            const isActive = dropdown.classList.contains('active');
+            
+            // Fermer tous les autres dropdowns
+            document.querySelectorAll('.dropdown').forEach(d => {
+                d.classList.remove('active');
+            });
+            
+            // Toggle le dropdown actuel
+            if (!isActive) {
+                dropdown.classList.add('active');
+            }
+        }
+        
+        // Fermer le dropdown quand on clique ailleurs
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.dropdown')) {
+                document.querySelectorAll('.dropdown').forEach(d => {
+                    d.classList.remove('active');
+                });
+            }
+        });
+    </script>
 </head>
 <body>
     <!-- Header -->
@@ -272,20 +348,39 @@
                 <a href="{{ route('admin.posts.index') }}" class="{{ request()->routeIs('admin.posts.*') ? 'active' : '' }}">
                     Articles
                 </a>
-                <a href="{{ route('admin.categories.index') }}" class="{{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
-                    Catégories
-                </a>
-                <a href="{{ route('admin.tags.index') }}" class="{{ request()->routeIs('admin.tags.*') ? 'active' : '' }}">
-                    Tags
-                </a>
                 <a href="{{ route('admin.appel-offre-configs.index') }}" class="{{ request()->routeIs('admin.appel-offre-configs.*') ? 'active' : '' }}">
-                    Config Appels d'offres
+                    Appels d'offres
                 </a>
                 @if(auth()->user()->isAdmin())
                 <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
                     Utilisateurs
                 </a>
                 @endif
+                <div class="dropdown {{ request()->routeIs('admin.type-marches.*') || request()->routeIs('admin.pole-activites.*') || request()->routeIs('admin.mots-cles.*') || request()->routeIs('admin.categories.*') || request()->routeIs('admin.tags.*') ? 'active' : '' }}">
+                    <a href="#" class="dropdown-toggle {{ request()->routeIs('admin.type-marches.*') || request()->routeIs('admin.pole-activites.*') || request()->routeIs('admin.mots-cles.*') || request()->routeIs('admin.categories.*') || request()->routeIs('admin.tags.*') ? 'active' : '' }}" onclick="event.preventDefault(); toggleDropdown(this);">
+                        Paramètres
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="dropdown-arrow">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </a>
+                    <div class="dropdown-menu">
+                        <a href="{{ route('admin.type-marches.index') }}" class="dropdown-item {{ request()->routeIs('admin.type-marches.*') ? 'active' : '' }}">
+                            Types de marché
+                        </a>
+                        <a href="{{ route('admin.pole-activites.index') }}" class="dropdown-item {{ request()->routeIs('admin.pole-activites.*') ? 'active' : '' }}">
+                            Pôles d'activité
+                        </a>
+                        <a href="{{ route('admin.mots-cles.index') }}" class="dropdown-item {{ request()->routeIs('admin.mots-cles.*') ? 'active' : '' }}">
+                            Mots-clés
+                        </a>
+                        <a href="{{ route('admin.categories.index') }}" class="dropdown-item {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
+                            Catégories
+                        </a>
+                        <a href="{{ route('admin.tags.index') }}" class="dropdown-item {{ request()->routeIs('admin.tags.*') ? 'active' : '' }}">
+                            Tags
+                        </a>
+                    </div>
+                </div>
                 <span class="header-nav-separator"></span>
                 <a href="{{ route('home') }}" target="_blank" style="color: #374151;">
                     <svg class="header-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

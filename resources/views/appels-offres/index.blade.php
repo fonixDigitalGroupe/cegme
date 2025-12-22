@@ -191,22 +191,6 @@
             </div>
         </section>
 
-        <!-- Statistiques par source -->
-        @if($totalParSource->count() > 0)
-        <section class="w-full bg-gray-50 px-4 sm:px-6 lg:px-8" style="padding: 32px 0;">
-            <div class="max-w-7xl mx-auto">
-                <h2 style="font-size: 1.25rem; font-weight: 600; color: #1a1a1a; margin-bottom: 1.5rem; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">Répartition par source</h2>
-                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem;">
-                    @foreach($totalParSource as $stat)
-                    <div style="background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 6px; padding: 1rem; text-align: center;">
-                        <div style="font-size: 1.5rem; font-weight: 700; color: #059669; margin-bottom: 0.5rem;">{{ $stat->count }}</div>
-                        <div style="font-size: 0.875rem; color: #6b7280;">{{ $stat->source }}</div>
-                    </div>
-                    @endforeach
-                </div>
-            </div>
-        </section>
-        @endif
 
         <!-- Appels d'offres Section -->
         <section class="w-full bg-white px-4 sm:px-6 lg:px-8" style="padding: 48px 0 96px 0;">
@@ -217,86 +201,93 @@
                             Affichage de <strong>{{ $appelsOffres->firstItem() }}</strong> à <strong>{{ $appelsOffres->lastItem() }}</strong> sur <strong>{{ $appelsOffres->total() }}</strong> appels d'offres
                         </p>
                     </div>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem;">
-                        @foreach($appelsOffres as $appelOffre)
-                        <div style="background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0, 0, 0, 0.15)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.boxShadow='0 1px 3px rgba(0, 0, 0, 0.1)'; this.style.transform='translateY(0)';">
-                            <!-- Header avec source -->
-                            <div style="margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid #e5e7eb;">
-                                <p style="font-size: 0.75rem; color: #6b7280; margin: 0 0 0.5rem 0; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500;">{{ $appelOffre->source ?? 'Source non spécifiée' }}</p>
-                                @if($appelOffre->type_marche)
-                                <span style="display: inline-block; padding: 0.25rem 0.75rem; background-color: #eff6ff; color: #2563eb; border-radius: 4px; font-size: 0.75rem; font-weight: 500; margin-top: 0.5rem;">{{ $appelOffre->type_marche }}</span>
-                                @endif
-                            </div>
-
-                            <!-- Titre -->
-                            <h3 style="font-size: 1.125rem; font-weight: 600; color: #059669; margin: 0 0 1rem 0; line-height: 1.5; min-height: 3.375rem;">
-                                {{ $appelOffre->titre }}
-                            </h3>
-
-                            <!-- Description -->
-                            @if($appelOffre->description)
-                            <p style="font-size: 0.875rem; color: #6b7280; margin: 0 0 1rem 0; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
-                                {{ \Illuminate\Support\Str::limit($appelOffre->description, 150) }}
-                            </p>
-                            @endif
-
-                            <!-- Informations -->
-                            <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem;">
-                                @if($appelOffre->zone_geographique)
-                                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #6b7280; flex-shrink: 0;">
-                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                                        <circle cx="12" cy="10" r="3"></circle>
-                                    </svg>
-                                    <span style="font-size: 0.875rem; color: #374151;">{{ $appelOffre->zone_geographique }}</span>
-                                </div>
-                                @endif
-
-                                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #6b7280; flex-shrink: 0;">
-                                        <circle cx="12" cy="12" r="10"></circle>
-                                        <polyline points="12 6 12 12 16 14"></polyline>
-                                    </svg>
-                                    <span style="font-size: 0.875rem; color: #374151;">
+                    
+                    <!-- Tableau des appels d'offres -->
+                    <div style="overflow-x: auto; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
+                        <table style="width: 100%; border-collapse: collapse; margin: 0;">
+                            <thead>
+                                <tr style="background-color: #f9fafb; border-bottom: 2px solid #e5e7eb;">
+                                    <th style="padding: 12px 16px; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151; border-right: 1px solid #e5e7eb; white-space: nowrap;">Source</th>
+                                    <th style="padding: 12px 16px; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151; border-right: 1px solid #e5e7eb; white-space: nowrap;">Type</th>
+                                    <th style="padding: 12px 16px; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151; border-right: 1px solid #e5e7eb;">Titre</th>
+                                    <th style="padding: 12px 16px; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151; border-right: 1px solid #e5e7eb; white-space: nowrap;">Zone</th>
+                                    <th style="padding: 12px 16px; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151; border-right: 1px solid #e5e7eb; white-space: nowrap;">Date limite</th>
+                                    <th style="padding: 12px 16px; text-align: center; font-size: 0.875rem; font-weight: 600; color: #374151; white-space: nowrap;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($appelsOffres as $appelOffre)
+                                <tr style="border-bottom: 1px solid #e5e7eb; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#f9fafb';" onmouseout="this.style.backgroundColor='#ffffff';">
+                                    <td style="padding: 16px; border-right: 1px solid #e5e7eb; font-size: 0.875rem; color: #6b7280; white-space: nowrap;">
+                                        {{ $appelOffre->source ?? '—' }}
+                                    </td>
+                                    <td style="padding: 16px; border-right: 1px solid #e5e7eb; font-size: 0.875rem; color: #374151;">
+                                        @if($appelOffre->type_marche)
+                                            <span style="display: inline-block; padding: 0.25rem 0.75rem; background-color: #eff6ff; color: #2563eb; border-radius: 4px; font-size: 0.75rem; font-weight: 500;">
+                                                {{ \Illuminate\Support\Str::limit($appelOffre->type_marche, 30) }}
+                                            </span>
+                                        @else
+                                            <span style="color: #9ca3af;">—</span>
+                                        @endif
+                                    </td>
+                                    <td style="padding: 16px; border-right: 1px solid #e5e7eb; font-size: 0.875rem; color: #1a1a1a; max-width: 400px;">
+                                        <div style="font-weight: 500; color: #059669; margin-bottom: 4px;">
+                                            {{ \Illuminate\Support\Str::limit($appelOffre->titre, 80) }}
+                                        </div>
+                                        @if($appelOffre->description)
+                                        <div style="font-size: 0.8125rem; color: #6b7280; margin-top: 4px; line-height: 1.4;">
+                                            {{ \Illuminate\Support\Str::limit($appelOffre->description, 100) }}
+                                        </div>
+                                        @endif
+                                        @if($appelOffre->mots_cles)
+                                        <div style="margin-top: 8px; display: flex; flex-wrap: gap: 0.375rem;">
+                                            @foreach(array_slice(explode(',', $appelOffre->mots_cles), 0, 3) as $motCle)
+                                            <span style="display: inline-block; padding: 0.125rem 0.5rem; background-color: #f3f4f6; color: #374151; border-radius: 3px; font-size: 0.6875rem;">
+                                                {{ trim($motCle) }}
+                                            </span>
+                                            @endforeach
+                                        </div>
+                                        @endif
+                                    </td>
+                                    <td style="padding: 16px; border-right: 1px solid #e5e7eb; font-size: 0.875rem; color: #374151; white-space: nowrap;">
+                                        {{ $appelOffre->zone_geographique ?? '—' }}
+                                    </td>
+                                    <td style="padding: 16px; border-right: 1px solid #e5e7eb; font-size: 0.875rem; color: #374151; white-space: nowrap;">
                                         @if($isAuthenticated)
                                             @if($appelOffre->date_limite)
-                                                Date limite : {{ $appelOffre->date_limite->format('d/m/Y') }}
+                                                <span style="color: #374151;">{{ $appelOffre->date_limite->format('d/m/Y') }}</span>
                                             @else
-                                                <span style="color: #9ca3af;">Date limite non spécifiée</span>
+                                                <span style="color: #9ca3af;">—</span>
                                             @endif
                                         @else
-                                            <span style="color: #9ca3af;">Date limite : JJ/MM/AAAA</span>
+                                            <span style="color: #9ca3af;">[Connectez-vous]</span>
                                         @endif
-                                    </span>
-                                </div>
-                            </div>
-
-                            <!-- Actions -->
-                            <div style="display: flex; gap: 0.75rem; align-items: center; padding-top: 1rem; border-top: 1px solid #e5e7eb;">
-                                @if($isAuthenticated && $appelOffre->lien_source)
-                                <a href="{{ $appelOffre->lien_source }}" target="_blank" rel="noopener noreferrer" style="flex: 1; padding: 0.625rem 1rem; background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white; border-radius: 6px; text-decoration: none; font-size: 0.875rem; font-weight: 500; text-align: center; transition: all 0.2s ease;" onmouseover="this.style.opacity='0.9';" onmouseout="this.style.opacity='1';">
-                                    Lire l'information
-                                </a>
-                                @else
-                                <div style="flex: 1; padding: 0.625rem 1rem; background-color: #f3f4f6; color: #9ca3af; border-radius: 6px; text-align: center; font-size: 0.875rem; font-weight: 500; cursor: not-allowed;">
-                                    [Lien]
-                                </div>
-                                @endif
-                            </div>
-
-                            <!-- Mots-clés -->
-                            @if($appelOffre->mots_cles)
-                            <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e5e7eb;">
-                                <p style="font-size: 0.75rem; color: #6b7280; margin: 0 0 0.5rem 0;">Mots-clés :</p>
-                                <div style="display: flex; flex-wrap: gap: 0.5rem;">
-                                    @foreach(explode(',', $appelOffre->mots_cles) as $motCle)
-                                    <span style="display: inline-block; padding: 0.25rem 0.5rem; background-color: #f3f4f6; color: #374151; border-radius: 4px; font-size: 0.75rem;">{{ trim($motCle) }}</span>
-                                    @endforeach
-                                </div>
-                            </div>
-                            @endif
-                        </div>
-                        @endforeach
+                                    </td>
+                                    <td style="padding: 16px; text-align: center;">
+                                        @if($isAuthenticated && $appelOffre->lien_source)
+                                        <a href="{{ $appelOffre->lien_source }}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white; border-radius: 6px; text-decoration: none; font-size: 0.8125rem; font-weight: 500; transition: all 0.2s ease;" onmouseover="this.style.opacity='0.9'; this.style.transform='scale(1.02)';" onmouseout="this.style.opacity='1'; this.style.transform='scale(1)';">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                                <polyline points="15 3 21 3 21 9"></polyline>
+                                                <line x1="10" y1="14" x2="21" y2="3"></line>
+                                            </svg>
+                                            Lire
+                                        </a>
+                                        @else
+                                        <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background-color: #f3f4f6; color: #9ca3af; border-radius: 6px; font-size: 0.8125rem; font-weight: 500; cursor: not-allowed;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <circle cx="12" cy="12" r="10"></circle>
+                                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                            </svg>
+                                            [Lien]
+                                        </div>
+                                        @endif
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
                     
                     @if(!$isAuthenticated)

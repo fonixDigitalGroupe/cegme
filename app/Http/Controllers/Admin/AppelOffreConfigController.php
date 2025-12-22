@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AppelOffreConfig;
+use App\Models\TypeMarche;
+use App\Models\PoleActivite;
 use Illuminate\Http\Request;
 
 class AppelOffreConfigController extends Controller
@@ -13,7 +15,7 @@ class AppelOffreConfigController extends Controller
      */
     public function index()
     {
-        $configs = AppelOffreConfig::orderBy('source_ptf')->paginate(15);
+        $configs = AppelOffreConfig::with(['typeMarche', 'poleActivite'])->orderBy('source_ptf')->paginate(15);
         return view('admin.appel-offre-configs.index', compact('configs'));
     }
 
@@ -22,7 +24,9 @@ class AppelOffreConfigController extends Controller
      */
     public function create()
     {
-        return view('admin.appel-offre-configs.create');
+        $typeMarches = TypeMarche::orderBy('nom')->get();
+        $poleActivites = PoleActivite::orderBy('nom')->get();
+        return view('admin.appel-offre-configs.create', compact('typeMarches', 'poleActivites'));
     }
 
     /**
@@ -32,7 +36,8 @@ class AppelOffreConfigController extends Controller
     {
         $validated = $request->validate([
             'source_ptf' => ['required', 'string', 'max:255'],
-            'type_marche' => ['nullable', 'string', 'max:255'],
+            'type_marche_id' => ['nullable', 'exists:type_marches,id'],
+            'pole_activite_id' => ['nullable', 'exists:pole_activites,id'],
             'zone_geographique' => ['nullable', 'string', 'max:255'],
             'site_officiel' => ['nullable', 'url', 'max:500'],
         ]);
@@ -56,7 +61,9 @@ class AppelOffreConfigController extends Controller
      */
     public function edit(AppelOffreConfig $appelOffreConfig)
     {
-        return view('admin.appel-offre-configs.edit', compact('appelOffreConfig'));
+        $typeMarches = TypeMarche::orderBy('nom')->get();
+        $poleActivites = PoleActivite::orderBy('nom')->get();
+        return view('admin.appel-offre-configs.edit', compact('appelOffreConfig', 'typeMarches', 'poleActivites'));
     }
 
     /**
@@ -66,7 +73,8 @@ class AppelOffreConfigController extends Controller
     {
         $validated = $request->validate([
             'source_ptf' => ['required', 'string', 'max:255'],
-            'type_marche' => ['nullable', 'string', 'max:255'],
+            'type_marche_id' => ['nullable', 'exists:type_marches,id'],
+            'pole_activite_id' => ['nullable', 'exists:pole_activites,id'],
             'zone_geographique' => ['nullable', 'string', 'max:255'],
             'site_officiel' => ['nullable', 'url', 'max:500'],
         ]);
