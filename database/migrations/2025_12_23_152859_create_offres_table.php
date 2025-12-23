@@ -11,14 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('appels_offres', function (Blueprint $table) {
+        // Supprimer la table si elle existe déjà
+        Schema::dropIfExists('offres');
+        
+        Schema::create('offres', function (Blueprint $table) {
             $table->id();
             $table->string('titre');
-            $table->string('acheteur')->nullable(); // Nom de l'institution
+            $table->string('acheteur')->nullable();
             $table->string('pays')->nullable();
             $table->date('date_limite_soumission')->nullable();
-            $table->text('lien_source')->nullable(); // URL de la source
-            $table->boolean('is_published')->default(false); // Pour publication automatique
+            $table->string('lien_source');
             $table->timestamps();
         });
     }
@@ -28,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('appels_offres');
+        Schema::dropIfExists('offres');
     }
 };

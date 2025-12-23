@@ -348,31 +348,19 @@
                 <a href="{{ route('admin.posts.index') }}" class="{{ request()->routeIs('admin.posts.*') ? 'active' : '' }}">
                     Articles
                 </a>
-                <a href="{{ route('admin.appel-offre-configs.index') }}" class="{{ request()->routeIs('admin.appel-offre-configs.*') ? 'active' : '' }}">
-                    Appels d'offres
-                </a>
                 @if(auth()->user()->isAdmin())
                 <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
                     Utilisateurs
                 </a>
                 @endif
-                <div class="dropdown {{ request()->routeIs('admin.type-marches.*') || request()->routeIs('admin.pole-activites.*') || request()->routeIs('admin.mots-cles.*') || request()->routeIs('admin.categories.*') || request()->routeIs('admin.tags.*') ? 'active' : '' }}">
-                    <a href="#" class="dropdown-toggle {{ request()->routeIs('admin.type-marches.*') || request()->routeIs('admin.pole-activites.*') || request()->routeIs('admin.mots-cles.*') || request()->routeIs('admin.categories.*') || request()->routeIs('admin.tags.*') ? 'active' : '' }}" onclick="event.preventDefault(); toggleDropdown(this);">
+                <div class="dropdown {{ request()->routeIs('admin.categories.*') || request()->routeIs('admin.tags.*') ? 'active' : '' }}">
+                    <a href="#" class="dropdown-toggle {{ request()->routeIs('admin.categories.*') || request()->routeIs('admin.tags.*') ? 'active' : '' }}" onclick="event.preventDefault(); toggleDropdown(this);">
                         Paramètres
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="dropdown-arrow">
                             <polyline points="6 9 12 15 18 9"></polyline>
                         </svg>
                     </a>
                     <div class="dropdown-menu">
-                        <a href="{{ route('admin.type-marches.index') }}" class="dropdown-item {{ request()->routeIs('admin.type-marches.*') ? 'active' : '' }}">
-                            Types de marché
-                        </a>
-                        <a href="{{ route('admin.pole-activites.index') }}" class="dropdown-item {{ request()->routeIs('admin.pole-activites.*') ? 'active' : '' }}">
-                            Pôles d'activité
-                        </a>
-                        <a href="{{ route('admin.mots-cles.index') }}" class="dropdown-item {{ request()->routeIs('admin.mots-cles.*') ? 'active' : '' }}">
-                            Mots-clés
-                        </a>
                         <a href="{{ route('admin.categories.index') }}" class="dropdown-item {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
                             Catégories
                         </a>
