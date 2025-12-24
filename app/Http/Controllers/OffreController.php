@@ -38,7 +38,7 @@ class OffreController extends Controller
             });
         }
 
-        $offres = $query->paginate(15)->withQueryString();
+        $offres = $query->paginate(12)->withQueryString();
 
         // Récupérer la liste des pays uniques pour le filtre
         // Extraire tous les pays individuels (même dans les chaînes multiples)

@@ -18,8 +18,58 @@
                 padding: 0;
                 background-color: #ffffff !important;
                 color: #1b1b18 !important;
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
                 min-height: 100vh;
+            }
+            .header {
+                background-color: #ffffff;
+                border-bottom: 1px solid #d1d5db;
+                padding: 1rem 2rem;
+                box-shadow: none;
+                position: sticky;
+                top: 0;
+                z-index: 100;
+            }
+            .header-nav {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                margin-left: 2rem;
+            }
+            .header-nav a,
+            .header-nav button {
+                color: #374151;
+                transition: all 0.15s ease;
+                display: flex;
+                align-items: center;
+                padding: 0.5rem 0.875rem;
+                border-radius: 3px;
+                text-decoration: none;
+                font-size: 0.75rem;
+                font-weight: 500;
+                text-transform: uppercase;
+                position: relative;
+                background: none;
+                border: none;
+                cursor: pointer;
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            }
+            .header-nav a:hover,
+            .header-nav button:hover {
+                color: #1a1a1a;
+                background-color: #f3f4f6;
+            }
+            .header-nav a.active,
+            .header-nav button.active {
+                color: #00C853;
+                background-color: transparent;
+                font-weight: 600;
+            }
+            .header-nav-separator {
+                width: 1px;
+                height: 20px;
+                background-color: #d1d5db;
+                margin: 0 0.5rem;
             }
             * {
                 box-sizing: border-box;
@@ -27,75 +77,49 @@
         </style>
 
         <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
         <!-- Styles / Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="bg-white text-[#1b1b18] min-h-screen" x-data="{ activeTab: 'environnement' }" style="background-color: #ffffff !important;">
-        <header class="w-full bg-white sticky top-0 z-50" style="position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000; background-color: rgb(255, 255, 255); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            @if (Route::has('login'))
-                    <nav class="py-4 flex items-center justify-between gap-4 flex-wrap">
-                        <div class="flex items-center gap-4 flex-wrap" style="margin-left: -24px;">
-                            <a href="/" class="flex items-center gap-3 shrink-0" style="text-decoration: none; color: inherit;">
-                                <img src="{{ asset('Image/CEGME Logo.JPG') }}" alt="CEGME Logo" class="block h-16 w-auto" style="height: 64px; width: auto; object-fit: contain;">
-                                <div class="flex flex-col" style="display: flex; flex-direction: column;">
-                                    <span class="font-bold" style="font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #10b981 0%, #059669 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2;">CEGME</span>
-                                    <span class="text-sm text-gray-600" style="font-size: 13px; color: rgb(75, 85, 99); line-height: 1.2; margin-top: 2px;">Géosciences • Mines • Environnement</span>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="flex items-center gap-4 flex-wrap" style="margin-right: -32px;">
-                            <a href="/" class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal transition-colors {{ request()->is('/') ? 'text-white bg-green-600' : 'hover:text-gray-700' }}" style="font-size: 16px; font-weight: 700; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; {{ request()->is('/') ? 'background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); border-radius: 6px;' : 'color: rgb(0, 0, 0); text-decoration: none;' }}">
-                                Accueil
-                            </a>
-                            <a href="/a-propos" class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal transition-colors {{ request()->is('a-propos') || request()->is('a-propos/*') ? 'text-white bg-green-600' : 'hover:text-gray-700' }}" style="font-size: 16px; font-weight: 700; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; {{ request()->is('a-propos') || request()->is('a-propos/*') ? 'background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); border-radius: 6px;' : 'color: rgb(0, 0, 0); text-decoration: none;' }}">
-                                À Propos
-                            </a>
-                            <span class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal" style="font-size: 16px; font-weight: 700; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: rgb(0, 0, 0); cursor: default; pointer-events: none;">
-                                Services
-                            </span>
-                            <a href="/realisations" class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal transition-colors {{ request()->is('realisations') || request()->is('realisations/*') ? 'text-white bg-green-600' : 'hover:text-gray-700' }}" style="font-size: 16px; font-weight: 700; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; {{ request()->is('realisations') || request()->is('realisations/*') ? 'background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); border-radius: 6px;' : 'color: rgb(0, 0, 0); text-decoration: none;' }}">
-                                Réalisations
-                            </a>
-                            <a href="/actualites" class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal transition-colors {{ request()->is('actualites') || request()->is('actualites/*') ? 'text-white bg-green-600' : 'hover:text-gray-700' }}" style="font-size: 16px; font-weight: 700; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; {{ request()->is('actualites') || request()->is('actualites/*') ? 'background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); border-radius: 6px;' : 'color: rgb(0, 0, 0); text-decoration: none;' }}">
-                                Actualités
-                            </a>
-                            <a href="{{ route('offres.index') }}" class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal transition-colors {{ request()->is('appels-offres') || request()->is('appels-offres/*') ? 'text-white bg-green-600' : 'hover:text-gray-700' }}" style="font-size: 16px; font-weight: 700; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; {{ request()->is('appels-offres') || request()->is('appels-offres/*') ? 'background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); border-radius: 6px;' : 'color: rgb(0, 0, 0); text-decoration: none;' }}">
-                                Appels d'offres
-                            </a>
-                            <span class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal" style="font-size: 16px; font-weight: 700; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: rgb(0, 0, 0); cursor: default; pointer-events: none;">
-                                Blog
-                            </span>
-                            <span class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal" style="font-size: 16px; font-weight: 700; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: rgb(0, 0, 0); cursor: default; pointer-events: none;">
-                                Contact
-                            </span>
+        <header class="header">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <img src="{{ asset('Image/CEGME Logo.JPG') }}" alt="CEGME Logo" style="height: 48px; width: auto; object-fit: contain;">
+                    <div>
+                        <h1 style="font-size: 1.25rem; font-weight: 700; margin: 0; letter-spacing: -0.02em; color: #00C853; line-height: 1.2; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">CEGME</h1>
+                        <p style="font-size: 0.75rem; color: #6b7280; margin: 0.125rem 0 0 0; font-weight: 400; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">Géosciences • Mines • Environnement</p>
+                    </div>
+                </div>
+                @if (Route::has('login'))
+                <nav class="header-nav">
+                    <a href="/" class="{{ request()->is('/') ? 'active' : '' }}">Accueil</a>
+                    <a href="/a-propos" class="{{ request()->is('a-propos') || request()->is('a-propos/*') ? 'active' : '' }}">À Propos</a>
+                    <a href="/services" class="{{ request()->is('services') || request()->is('services/*') ? 'active' : '' }}">Services</a>
+                    <a href="/realisations" class="{{ request()->is('realisations') || request()->is('realisations/*') ? 'active' : '' }}">Réalisations</a>
+                    <a href="/actualites" class="{{ request()->is('actualites') || request()->is('actualites/*') ? 'active' : '' }}">Actualités</a>
+                    <a href="{{ route('offres.index') }}" class="{{ request()->is('appels-offres') || request()->is('appels-offres/*') ? 'active' : '' }}">Appels d'offres</a>
+                    <a href="/blog" class="{{ request()->is('blog') || request()->is('blog/*') ? 'active' : '' }}">Blog</a>
+                    <span class="header-nav-separator"></span>
                     @auth
-                        <a
-                            href="{{ url('/dashboard') }}"
-                            class="inline-block px-5 py-1.5 text-black border border-gray-300 hover:border-gray-400 rounded-sm text-sm leading-normal"
-                        >
-                            Dashboard
-                        </a>
+                        <a href="{{ url('/dashboard') }}">Dashboard</a>
+                        <span class="header-nav-separator"></span>
+                        <form method="POST" action="{{ route('logout') }}" style="margin: 0; display: inline;">
+                            @csrf
+                            <button type="submit" style="color: #dc2626;" onmouseover="this.style.backgroundColor='#fee2e2'; this.style.color='#991b1b';" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#dc2626';">
+                                Déconnexion
+                            </button>
+                        </form>
                     @else
-                        <a
-                            href="{{ route('login') }}"
-                            class="inline-flex items-center justify-center gap-2 px-6 py-3 text-white font-medium transition-all duration-200 hover:opacity-90 rounded-full"
-                            style="background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); padding: 8px 20px; font-size: 16px; border-radius: 8px;"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
-                                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
-                                <polyline points="10 17 15 12 10 7"></polyline>
-                                <line x1="15" y1="12" x2="3" y2="12"></line>
-                            </svg>
-                            <span>Se connecter</span>
+                        <a href="{{ route('login') }}">
+                            Se connecter
                         </a>
                     @endauth
-                        </div>
                 </nav>
-            @endif
+                @endif
             </div>
         </header>
 
