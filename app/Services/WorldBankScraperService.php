@@ -27,6 +27,10 @@ class WorldBankScraperService
      */
     public function scrape(): array
     {
+        // Vider la base de données avant chaque scraping
+        $deletedCount = Offre::where('source', 'World Bank')->delete();
+        Log::info("World Bank Scraper: Base de données vidée", ['offres_supprimees' => $deletedCount]);
+        
         $totalCount = 0;
         $totalNoticesFound = 0;
         $totalExcluded = 0;
@@ -117,6 +121,8 @@ class WorldBankScraperService
                 'os' => $start, // Offset
                 'rows' => $rows, // Nombre de résultats
             ];
+            
+            // Note: L'API peut être instable, on essaie sans certains paramètres si nécessaire
             
             // Note: On ne peut pas filtrer par notice_type dans l'API, donc on filtre après récupération
             
@@ -342,13 +348,54 @@ class WorldBankScraperService
                 return null;
             }
             
-            // Lien: construire depuis l'ID de la notice
+            // STRATÉGIE DE LIEN WORLD BANK (MANDATORY)
+            // RÈGLE 1: Si project_id existe, utiliser le lien vers la page du projet (STABLE)
+            // RÈGLE 2: Sinon, utiliser le lien de recherche contextuelle (FALLBACK)
+            // INTERDIT: Ne JAMAIS utiliser /procurement/notice/{id} (404 garanti)
+            
+            $projectId = $doc['project_id'] ?? null;
             $lien = null;
-            if (isset($doc['id'])) {
-                // Construire l'URL de la notice depuis l'ID
-                $lien = 'https://projects.worldbank.org/en/projects-operations/procurement/notice/' . $doc['id'];
-            } elseif (isset($doc['project_id'])) {
-                $lien = 'https://projects.worldbank.org/en/projects-operations/project-detail/' . $doc['project_id'];
+            $linkType = null;
+            
+            if ($projectId) {
+                // PRIORITÉ 1: Lien vers la page du projet (STABLE)
+                $lien = 'https://projects.worldbank.org/en/projects-operations/project-detail/' . $projectId;
+                $linkType = 'project_detail';
+            } else {
+                // PRIORITÉ 2: Lien de recherche contextuelle (FALLBACK)
+                $baseUrl = 'https://projects.worldbank.org/en/projects-operations/procurement';
+                $params = [];
+                
+                // searchTerm = titre de la notice (obligatoire)
+                $params['searchTerm'] = $titre;
+                
+                // country = pays si disponible
+                if (isset($doc['project_ctry_name']) && !empty($doc['project_ctry_name'])) {
+                    $countries = is_array($doc['project_ctry_name'])
+                        ? $doc['project_ctry_name']
+                        : [$doc['project_ctry_name']];
+                    if (!empty($countries[0])) {
+                        $params['country'] = $countries[0];
+                    }
+                }
+                
+                // notice_type = type de notice si disponible
+                if (isset($doc['notice_type']) && !empty($doc['notice_type'])) {
+                    $noticeType = strtolower(trim($doc['notice_type']));
+                    if (stripos($noticeType, 'invitation for bid') !== false ||
+                        stripos($noticeType, 'invitation to bid') !== false) {
+                        $params['noticeType'] = 'Invitation for Bids';
+                    } elseif (stripos($noticeType, 'request for proposal') !== false) {
+                        $params['noticeType'] = 'Request for Proposals';
+                    } elseif (stripos($noticeType, 'request for expression') !== false) {
+                        $params['noticeType'] = 'Request for Expression of Interest';
+                    } elseif (stripos($noticeType, 'prequalification') !== false) {
+                        $params['noticeType'] = 'Invitation for Prequalification';
+                    }
+                }
+                
+                $lien = $baseUrl . '?' . http_build_query($params);
+                $linkType = 'search_context';
             }
             
             if (!$lien) {
@@ -359,7 +406,6 @@ class WorldBankScraperService
             $dateLimite = null;
             if (isset($doc['submission_deadline_date']) && !empty($doc['submission_deadline_date'])) {
                 try {
-                    // Format de date peut varier, essayer plusieurs formats
                     $dateStr = $doc['submission_deadline_date'];
                     if (preg_match('/^\d{4}-\d{2}-\d{2}/', $dateStr)) {
                         $dateLimite = substr($dateStr, 0, 10);
@@ -382,6 +428,8 @@ class WorldBankScraperService
             
             // Acheteur
             $acheteur = "World Bank";
+            
+            $noticeType = $doc['notice_type'] ?? null;
 
             return [
                 'titre' => $titre,
@@ -390,6 +438,10 @@ class WorldBankScraperService
                 'date_limite_soumission' => $dateLimite,
                 'lien_source' => $lien,
                 'source' => 'World Bank',
+                'project_id' => $projectId,
+                'link_type' => $linkType,
+                'detail_url' => null, // TOUJOURS NULL pour World Bank
+                'notice_type' => $noticeType,
             ];
 
         } catch (\Exception $e) {
