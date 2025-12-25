@@ -624,6 +624,7 @@ class AFDScraperService
                 'pays' => $pays,
                 'date_limite_soumission' => $dateLimite,
                 'lien_source' => $lien,
+                'source' => 'AFD',
             ];
 
         } catch (\Exception $e) {
