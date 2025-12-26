@@ -41,7 +41,7 @@ class WorldBankScraperService
 
         try {
             while ($start < 10000) { // Limite de sécurité (10,000 résultats max)
-                Log::info("World Bank Scraper: Fetching page {$page} (start={$start})");
+                Log::debug("World Bank Scraper: Fetching page {$page} (start={$start})");
                 
                 $result = $this->fetchApiPage($start, $rows);
                 $count = $result['count'];
@@ -60,13 +60,16 @@ class WorldBankScraperService
                     'excluded' => $excluded,
                 ];
                 
-                Log::info("World Bank Scraper: Page {$page} traitée", [
-                    'offres_trouvees' => $count,
-                    'notices_trouvees' => $noticesFound,
-                    'exclues' => $excluded,
-                    'total_accumule' => $totalCount,
-                    'start' => $start,
-                ]);
+                // Log seulement toutes les 10 pages pour réduire la charge
+                if ($page % 10 === 0 || $count > 0) {
+                    Log::info("World Bank Scraper: Page {$page} traitée", [
+                        'offres_trouvees' => $count,
+                        'notices_trouvees' => $noticesFound,
+                        'exclues' => $excluded,
+                        'total_accumule' => $totalCount,
+                        'start' => $start,
+                    ]);
+                }
                 
                 // Arrêter si aucune offre trouvée ou pas de suite
                 if ($count === 0 || !$hasMore) {
@@ -76,7 +79,7 @@ class WorldBankScraperService
                 
                 $start += $rows;
                 $page++;
-                usleep(500000); // 0.5 seconde entre les pages
+                usleep(100000); // Réduit à 0.1 seconde entre les pages
             }
 
         } catch (\Exception $e) {
@@ -128,7 +131,7 @@ class WorldBankScraperService
             
             $url = self::API_BASE_URL . '?' . http_build_query($params);
             
-            Log::info("World Bank Scraper: Fetching API", ['url' => $url]);
+            Log::debug("World Bank Scraper: Fetching API", ['url' => $url]);
             
             $response = Http::withoutVerifying()
                 ->timeout(30)
@@ -162,14 +165,10 @@ class WorldBankScraperService
             $excludedCount = 0;
             $exclusionReasons = [];
             $keptCount = 0;
-            
-            Log::info("World Bank Scraper: API response", [
-                'documents_count' => $totalNotices,
-                'total_found' => $totalFound,
-                'has_more' => $hasMore,
-            ]);
+            $passedFilterCount = 0;
 
-            // Traiter chaque document
+            // Traiter chaque document et collecter les offres valides
+            $validOffres = [];
             foreach ($documents as $doc) {
                 try {
                     // Vérifier d'abord si le type de notice est valide
@@ -182,48 +181,94 @@ class WorldBankScraperService
                             $exclusionReasons[$reason] = 0;
                         }
                         $exclusionReasons[$reason]++;
-                        Log::debug("World Bank Scraper: Notice excluded", [
-                            'id' => $doc['id'] ?? 'N/A',
-                            'notice_type' => $doc['notice_type'] ?? 'N/A',
-                            'reason' => $reason,
-                        ]);
                         continue;
                     }
+                    
+                    $passedFilterCount++;
                     
                     $offre = $this->extractOffreFromApiDocument($doc);
                     
                     if ($offre && !empty($offre['titre']) && !empty($offre['lien_source'])) {
-                        // Vérifier si l'offre existe déjà (par titre ou lien)
-                        $existing = Offre::where('lien_source', $offre['lien_source'])
-                            ->orWhere(function($q) use ($offre) {
-                                $q->where('titre', $offre['titre'])
-                                  ->where('source', 'World Bank');
-                            })
-                            ->first();
-                        
-                        if (!$existing) {
-                            Offre::create($offre);
-                            $count++;
-                        }
+                        $validOffres[] = $offre;
                         $keptCount++;
+                    } else {
+                        // Log pour debug si l'offre n'est pas valide
+                        Log::info('World Bank Scraper: Offre invalide', [
+                            'has_offre' => !is_null($offre),
+                            'has_titre' => !empty($offre['titre'] ?? null),
+                            'has_lien' => !empty($offre['lien_source'] ?? null),
+                            'project_name' => $doc['project_name'] ?? 'N/A',
+                            'project_id' => $doc['project_id'] ?? 'N/A',
+                            'notice_type' => $doc['notice_type'] ?? 'N/A',
+                            'titre_length' => strlen(trim($doc['project_name'] ?? $doc['notice_type'] ?? '')),
+                        ]);
                     }
                 } catch (\Exception $e) {
-                    Log::warning('World Bank Scraper: Error processing document', [
+                    Log::debug('World Bank Scraper: Error processing document', [
                         'error' => $e->getMessage(),
-                        'doc' => $doc,
                     ]);
                     continue;
                 }
             }
             
-            Log::info("World Bank Scraper: Filtering results for page", [
-                'page' => $start / $rows,
-                'total_notices' => $totalNotices,
-                'kept_and_saved' => $count,
-                'kept_total' => $keptCount,
-                'excluded' => $excludedCount,
-                'exclusion_reasons' => $exclusionReasons,
-            ]);
+            // Vérifier les offres existantes en batch (optimisation)
+            if (!empty($validOffres)) {
+                $liensSources = array_column($validOffres, 'lien_source');
+                $titres = array_column($validOffres, 'titre');
+                
+                // Récupérer toutes les offres existantes en une seule requête
+                $existingLiens = Offre::where('source', 'World Bank')
+                    ->whereIn('lien_source', $liensSources)
+                    ->pluck('lien_source')
+                    ->toArray();
+                
+                $existingTitres = Offre::where('source', 'World Bank')
+                    ->whereIn('titre', $titres)
+                    ->pluck('titre')
+                    ->toArray();
+                
+                // Filtrer les offres qui n'existent pas déjà
+                $newOffres = [];
+                foreach ($validOffres as $offre) {
+                    $exists = in_array($offre['lien_source'], $existingLiens) 
+                           || in_array($offre['titre'], $existingTitres);
+                    
+                    if (!$exists) {
+                        $newOffres[] = $offre;
+                    }
+                }
+                
+                // Insérer en batch (optimisation majeure)
+                if (!empty($newOffres)) {
+                    // Ajouter les timestamps pour l'insertion en batch
+                    $now = now();
+                    foreach ($newOffres as &$offre) {
+                        $offre['created_at'] = $now;
+                        $offre['updated_at'] = $now;
+                    }
+                    unset($offre);
+                    
+                    // Insérer par chunks pour éviter les problèmes de mémoire
+                    $chunks = array_chunk($newOffres, 50);
+                    foreach ($chunks as $chunk) {
+                        Offre::insert($chunk);
+                        $count += count($chunk);
+                    }
+                }
+            }
+            
+            // Log seulement si des offres ont été trouvées ou si c'est la première page
+            if ($count > 0 || ($start / $rows) === 0) {
+                Log::info("World Bank Scraper: Filtering results for page", [
+                    'page' => $start / $rows,
+                    'total_notices' => $totalNotices,
+                    'passed_filter' => $passedFilterCount,
+                    'kept_and_saved' => $count,
+                    'kept_total' => $keptCount,
+                    'excluded' => $excludedCount,
+                    'exclusion_reasons' => $exclusionReasons,
+                ]);
+            }
 
         } catch (\Exception $e) {
             Log::error('World Bank Scraper: Exception occurred while fetching API page', [
@@ -344,7 +389,7 @@ class WorldBankScraperService
             // Titre: utiliser project_name ou notice_type
             $titre = $doc['project_name'] ?? $doc['notice_type'] ?? null;
             
-            if (!$titre || strlen(trim($titre)) < 30) {
+            if (!$titre || strlen(trim($titre)) < 10) {
                 return null;
             }
             
@@ -666,7 +711,8 @@ class WorldBankScraperService
                 $items = $itemsArray;
             }
             
-            // Traiter chaque item
+            // Traiter chaque item et collecter les offres valides
+            $validOffres = [];
             foreach ($items as $item) {
                 try {
                     $offre = $this->extractOffreData($item, $xpath);
@@ -676,14 +722,6 @@ class WorldBankScraperService
                         if (isset($offre['pays']) && is_string($offre['pays'])) {
                             $offre['pays'] = trim($offre['pays']);
                         }
-                        
-                        // Vérifier si l'offre existe déjà (par titre ou lien)
-                        $existing = Offre::where('lien_source', $offre['lien_source'])
-                            ->orWhere(function($q) use ($offre) {
-                                $q->where('titre', $offre['titre'])
-                                  ->where('source', 'World Bank');
-                            })
-                            ->first();
                         
                         // Double vérification: ignorer les offres avec des titres suspects
                         $titreLower = strtolower($offre['titre']);
@@ -696,13 +734,58 @@ class WorldBankScraperService
                             }
                         }
                         
-                        if (!$existing && !$isExcluded) {
-                            Offre::create($offre);
-                            $count++;
+                        if (!$isExcluded) {
+                            $validOffres[] = $offre;
                         }
                     }
                 } catch (\Exception $e) {
                     continue;
+                }
+            }
+            
+            // Vérifier les offres existantes en batch (optimisation)
+            if (!empty($validOffres)) {
+                $liensSources = array_column($validOffres, 'lien_source');
+                $titres = array_column($validOffres, 'titre');
+                
+                // Récupérer toutes les offres existantes en une seule requête
+                $existingLiens = Offre::where('source', 'World Bank')
+                    ->whereIn('lien_source', $liensSources)
+                    ->pluck('lien_source')
+                    ->toArray();
+                
+                $existingTitres = Offre::where('source', 'World Bank')
+                    ->whereIn('titre', $titres)
+                    ->pluck('titre')
+                    ->toArray();
+                
+                // Filtrer les offres qui n'existent pas déjà
+                $newOffres = [];
+                foreach ($validOffres as $offre) {
+                    $exists = in_array($offre['lien_source'], $existingLiens) 
+                           || in_array($offre['titre'], $existingTitres);
+                    
+                    if (!$exists) {
+                        $newOffres[] = $offre;
+                    }
+                }
+                
+                // Insérer en batch (optimisation majeure)
+                if (!empty($newOffres)) {
+                    // Ajouter les timestamps pour l'insertion en batch
+                    $now = now();
+                    foreach ($newOffres as &$offre) {
+                        $offre['created_at'] = $now;
+                        $offre['updated_at'] = $now;
+                    }
+                    unset($offre);
+                    
+                    // Insérer par chunks pour éviter les problèmes de mémoire
+                    $chunks = array_chunk($newOffres, 50);
+                    foreach ($chunks as $chunk) {
+                        Offre::insert($chunk);
+                        $count += count($chunk);
+                    }
                 }
             }
 

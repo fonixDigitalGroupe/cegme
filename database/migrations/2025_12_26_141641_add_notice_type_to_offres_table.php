@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('offres', function (Blueprint $table) {
-            if (!Schema::hasColumn('offres', 'acheteur')) {
-                $table->string('acheteur')->nullable()->after('titre');
+            if (!Schema::hasColumn('offres', 'notice_type')) {
+                $table->string('notice_type')->nullable()->after('source');
             }
         });
     }
@@ -24,7 +24,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('offres', function (Blueprint $table) {
-            $table->dropColumn('acheteur');
+            if (Schema::hasColumn('offres', 'notice_type')) {
+                $table->dropColumn('notice_type');
+            }
         });
     }
 };
