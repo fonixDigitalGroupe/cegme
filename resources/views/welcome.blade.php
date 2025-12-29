@@ -78,14 +78,638 @@
                     display: none;
                 }
             }
+            
+            /* MOBILE ONLY STYLES - Ne pas affecter le desktop */
+            @media (max-width: 768px) {
+                /* Empêcher le débordement horizontal */
+                body {
+                    overflow-x: hidden !important;
+                    max-width: 100vw !important;
+                }
+                
+                * {
+                    max-width: 100% !important;
+                }
+                /* Masquer le menu desktop sur mobile */
+                .desktop-menu {
+                    display: none !important;
+                }
+                
+                /* Afficher le header mobile */
+                .mobile-header {
+                    display: flex !important;
+                }
+                
+                /* Afficher le bouton hamburger */
+                .mobile-menu-button {
+                    display: flex !important;
+                    visibility: visible !important;
+                    opacity: 1 !important;
+                }
+                
+                /* Menu mobile - masqué par défaut avec animation slide */
+                .mobile-menu {
+                    display: block;
+                    position: fixed;
+                    top: calc(3px + 64px);
+                    left: 0;
+                    right: 0;
+                    background-color: rgb(255, 255, 255);
+                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                    z-index: 999;
+                    max-height: calc(100vh - 67px);
+                    overflow-y: auto;
+                    border-top: 1px solid rgba(229, 231, 235, 0.5);
+                    transform: translateY(-100%);
+                    opacity: 0;
+                    transition: transform 0.3s ease, opacity 0.3s ease;
+                    pointer-events: none;
+                }
+                
+                .mobile-menu.active {
+                    transform: translateY(0);
+                    opacity: 1;
+                    pointer-events: auto;
+                }
+                
+                .mobile-menu a {
+                    display: block;
+                    padding: 16px 20px;
+                    color: rgb(55, 65, 81);
+                    text-decoration: none;
+                    font-size: 16px;
+                    font-weight: 600;
+                    border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+                    transition: background-color 0.2s ease;
+                }
+                
+                .mobile-menu a:hover,
+                .mobile-menu a:active {
+                    background-color: rgb(249, 250, 251);
+                }
+                
+                .mobile-menu a.active {
+                    background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%);
+                    color: rgb(255, 255, 255);
+                }
+                
+                /* Header mobile - logo centré */
+                .mobile-header {
+                    display: flex !important;
+                    align-items: center;
+                    justify-content: space-between;
+                    width: 100%;
+                    padding: 12px 16px;
+                    min-height: 64px;
+                    position: relative;
+                    z-index: 1000;
+                }
+                
+                .mobile-logo {
+                    flex: 1;
+                    display: flex;
+                    align-items: center;
+                    justify-content: flex-start;
+                    min-width: 0;
+                }
+                
+                .mobile-logo a {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    min-width: 0;
+                    flex: 1;
+                }
+                
+                .mobile-logo img {
+                    height: 40px !important;
+                    width: auto !important;
+                    flex-shrink: 0;
+                }
+                
+                .mobile-logo .flex.flex-col {
+                    min-width: 0;
+                    flex: 1;
+                }
+                
+                .mobile-logo span.font-bold {
+                    font-size: 16px !important;
+                    line-height: 1.2 !important;
+                }
+                
+                .mobile-logo .text-xs,
+                .mobile-logo .text-sm {
+                    font-size: 10px !important;
+                    line-height: 1.2 !important;
+                    margin-top: 2px !important;
+                }
+                
+                /* Bouton hamburger - VISIBLE ET FONCTIONNEL */
+                .mobile-menu-button {
+                    display: flex !important;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    width: 44px;
+                    height: 44px;
+                    background: transparent;
+                    border: 2px solid rgba(55, 65, 81, 0.2);
+                    border-radius: 8px;
+                    cursor: pointer;
+                    padding: 0;
+                    z-index: 1001;
+                    position: relative;
+                    visibility: visible !important;
+                    opacity: 1 !important;
+                    gap: 5px;
+                }
+                
+                .mobile-menu-button span {
+                    width: 24px;
+                    height: 3px;
+                    background-color: rgb(55, 65, 81);
+                    border-radius: 2px;
+                    transition: all 0.3s ease;
+                    display: block;
+                    position: relative;
+                }
+                
+                /* Améliorer la visibilité du bouton hamburger */
+                .mobile-menu-button:hover {
+                    border-color: rgb(5, 150, 105);
+                    background-color: rgba(5, 150, 105, 0.05);
+                }
+                
+                .mobile-menu-button:hover span {
+                    background-color: rgb(5, 150, 105);
+                }
+                
+                .mobile-menu-button:active span {
+                    background-color: rgb(5, 150, 105);
+                }
+                
+                .mobile-menu-button.active span:nth-child(1) {
+                    transform: rotate(45deg) translate(8px, 8px);
+                }
+                
+                .mobile-menu-button.active span:nth-child(2) {
+                    opacity: 0;
+                }
+                
+                .mobile-menu-button.active span:nth-child(3) {
+                    transform: rotate(-45deg) translate(8px, -8px);
+                }
+                
+                /* Masquer le bouton Se connecter du header sur mobile */
+                .desktop-login-button {
+                    display: none !important;
+                }
+                
+                /* Ajuster le padding du header */
+                header nav {
+                    padding: 12px 0 !important;
+                }
+                
+                /* Sections mobile - réduire les paddings */
+                section {
+                    padding-left: 16px !important;
+                    padding-right: 16px !important;
+                    padding-top: 40px !important;
+                    padding-bottom: 40px !important;
+                }
+                
+                /* Hero section mobile - Style selon image */
+                .hero-section {
+                    padding-top: 0 !important;
+                    padding-bottom: 0 !important;
+                    min-height: 100vh !important;
+                    position: relative !important;
+                    overflow: hidden !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                }
+                
+                /* Image de fond Hero mobile - Style selon site de référence */
+                .hero-section > div[style*="background: linear-gradient(to right bottom"] {
+                    position: absolute !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                    right: 0 !important;
+                    bottom: 0 !important;
+                    width: 100% !important;
+                    height: 100% !important;
+                }
+                
+                .hero-section img[alt="Bannière CEGME"] {
+                    width: 100% !important;
+                    height: 100% !important;
+                    object-fit: cover !important;
+                    object-position: center center !important;
+                    position: absolute !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                    z-index: 1 !important;
+                    opacity: 0.4 !important;
+                }
+                
+                /* Overlay gradient sur l'image */
+                .hero-section > div[style*="background: linear-gradient(to right bottom"] > div[style*="background: linear-gradient"] {
+                    position: absolute !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                    right: 0 !important;
+                    bottom: 0 !important;
+                    z-index: 2 !important;
+                }
+                
+                /* Conteneur de contenu - Centré selon image */
+                .hero-section > div[style*="padding-top: 120px"] {
+                    padding-top: 80px !important;
+                    padding-bottom: 60px !important;
+                    min-height: 100vh !important;
+                    position: relative !important;
+                    z-index: 10 !important;
+                    display: flex !important;
+                    flex-direction: column !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    text-align: center !important;
+                }
+                
+                /* Badge Hero mobile - Style selon image */
+                .hero-section .inline-block {
+                    padding: 8px 20px !important;
+                    font-size: 14px !important;
+                    margin-bottom: 20px !important;
+                    margin-top: 40px !important;
+                    background-color: rgba(16, 185, 129, 0.3) !important;
+                    border: 1px solid rgb(5, 150, 105) !important;
+                    border-radius: 9999px !important;
+                }
+                
+                .hero-section .inline-block p {
+                    font-size: 14px !important;
+                    line-height: 1.4 !important;
+                    color: rgb(110, 231, 183) !important;
+                    font-weight: 500 !important;
+                }
+                
+                /* Titre Hero mobile - Style selon image */
+                .hero-title {
+                    font-size: 44px !important;
+                    line-height: 52px !important;
+                    padding: 0 20px !important;
+                    margin-bottom: 24px !important;
+                    margin-top: 20px !important;
+                    font-weight: 700 !important;
+                }
+                
+                .hero-title span {
+                    display: block !important;
+                    margin-bottom: 4px !important;
+                }
+                
+                .hero-title span.text-white {
+                    font-size: 44px !important;
+                    line-height: 52px !important;
+                    color: #ffffff !important;
+                }
+                
+                .hero-title span[style*="color: rgb(20, 184, 166)"] {
+                    font-size: 44px !important;
+                    line-height: 52px !important;
+                    color: rgb(20, 184, 166) !important;
+                }
+                
+                /* Description Hero mobile - Style selon image */
+                .hero-description {
+                    font-size: 17px !important;
+                    line-height: 26px !important;
+                    padding: 0 20px !important;
+                    margin-bottom: 32px !important;
+                    margin-top: 0 !important;
+                    color: rgb(229, 231, 235) !important;
+                    max-width: 100% !important;
+                }
+                
+                /* Boutons Hero mobile - Style selon image */
+                .hero-buttons {
+                    flex-direction: column !important;
+                    gap: 14px !important;
+                    padding: 0 20px !important;
+                    margin-top: 0 !important;
+                    width: 100% !important;
+                    align-items: center !important;
+                }
+                
+                .hero-buttons a {
+                    width: 100% !important;
+                    max-width: 300px !important;
+                    padding: 14px 32px !important;
+                    font-size: 17px !important;
+                    text-align: center !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    min-height: 52px !important;
+                    border-radius: 9999px !important;
+                    background-color: rgb(5, 150, 105) !important;
+                    color: #ffffff !important;
+                    font-weight: 500 !important;
+                    gap: 10px !important;
+                }
+                
+                .hero-buttons span {
+                    width: 100% !important;
+                    max-width: 300px !important;
+                    padding: 14px 32px !important;
+                    font-size: 17px !important;
+                    text-align: center !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    min-height: 52px !important;
+                    border-radius: 9999px !important;
+                    background-color: rgba(55, 65, 81, 0.8) !important;
+                    border: 2px solid rgb(255, 255, 255) !important;
+                    color: #ffffff !important;
+                    font-weight: 500 !important;
+                }
+                
+                .hero-buttons a svg {
+                    width: 20px !important;
+                    height: 20px !important;
+                    stroke-width: 2.5 !important;
+                }
+                
+                /* Statistiques mobile */
+                .stats-grid,
+                .grid.grid-cols-1.md\\:grid-cols-4,
+                div[style*="grid-template-columns: repeat(4"] {
+                    grid-template-columns: 1fr !important;
+                    gap: 24px !important;
+                    padding: 0 16px !important;
+                }
+                
+                /* Statistiques - réduire taille des icônes et textes */
+                .stats-grid > div {
+                    padding: 20px !important;
+                }
+                
+                .stats-grid .text-4xl,
+                .stats-grid .text-5xl {
+                    font-size: 32px !important;
+                }
+                
+                .stats-grid .text-xl {
+                    font-size: 16px !important;
+                }
+                
+                /* Cartes mobile - empiler verticalement */
+                .card-grid,
+                .grid.grid-cols-1.md\\:grid-cols-2,
+                .grid.grid-cols-1.md\\:grid-cols-3 {
+                    grid-template-columns: 1fr !important;
+                    gap: 20px !important;
+                }
+                
+                /* Titres de sections mobile */
+                h2 {
+                    font-size: 28px !important;
+                    line-height: 36px !important;
+                    margin-bottom: 16px !important;
+                    padding: 0 16px !important;
+                }
+                
+                /* Textes descriptifs mobile */
+                p.text-lg,
+                p.text-xl {
+                    font-size: 16px !important;
+                    line-height: 24px !important;
+                    padding: 0 16px !important;
+                }
+                
+                /* Styles Hero déjà définis plus haut - suppression dupliqués */
+                
+                /* Badge Hero mobile */
+                .hero-section .inline-block {
+                    padding: 6px 16px !important;
+                    font-size: 14px !important;
+                    margin-bottom: 16px !important;
+                }
+                
+                /* Description Hero mobile */
+                .hero-description {
+                    font-size: 16px !important;
+                    line-height: 24px !important;
+                    padding: 0 16px !important;
+                    margin-bottom: 24px !important;
+                }
+                
+                /* Images mobile */
+                img {
+                    max-width: 100% !important;
+                    height: auto !important;
+                }
+                
+                /* Boutons mobile - taille tactile */
+                button,
+                a[class*="button"],
+                a[class*="btn"] {
+                    min-height: 44px !important;
+                    padding: 12px 20px !important;
+                    font-size: 16px !important;
+                }
+                
+                /* Footer mobile */
+                footer {
+                    padding: 40px 16px 24px !important;
+                }
+                
+                footer .grid {
+                    grid-template-columns: 1fr !important;
+                    gap: 32px !important;
+                }
+                
+                footer h3 {
+                    font-size: 18px !important;
+                    margin-bottom: 16px !important;
+                }
+                
+                /* About section mobile - empiler image et texte */
+                .grid.grid-cols-1.lg\\:grid-cols-2,
+                section[style*="background: linear-gradient(to bottom, #ffffff"] .grid {
+                    grid-template-columns: 1fr !important;
+                    gap: 32px !important;
+                    align-items: flex-start !important;
+                }
+                
+                /* Section "L'Expertise au Service de l'Émergence" mobile */
+                section[style*="background: linear-gradient(to bottom, rgb(248, 250, 252)"] {
+                    padding: 50px 16px !important;
+                }
+                
+                /* Image dans section About mobile */
+                section[style*="background: linear-gradient(to bottom, rgb(248, 250, 252)"] .relative.w-full {
+                    order: 1 !important;
+                    width: 100% !important;
+                    margin-bottom: 24px !important;
+                }
+                
+                section[style*="background: linear-gradient(to bottom, rgb(248, 250, 252)"] img[alt="Équipe CEGME"] {
+                    width: 100% !important;
+                    height: auto !important;
+                    min-height: 300px !important;
+                    max-height: 400px !important;
+                    object-fit: cover !important;
+                    object-position: center !important;
+                }
+                
+                /* Grid mobile pour section About */
+                section[style*="background: linear-gradient(to bottom, rgb(248, 250, 252)"] .grid {
+                    grid-template-columns: 1fr !important;
+                    gap: 32px !important;
+                }
+                
+                section[style*="background: linear-gradient(to bottom, #ffffff"] div[style*="min-height: 550px"] {
+                    min-height: 300px !important;
+                    max-height: 400px !important;
+                }
+                
+                /* Texte dans section About mobile */
+                section[style*="background: linear-gradient(to bottom, #ffffff"] .w-full:not(.relative) {
+                    order: 2 !important;
+                    width: 100% !important;
+                    padding: 0 !important;
+                }
+                
+                section[style*="background: linear-gradient(to bottom, #ffffff"] h2 {
+                    font-size: 26px !important;
+                    line-height: 34px !important;
+                    margin-bottom: 16px !important;
+                    padding: 0 !important;
+                }
+                
+                section[style*="background: linear-gradient(to bottom, #ffffff"] p {
+                    font-size: 15px !important;
+                    line-height: 24px !important;
+                    margin-bottom: 16px !important;
+                    padding: 0 !important;
+                }
+                
+                section[style*="background: linear-gradient(to bottom, #ffffff"] .space-y-6 {
+                    gap: 16px !important;
+                }
+                
+                /* Projets récents mobile */
+                .project-card,
+                a[href="/services"] {
+                    margin-bottom: 24px !important;
+                    width: 100% !important;
+                }
+                
+                /* Images de projets mobile */
+                .project-card img,
+                a[href="/services"] img {
+                    height: 200px !important;
+                    object-fit: cover !important;
+                }
+                
+                /* Logos partenaires mobile */
+                .flex.flex-wrap {
+                    justify-content: center !important;
+                    gap: 12px !important;
+                    padding: 0 16px !important;
+                }
+                
+                /* Cartes de logos partenaires mobile */
+                .flex.flex-wrap > div {
+                    min-width: 120px !important;
+                    min-height: 100px !important;
+                    padding: 16px !important;
+                }
+                
+                .flex.flex-wrap img {
+                    max-height: 50px !important;
+                }
+                
+                /* Mot de la direction mobile */
+                .max-w-3xl {
+                    max-width: 100% !important;
+                    padding: 0 16px !important;
+                }
+                
+                /* Espacement général mobile */
+                .mb-16,
+                .mb-12 {
+                    margin-bottom: 24px !important;
+                }
+                
+                .gap-12,
+                .gap-16 {
+                    gap: 24px !important;
+                }
+            }
+            
+                /* Desktop - masquer le menu mobile */
+            @media (min-width: 769px) {
+                .mobile-menu-button,
+                .mobile-menu,
+                .mobile-header {
+                    display: none !important;
+                }
+                
+                .desktop-menu {
+                    display: flex !important;
+                }
+            }
             </style>
     </head>
     <body class="bg-white text-[#1b1b18] min-h-screen" style="background-color: #ffffff !important;">
-        <header class="w-full bg-white sticky top-0 z-50" style="position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000; background-color: rgb(255, 255, 255); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+        <header class="w-full bg-white sticky top-0 z-50" style="position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000; background-color: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
             <div style="height: 3px; background-color: rgb(101, 64, 48);"></div>
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             @if (Route::has('login'))
-                    <nav class="py-4 flex items-center justify-between gap-4 flex-wrap">
+                    <!-- Mobile Header -->
+                    <div class="mobile-header">
+                        <div class="mobile-logo">
+                            <a href="/" class="flex items-center gap-2 shrink-0" style="text-decoration: none; color: inherit;">
+                                <img src="{{ asset('Image/CEGME Logo.JPG') }}" alt="CEGME Logo" class="block h-12 w-auto" style="height: 48px; width: auto; object-fit: contain;">
+                                <div class="flex flex-col" style="display: flex; flex-direction: column;">
+                                    <span class="font-bold" style="font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #10b981 0%, #059669 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2;">CEGME</span>
+                                    <span class="text-xs text-gray-600" style="font-size: 11px; color: rgb(75, 85, 99); line-height: 1.2; margin-top: 2px;">Géosciences • Mines • Environnement</span>
+                                </div>
+                            </a>
+                        </div>
+                        <button class="mobile-menu-button" id="mobileMenuButton" onclick="toggleMobileMenu()" aria-label="Menu">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </button>
+                    </div>
+                    
+                    <!-- Mobile Menu -->
+                    <div class="mobile-menu" id="mobileMenu">
+                        <a href="/" class="{{ request()->is('/') ? 'active' : '' }}">Accueil</a>
+                        <a href="/a-propos" class="{{ request()->is('a-propos') || request()->is('a-propos/*') ? 'active' : '' }}">À Propos</a>
+                        <a href="/services" class="{{ request()->is('services') || request()->is('services/*') ? 'active' : '' }}">Services</a>
+                        <a href="/realisations" class="{{ request()->is('realisations') || request()->is('realisations/*') ? 'active' : '' }}">Réalisations</a>
+                        <a href="/actualites" class="{{ request()->is('actualites') || request()->is('actualites/*') ? 'active' : '' }}">Actualités</a>
+                        <a href="/blog" class="{{ request()->is('blog') || request()->is('blog/*') ? 'active' : '' }}">Blog</a>
+                        <a href="{{ route('appels-offres.index') }}" class="{{ request()->is('appels-offres') || request()->is('appels-offres/*') ? 'active' : '' }}">Appels d'Offres</a>
+                        <a href="/contact" class="{{ request()->is('contact') || request()->is('contact/*') ? 'active' : '' }}">Contact</a>
+                        @auth
+                            <a href="{{ url('/dashboard') }}">Dashboard</a>
+                        @else
+                            <a href="{{ route('login') }}" style="background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); margin: 12px 20px; border-radius: 8px; text-align: center;">
+                                Se connecter
+                            </a>
+                        @endauth
+                    </div>
+                    
+                    <!-- Desktop Menu -->
+                    <nav class="py-4 flex items-center justify-between gap-4 flex-wrap desktop-menu">
                         <div class="flex items-center gap-4 flex-wrap" style="margin-left: -24px;">
                             <a href="/" class="flex items-center gap-3 shrink-0" style="text-decoration: none; color: inherit;">
                                 <img src="{{ asset('Image/CEGME Logo.JPG') }}" alt="CEGME Logo" class="block h-16 w-auto" style="height: 64px; width: auto; object-fit: contain;">
@@ -95,7 +719,7 @@
                                 </div>
                             </a>
                         </div>
-                        <div class="flex items-center gap-4 flex-wrap" style="margin-right: -32px;">
+                        <div class="flex items-center gap-4 flex-wrap desktop-menu" style="margin-right: -32px;">
                             <a href="/" class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal transition-colors {{ request()->is('/') ? 'text-white bg-green-600' : 'hover:text-gray-700' }}" style="font-size: 15px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; {{ request()->is('/') ? 'background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); border-radius: 6px;' : 'color: rgb(55, 65, 81); text-decoration: none;' }}">
                                 Accueil
                             </a>
@@ -130,7 +754,7 @@
                     @else
                         <a
                             href="{{ route('login') }}"
-                            class="inline-flex items-center justify-center gap-1.5 px-4 py-2 text-white font-medium transition-all duration-200 hover:opacity-90 rounded-full"
+                            class="inline-flex items-center justify-center gap-1.5 px-4 py-2 text-white font-medium transition-all duration-200 hover:opacity-90 rounded-full desktop-login-button"
                             style="background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); padding: 8px 18px; font-size: 14px; border-radius: 8px;"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
@@ -147,13 +771,13 @@
             </div>
         </header>
         <!-- Hero Section - Exact Reproduction from Site -->
-        <section class="relative w-full flex items-center justify-center overflow-hidden" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; min-height: 100vh; padding: 0;">
+        <section class="hero-section relative w-full flex items-center justify-center overflow-hidden" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; min-height: 100vh; padding: 0;">
             <!-- Background Image with Greenish-Blue Overlay -->
-            <div class="absolute inset-0" style="background-color: rgb(5, 130, 80);">
+            <div class="absolute inset-0" style="background: linear-gradient(to right bottom, rgb(6, 78, 59), rgb(17, 94, 89), rgb(15, 23, 42)); z-index: 1;">
                 <!-- Background Image -->
-                <img src="{{ asset('Image/IIMG_Banniere.jpg') }}" alt="Bannière CEGME" class="absolute inset-0 w-full h-full object-cover" loading="eager" style="background-color: rgb(5, 130, 80); z-index: 1;">
-                <!-- Green overlay filter mixed with image -->
-                <div class="absolute inset-0" style="background: linear-gradient(135deg, rgba(5, 130, 80, 0.7) 0%, rgba(8, 60, 45, 0.7) 100%); z-index: 2;"></div>
+                <img src="{{ asset('Image/IIMG_Banniere.jpg') }}" alt="Bannière CEGME" class="absolute inset-0 w-full h-full object-cover" loading="eager" style="z-index: 1; opacity: 0.4;">
+                <!-- Gradient overlay filter mixed with image -->
+                <div class="absolute inset-0" style="background: linear-gradient(to right bottom, rgba(6, 78, 59, 0.75), rgba(17, 94, 89, 0.75), rgba(15, 23, 42, 0.75)); z-index: 2;"></div>
             </div>
             
             <!-- Content Container - Centered, Exact Positioning from Site -->
@@ -166,18 +790,18 @@
                 </div>
                 
                 <!-- Main Title - Exact Typography from Site -->
-                <h1 class="mb-6 text-center" style="font-size: 72px; font-weight: 700; line-height: 72px; margin-bottom: 24px; margin-top: 40px; color: #ffffff;">
+                <h1 class="hero-title mb-6 text-center" style="font-size: 84px; font-weight: 700; line-height: 84px; margin-bottom: 24px; margin-top: 40px; color: #ffffff;">
                     <span class="block text-white">Expertise en Géosciences,</span>
                     <span class="block text-center" style="color: rgb(20, 184, 166); text-align: center;">Mines & Environnement</span>
                 </h1>
                 
                 <!-- Descriptive Paragraph - Exact from Site -->
-                <p class="mb-10 mx-auto text-center" style="font-size: 20px; color: rgb(229, 231, 235); line-height: 32.5px; margin-bottom: 40px; max-width: 768px; text-align: center; display: block; margin-left: auto; margin-right: auto;">
+                <p class="hero-description mb-10 mx-auto text-center" style="font-size: 20px; color: rgb(229, 231, 235); line-height: 32.5px; margin-bottom: 24px; max-width: 768px; text-align: center; display: block; margin-left: auto; margin-right: auto;">
                     CEGME accompagne vos projets en République Centrafricaine avec une approche durable et responsable
                 </p>
                 
                 <!-- Call-to-Action Buttons - Exact from Site -->
-                <div class="flex flex-row items-center justify-center" style="gap: 20px; margin-top: 40px;">
+                <div class="hero-buttons flex flex-row items-center justify-center" style="gap: 20px; margin-top: 20px;">
                     <!-- Nos Services Button - Exact from Site -->
                     <a href="/services" class="inline-flex items-center justify-center gap-2 px-8 py-2 text-white font-medium transition-all duration-200 hover:opacity-90" style="background-color: rgb(5, 150, 105); border-radius: 9999px; padding: 10px 32px; font-size: 18px;">
                         <span>Nos Services</span>
@@ -187,7 +811,7 @@
                                 </a>
                     
                     <!-- Nous Contacter Button - Exact from Site -->
-                    <span class="inline-flex items-center justify-center px-8 py-2 text-white font-medium" style="background-color: transparent !important; border: 2px solid rgb(255, 255, 255) !important; border-radius: 9999px; padding: 10px 32px; font-size: 18px; cursor: default; pointer-events: none;">
+                    <span class="inline-flex items-center justify-center px-8 py-2 text-white font-medium" style="background-color: rgba(55, 65, 81, 0.8) !important; border: 2px solid rgb(255, 255, 255) !important; border-radius: 9999px; padding: 10px 32px; font-size: 18px; cursor: default; pointer-events: none;">
                         <span>Nous Contacter</span>
                     </span>
                 </div>
@@ -195,13 +819,13 @@
         </section>
         
         <!-- About Section - Before Statistics -->
-        <section class="w-full" style="padding: 100px 0; margin: 0; background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);">
+        <section class="w-full" style="padding: 100px 0; margin: 0; background: linear-gradient(to bottom, rgb(248, 250, 252), rgb(255, 255, 255));">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 64px; align-items: center;">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 64px; align-items: stretch;">
                     <!-- Image à gauche -->
                     <div class="relative w-full flex items-stretch" style="position: relative; width: 100%; display: flex; align-items: stretch;">
                         <div class="absolute -inset-4 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl opacity-20 blur-xl" style="position: absolute; top: -16px; right: -16px; bottom: -16px; left: -16px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.3) 0%, rgba(5, 150, 105, 0.3) 100%); border-radius: 16px; opacity: 0.2; filter: blur(20px); z-index: 0;"></div>
-                        <div class="relative overflow-hidden rounded-2xl shadow-2xl w-full" style="position: relative; overflow: hidden; border-radius: 16px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15); z-index: 1; width: 100%; height: 100%; min-height: 550px;">
+                        <div class="relative overflow-hidden rounded-2xl shadow-2xl w-full" style="position: relative; overflow: hidden; border-radius: 16px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03); z-index: 1; width: 100%; height: 100%; min-height: 550px;">
                             <img src="{{ asset('Image/Personnel.jpg') }}" alt="Équipe CEGME" class="w-full h-full object-cover transition-transform duration-700 hover:scale-105" style="width: 100%; height: 100%; min-height: 550px; object-fit: cover; transition: transform 0.7s ease; display: block;">
                         </div>
                     </div>
@@ -1081,7 +1705,7 @@
         </section>
         
         <!-- Footer - Enhanced Professional Design -->
-        <footer class="w-full text-white px-4 sm:px-6 lg:px-8" style="background: linear-gradient(135deg, rgb(20, 83, 45) 0%, rgb(15, 64, 62) 50%, rgb(22, 78, 75) 100%); padding: 80px 0 32px; color: rgb(255, 255, 255); position: relative; overflow: hidden;">
+        <footer class="w-full text-white px-4 sm:px-6 lg:px-8" style="background: linear-gradient(to right bottom, rgb(15, 23, 42), rgb(6, 78, 59), rgb(19, 78, 74)); padding: 80px 0 32px; color: rgb(255, 255, 255); position: relative; overflow: hidden;">
             <!-- Decorative overlay -->
             <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 20% 50%, rgba(16, 185, 129, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(5, 150, 105, 0.08) 0%, transparent 50%); pointer-events: none;"></div>
             <div class="relative z-10" style="position: relative; z-index: 10;">
@@ -1252,5 +1876,39 @@
                 </div>
             </div>
         </footer>
+        
+        <!-- Mobile Menu JavaScript -->
+        <script>
+            function toggleMobileMenu() {
+                const menu = document.getElementById('mobileMenu');
+                const button = document.getElementById('mobileMenuButton');
+                
+                menu.classList.toggle('active');
+                button.classList.toggle('active');
+            }
+            
+            // Fermer le menu au clic sur un lien
+            document.querySelectorAll('.mobile-menu a').forEach(link => {
+                link.addEventListener('click', () => {
+                    const menu = document.getElementById('mobileMenu');
+                    const button = document.getElementById('mobileMenuButton');
+                    menu.classList.remove('active');
+                    button.classList.remove('active');
+                });
+            });
+            
+            // Fermer le menu en cliquant en dehors
+            document.addEventListener('click', (e) => {
+                const menu = document.getElementById('mobileMenu');
+                const button = document.getElementById('mobileMenuButton');
+                const isClickInsideMenu = menu.contains(e.target);
+                const isClickOnButton = button.contains(e.target);
+                
+                if (!isClickInsideMenu && !isClickOnButton && menu.classList.contains('active')) {
+                    menu.classList.remove('active');
+                    button.classList.remove('active');
+                }
+            });
+        </script>
     </body>
 </html>
