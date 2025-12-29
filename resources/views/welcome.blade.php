@@ -153,13 +153,13 @@
                     color: rgb(255, 255, 255);
                 }
                 
-                /* Header mobile - logo centré */
+                /* Header mobile - logo centré - Style site de référence */
                 .mobile-header {
                     display: flex !important;
                     align-items: center;
                     justify-content: space-between;
                     width: 100%;
-                    padding: 12px 16px;
+                    padding: 16px 24px;
                     min-height: 64px;
                     position: relative;
                     z-index: 1000;
@@ -270,12 +270,12 @@
                     padding: 12px 0 !important;
                 }
                 
-                /* Sections mobile - réduire les paddings */
+                /* Sections mobile - Style site de référence */
                 section {
-                    padding-left: 16px !important;
-                    padding-right: 16px !important;
-                    padding-top: 40px !important;
-                    padding-bottom: 40px !important;
+                    padding-left: 24px !important;
+                    padding-right: 24px !important;
+                    padding-top: 48px !important;
+                    padding-bottom: 48px !important;
                 }
                 
                 /* Hero section mobile - Style selon image */
@@ -323,118 +323,178 @@
                     z-index: 2 !important;
                 }
                 
-                /* Conteneur de contenu - Centré selon image */
+                /* Conteneur de contenu - Pixel perfect site de référence */
                 .hero-section > div[style*="padding-top: 120px"] {
                     padding-top: 80px !important;
-                    padding-bottom: 60px !important;
+                    padding-bottom: 0 !important;
+                    padding-left: 24px !important;
+                    padding-right: 24px !important;
                     min-height: 100vh !important;
                     position: relative !important;
                     z-index: 10 !important;
                     display: flex !important;
                     flex-direction: column !important;
                     align-items: center !important;
-                    justify-content: center !important;
+                    justify-content: flex-start !important;
                     text-align: center !important;
+                    width: 100% !important;
+                    max-width: 100% !important;
                 }
                 
-                /* Badge Hero mobile - Style selon image */
+                /* Largeur des éléments pour correspondre exactement */
+                .hero-section > div[style*="padding-top: 120px"] > .hero-title,
+                .hero-section > div[style*="padding-top: 120px"] > .hero-description,
+                .hero-section > div[style*="padding-top: 120px"] > .hero-buttons {
+                    max-width: 344px !important;
+                    width: 100% !important;
+                }
+                
+                .hero-section > div[style*="padding-top: 120px"] > .inline-block {
+                    max-width: none !important;
+                    width: auto !important;
+                    visibility: visible !important;
+                    opacity: 1 !important;
+                    display: inline-block !important;
+                    position: relative !important;
+                    z-index: 20 !important;
+                }
+                
+                /* Badge Hero mobile - Pixel perfect site de référence */
                 .hero-section .inline-block {
-                    padding: 8px 20px !important;
-                    font-size: 14px !important;
-                    margin-bottom: 20px !important;
+                    padding: 14px 36px !important;
+                    font-size: 18px !important;
+                    margin-bottom: 33px !important;
                     margin-top: 40px !important;
                     background-color: rgba(16, 185, 129, 0.3) !important;
                     border: 1px solid rgb(5, 150, 105) !important;
                     border-radius: 9999px !important;
+                    width: auto !important;
+                    max-width: 85% !important;
+                    display: inline-block !important;
+                    visibility: visible !important;
+                    opacity: 1 !important;
+                    position: relative !important;
+                    z-index: 20 !important;
                 }
                 
                 .hero-section .inline-block p {
-                    font-size: 14px !important;
-                    line-height: 1.4 !important;
+                    font-size: 18px !important;
+                    line-height: 28px !important;
                     color: rgb(110, 231, 183) !important;
                     font-weight: 500 !important;
+                    padding: 0 !important;
+                    margin: 0 !important;
+                    visibility: visible !important;
+                    opacity: 1 !important;
+                    display: block !important;
                 }
                 
-                /* Titre Hero mobile - Style selon image */
+                /* Titre Hero mobile - Pixel perfect site de référence */
                 .hero-title {
-                    font-size: 44px !important;
-                    line-height: 52px !important;
-                    padding: 0 20px !important;
+                    font-size: 48px !important;
+                    line-height: 60px !important;
+                    padding: 0 !important;
                     margin-bottom: 24px !important;
-                    margin-top: 20px !important;
+                    margin-top: 0 !important;
                     font-weight: 700 !important;
+                    width: 344px !important;
+                    max-width: 100% !important;
+                    color: rgb(255, 255, 255) !important;
                 }
                 
                 .hero-title span {
                     display: block !important;
-                    margin-bottom: 4px !important;
+                    margin-bottom: 0 !important;
+                    font-size: 48px !important;
+                    line-height: 60px !important;
+                    font-weight: 700 !important;
                 }
                 
                 .hero-title span.text-white {
-                    font-size: 44px !important;
-                    line-height: 52px !important;
-                    color: #ffffff !important;
+                    font-size: 48px !important;
+                    line-height: 60px !important;
+                    color: rgb(255, 255, 255) !important;
                 }
                 
                 .hero-title span[style*="color: rgb(20, 184, 166)"] {
-                    font-size: 44px !important;
-                    line-height: 52px !important;
-                    color: rgb(20, 184, 166) !important;
+                    font-size: 48px !important;
+                    line-height: 60px !important;
+                    background: linear-gradient(to right, rgb(52, 211, 153), rgb(45, 212, 191)) !important;
+                    -webkit-background-clip: text !important;
+                    -webkit-text-fill-color: transparent !important;
+                    background-clip: text !important;
+                    color: transparent !important;
                 }
                 
-                /* Description Hero mobile - Style selon image */
+                /* Description Hero mobile - Pixel perfect site de référence */
                 .hero-description {
-                    font-size: 17px !important;
-                    line-height: 26px !important;
-                    padding: 0 20px !important;
-                    margin-bottom: 32px !important;
+                    font-size: 20px !important;
+                    line-height: 32.5px !important;
+                    padding: 0 !important;
+                    margin-bottom: 40px !important;
                     margin-top: 0 !important;
                     color: rgb(229, 231, 235) !important;
-                    max-width: 100% !important;
+                    max-width: 768px !important;
+                    width: 344px !important;
+                    font-weight: 400 !important;
                 }
                 
-                /* Boutons Hero mobile - Style selon image */
+                /* Boutons Hero mobile - Pixel perfect site de référence */
                 .hero-buttons {
+                    display: flex !important;
                     flex-direction: column !important;
-                    gap: 14px !important;
-                    padding: 0 20px !important;
+                    gap: 16px !important;
+                    padding: 0 !important;
                     margin-top: 0 !important;
                     width: 100% !important;
-                    align-items: center !important;
+                    max-width: 100% !important;
+                    align-items: stretch !important;
+                    justify-content: center !important;
+                    margin-left: 0 !important;
+                    margin-right: 0 !important;
                 }
                 
                 .hero-buttons a {
                     width: 100% !important;
-                    max-width: 300px !important;
-                    padding: 14px 32px !important;
-                    font-size: 17px !important;
+                    max-width: 100% !important;
+                    padding: 24px 32px !important;
+                    font-size: 18px !important;
+                    line-height: 28px !important;
                     text-align: center !important;
                     display: flex !important;
                     align-items: center !important;
                     justify-content: center !important;
-                    min-height: 52px !important;
+                    height: 48px !important;
+                    min-height: 48px !important;
                     border-radius: 9999px !important;
                     background-color: rgb(5, 150, 105) !important;
-                    color: #ffffff !important;
+                    color: rgb(255, 255, 255) !important;
                     font-weight: 500 !important;
-                    gap: 10px !important;
+                    gap: 8px !important;
+                    flex-shrink: 0 !important;
+                    box-sizing: border-box !important;
                 }
                 
-                .hero-buttons span {
+                .hero-buttons > span {
                     width: 100% !important;
-                    max-width: 300px !important;
-                    padding: 14px 32px !important;
-                    font-size: 17px !important;
+                    max-width: 100% !important;
+                    padding: 24px 32px !important;
+                    font-size: 18px !important;
+                    line-height: 28px !important;
                     text-align: center !important;
                     display: flex !important;
                     align-items: center !important;
                     justify-content: center !important;
+                    height: 52px !important;
                     min-height: 52px !important;
                     border-radius: 9999px !important;
-                    background-color: rgba(55, 65, 81, 0.8) !important;
+                    background-color: rgba(255, 255, 255, 0.1) !important;
                     border: 2px solid rgb(255, 255, 255) !important;
-                    color: #ffffff !important;
+                    color: rgb(255, 255, 255) !important;
                     font-weight: 500 !important;
+                    gap: 8px !important;
+                    flex-shrink: 0 !important;
+                    box-sizing: border-box !important;
                 }
                 
                 .hero-buttons a svg {
@@ -443,13 +503,13 @@
                     stroke-width: 2.5 !important;
                 }
                 
-                /* Statistiques mobile */
+                /* Statistiques mobile - Style site de référence */
                 .stats-grid,
                 .grid.grid-cols-1.md\\:grid-cols-4,
                 div[style*="grid-template-columns: repeat(4"] {
                     grid-template-columns: 1fr !important;
-                    gap: 24px !important;
-                    padding: 0 16px !important;
+                    gap: 20px !important;
+                    padding: 0 24px !important;
                 }
                 
                 /* Statistiques - réduire taille des icônes et textes */
@@ -524,7 +584,7 @@
                 
                 /* Footer mobile */
                 footer {
-                    padding: 40px 16px 24px !important;
+                    padding: 40px 24px 24px !important;
                 }
                 
                 footer .grid {
@@ -545,9 +605,9 @@
                     align-items: flex-start !important;
                 }
                 
-                /* Section "L'Expertise au Service de l'Émergence" mobile */
+                /* Section "L'Expertise au Service de l'Émergence" mobile - Style site de référence */
                 section[style*="background: linear-gradient(to bottom, rgb(248, 250, 252)"] {
-                    padding: 50px 16px !important;
+                    padding: 48px 24px !important;
                 }
                 
                 /* Image dans section About mobile */
@@ -792,7 +852,7 @@
                 <!-- Main Title - Exact Typography from Site -->
                 <h1 class="hero-title mb-6 text-center" style="font-size: 84px; font-weight: 700; line-height: 84px; margin-bottom: 24px; margin-top: 40px; color: #ffffff;">
                     <span class="block text-white">Expertise en Géosciences,</span>
-                    <span class="block text-center" style="color: rgb(20, 184, 166); text-align: center;">Mines & Environnement</span>
+                    <span class="block text-center" style="background: linear-gradient(to right, rgb(52, 211, 153), rgb(45, 212, 191)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; color: transparent; text-align: center;">Mines & Environnement</span>
                 </h1>
                 
                 <!-- Descriptive Paragraph - Exact from Site -->
@@ -1595,7 +1655,7 @@
         </section>
         
         <!-- Notre Approche Section - Enhanced Design -->
-        <section class="w-full bg-gray-100 px-4 sm:px-6 lg:px-8" style="padding: 32px 0; margin: 0; background-color: #f3f4f6 !important;">
+        <section class="w-full bg-gray-100 px-4 sm:px-6 lg:px-8" style="padding: 32px 0; margin: 0; background-color: #f9fafb !important;">
             <div class="max-w-7xl mx-auto">
                 <!-- Header -->
                 <div class="text-center mb-8" style="text-align: center; margin-bottom: 32px;">
