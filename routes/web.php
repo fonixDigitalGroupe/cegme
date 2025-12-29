@@ -26,7 +26,7 @@ Route::get('/actualites', function () {
 Route::get('/blog', [\App\Http\Controllers\BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{slug}', [\App\Http\Controllers\BlogController::class, 'show'])->name('blog.show');
 
-Route::get('/appels-offres', [\App\Http\Controllers\OffreController::class, 'index'])->name('offres.index');
+Route::get('/appels-offres', [\App\Http\Controllers\OffreController::class, 'index'])->name('appels-offres.index');
 
 Route::get('/contact', function () {
     return view('contact');

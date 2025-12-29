@@ -18,13 +18,13 @@
                 padding: 0;
                 background-color: #ffffff !important;
                 color: #1b1b18 !important;
-                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+                font-family: 'Georgia', 'Times New Roman', Times, serif;
                 min-height: 100vh;
             }
             .header {
                 background-color: #ffffff;
                 border-bottom: 1px solid #d1d5db;
-                padding: 1rem 2rem;
+                padding: 1.25rem 2rem;
                 box-shadow: none;
                 position: sticky;
                 top: 0;
@@ -38,32 +38,32 @@
             }
             .header-nav a,
             .header-nav button {
-                color: #374151;
+                color: #4b5563;
                 transition: all 0.15s ease;
                 display: flex;
                 align-items: center;
                 padding: 0.5rem 0.875rem;
-                border-radius: 3px;
+                border-radius: 6px;
                 text-decoration: none;
-                font-size: 0.75rem;
+                font-size: 0.875rem;
                 font-weight: 500;
-                text-transform: uppercase;
+                text-transform: none;
                 position: relative;
                 background: none;
                 border: none;
                 cursor: pointer;
-                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             }
             .header-nav a:hover,
             .header-nav button:hover {
-                color: #1a1a1a;
+                color: #1f2937;
                 background-color: #f3f4f6;
             }
             .header-nav a.active,
             .header-nav button.active {
-                color: #00C853;
-                background-color: transparent;
-                font-weight: 600;
+                color: white;
+                background: #0d9488;
+                font-weight: 500;
             }
             .header-nav-separator {
                 width: 1px;
@@ -79,64 +79,92 @@
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
         <!-- Styles / Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="bg-white text-[#1b1b18] min-h-screen" style="background-color: #ffffff !important;">
-        <header class="header">
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-                <div style="display: flex; align-items: center; gap: 1rem;">
-                    <img src="{{ asset('Image/CEGME Logo.JPG') }}" alt="CEGME Logo" style="height: 48px; width: auto; object-fit: contain;">
-                    <div>
-                        <h1 style="font-size: 1.25rem; font-weight: 700; margin: 0; letter-spacing: -0.02em; color: #00C853; line-height: 1.2; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">CEGME</h1>
-                        <p style="font-size: 0.75rem; color: #6b7280; margin: 0.125rem 0 0 0; font-weight: 400; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">Géosciences • Mines • Environnement</p>
-                    </div>
-                </div>
-                @if (Route::has('login'))
-                <nav class="header-nav">
-                    <a href="/" class="{{ request()->is('/') ? 'active' : '' }}">Accueil</a>
-                    <a href="/a-propos" class="{{ request()->is('a-propos') || request()->is('a-propos/*') ? 'active' : '' }}">À Propos</a>
-                    <a href="/services" class="{{ request()->is('services') || request()->is('services/*') ? 'active' : '' }}">Services</a>
-                    <a href="/realisations" class="{{ request()->is('realisations') || request()->is('realisations/*') ? 'active' : '' }}">Réalisations</a>
-                    <a href="/actualites" class="{{ request()->is('actualites') || request()->is('actualites/*') ? 'active' : '' }}">Actualités</a>
-                    <a href="{{ route('offres.index') }}" class="{{ request()->is('appels-offres') || request()->is('appels-offres/*') ? 'active' : '' }}">Appels d'offres</a>
-                    <a href="/blog" class="{{ request()->is('blog') || request()->is('blog/*') ? 'active' : '' }}">Blog</a>
-                    <span class="header-nav-separator"></span>
+        <header class="w-full bg-white sticky top-0 z-50" style="position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000; background-color: rgb(255, 255, 255); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+            <div style="height: 3px; background-color: rgb(101, 64, 48);"></div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            @if (Route::has('login'))
+                    <nav class="py-4 flex items-center justify-between gap-4 flex-wrap">
+                        <div class="flex items-center gap-4 flex-wrap" style="margin-left: -24px;">
+                            <a href="/" class="flex items-center gap-3 shrink-0" style="text-decoration: none; color: inherit;">
+                                <img src="{{ asset('Image/CEGME Logo.JPG') }}" alt="CEGME Logo" class="block h-16 w-auto" style="height: 64px; width: auto; object-fit: contain;">
+                                <div class="flex flex-col" style="display: flex; flex-direction: column;">
+                                    <span class="font-bold" style="font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #10b981 0%, #059669 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2;">CEGME</span>
+                                    <span class="text-sm text-gray-600" style="font-size: 13px; color: rgb(75, 85, 99); line-height: 1.2; margin-top: 2px;">Géosciences • Mines • Environnement</span>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="flex items-center gap-4 flex-wrap" style="margin-right: -32px;">
+                            <a href="/" class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal transition-colors {{ request()->is('/') ? 'text-white bg-green-600' : 'hover:text-gray-700' }}" style="font-size: 15px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; {{ request()->is('/') ? 'background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); border-radius: 6px;' : 'color: rgb(55, 65, 81); text-decoration: none;' }}">
+                                Accueil
+                            </a>
+                            <a href="/a-propos" class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal transition-colors {{ request()->is('a-propos') || request()->is('a-propos/*') ? 'text-white bg-green-600' : 'hover:text-gray-700' }}" style="font-size: 15px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; {{ request()->is('a-propos') || request()->is('a-propos/*') ? 'background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); border-radius: 6px;' : 'color: rgb(55, 65, 81); text-decoration: none;' }}">
+                                À Propos
+                            </a>
+                            <a href="/services" class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal transition-colors {{ request()->is('services') || request()->is('services/*') ? 'text-white bg-green-600' : 'hover:text-gray-700' }}" style="font-size: 15px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; {{ request()->is('services') || request()->is('services/*') ? 'background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); border-radius: 6px;' : 'color: rgb(55, 65, 81); text-decoration: none;' }}">
+                                Services
+                            </a>
+                            <a href="/realisations" class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal transition-colors {{ request()->is('realisations') || request()->is('realisations/*') ? 'text-white bg-green-600' : 'hover:text-gray-700' }}" style="font-size: 15px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; {{ request()->is('realisations') || request()->is('realisations/*') ? 'background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); border-radius: 6px;' : 'color: rgb(55, 65, 81); text-decoration: none;' }}">
+                                Réalisations
+                            </a>
+                            <a href="/actualites" class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal transition-colors {{ request()->is('actualites') || request()->is('actualites/*') ? 'text-white bg-green-600' : 'hover:text-gray-700' }}" style="font-size: 15px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; {{ request()->is('actualites') || request()->is('actualites/*') ? 'background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); border-radius: 6px;' : 'color: rgb(55, 65, 81); text-decoration: none;' }}">
+                                Actualités
+                            </a>
+                            <a href="/blog" class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal transition-colors {{ request()->is('blog') || request()->is('blog/*') ? 'text-white bg-green-600' : 'hover:text-gray-700' }}" style="font-size: 15px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; {{ request()->is('blog') || request()->is('blog/*') ? 'background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); border-radius: 6px;' : 'color: rgb(55, 65, 81); text-decoration: none;' }}">
+                                Blog
+                            </a>
+                            <a href="{{ route('appels-offres.index') }}" class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal transition-colors {{ request()->is('appels-offres') || request()->is('appels-offres/*') ? 'text-white bg-green-600' : 'hover:text-gray-700' }}" style="font-size: 15px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; {{ request()->is('appels-offres') || request()->is('appels-offres/*') ? 'background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); border-radius: 6px;' : 'color: rgb(55, 65, 81); text-decoration: none;' }}">
+                                Appels d'Offres
+                            </a>
+                            <a href="/contact" class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal transition-colors {{ request()->is('contact') || request()->is('contact/*') ? 'text-white bg-green-600' : 'hover:text-gray-700' }}" style="font-size: 15px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; {{ request()->is('contact') || request()->is('contact/*') ? 'background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); border-radius: 6px;' : 'color: rgb(55, 65, 81); text-decoration: none;' }}">
+                                Contact
+                            </a>
                     @auth
-                        <a href="{{ url('/dashboard') }}">Dashboard</a>
-                        <span class="header-nav-separator"></span>
-                        <form method="POST" action="{{ route('logout') }}" style="margin: 0; display: inline;">
-                            @csrf
-                            <button type="submit" style="color: #dc2626;" onmouseover="this.style.backgroundColor='#fee2e2'; this.style.color='#991b1b';" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#dc2626';">
-                                Déconnexion
-                            </button>
-                        </form>
+                        <a
+                            href="{{ url('/dashboard') }}"
+                            class="inline-block px-5 py-1.5 text-black border border-gray-300 hover:border-gray-400 rounded-sm text-sm leading-normal"
+                        >
+                            Dashboard
+                        </a>
                     @else
-                        <a href="{{ route('login') }}">
-                            Se connecter
+                        <a
+                            href="{{ route('login') }}"
+                            class="inline-flex items-center justify-center gap-1.5 px-4 py-2 text-white font-medium transition-all duration-200 hover:opacity-90 rounded-full"
+                            style="background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); padding: 8px 18px; font-size: 14px; border-radius: 8px;"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
+                                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                                <polyline points="10 17 15 12 10 7"></polyline>
+                                <line x1="15" y1="12" x2="3" y2="12"></line>
+                            </svg>
+                            <span>Se connecter</span>
                         </a>
                     @endauth
+                        </div>
                 </nav>
-                @endif
+            @endif
             </div>
         </header>
 
         <!-- Hero Section - Page Header -->
-        <section class="relative w-full flex items-center justify-center overflow-hidden" style="min-height: 45vh; padding: 60px 0; background-color: rgb(245, 250, 248);">
+        <section class="relative w-full flex items-center justify-center overflow-hidden" style="min-height: 45vh; padding: 60px 0; background-color: rgb(245, 250, 248); font-family: 'Georgia', 'Times New Roman', Times, serif;">
             <div class="relative z-10 w-full max-w-4xl mx-auto px-4 text-center" style="margin-top: 60px;">
-                <h1 class="mb-6" style="font-size: 60px; font-weight: 700; color: rgb(17, 24, 39); margin-bottom: 24px; text-align: center; line-height: 72px;">
+                <h1 class="mb-6" style="font-size: 60px; font-weight: 700; color: rgb(17, 24, 39); margin-bottom: 24px; text-align: center; line-height: 72px; font-family: 'Georgia', 'Times New Roman', Times, serif;">
                     À Propos de Nous
                 </h1>
-                <p class="mx-auto max-w-3xl" style="font-size: 20px; color: rgb(75, 85, 99); text-align: center; line-height: 32px;">
+                <p class="mx-auto max-w-3xl" style="font-size: 20px; color: rgb(75, 85, 99); text-align: center; line-height: 32px; font-family: 'Georgia', 'Times New Roman', Times, serif;">
                     Bureau d'études et de consultation dans le domaine des géosciences, des mines et de<br>l'environnement en République Centrafricaine
                 </p>
             </div>
         </section>
 
         <!-- Main Content Section -->
-        <section class="w-full bg-white" style="padding: 0px 24px;">
+        <section class="w-full bg-white" style="padding: 0px 24px; font-family: 'Georgia', 'Times New Roman', Times, serif;">
             <div class="max-w-7xl mx-auto" style="padding: 96px 0;">
                 <!-- Image and Text Grid -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20" style="display: grid; grid-template-columns: 592px 592px; gap: 48px; align-items: center; margin-bottom: 80px;">
@@ -145,19 +173,19 @@
                         <img src="{{ asset('Image/Cabinet d\'Études Géologiques.jpg') }}" alt="Cabinet d'Études Géologiques" class="w-full h-auto" style="width: 592px; height: 500px; object-fit: cover; border-radius: 0px;">
                     </div>
                     <!-- Text Content -->
-                    <div>
+                    <div style="font-family: 'Georgia', 'Times New Roman', Times, serif;">
                         <div class="mb-4" style="margin-bottom: 16px;">
                             <span class="inline-block px-4 py-2 rounded-full text-sm font-semibold" style="background-color: rgba(16, 185, 129, 0.1); color: rgb(5, 150, 105); padding: 8px 16px; border-radius: 9999px; font-size: 14px; font-weight: 600; display: inline-block;">
                                 CEGME SARL
                             </span>
                         </div>
-                        <h2 class="text-3xl font-bold mb-6" style="font-size: 32px; font-weight: 700; color: rgb(17, 24, 39); margin-bottom: 24px; line-height: 40px;">
+                        <h2 class="text-3xl font-bold mb-6" style="font-size: 32px; font-weight: 700; color: rgb(17, 24, 39); margin-bottom: 24px; line-height: 40px; font-family: 'Georgia', 'Times New Roman', Times, serif;">
                             Cabinet d'Études Géologiques, Minières et Environnementales
                         </h2>
-                        <p class="text-gray-700 mb-4" style="font-size: 16px; color: rgb(55, 65, 81); line-height: 26px; margin-bottom: 16px;">
+                        <p class="text-gray-700 mb-4" style="font-size: 16px; color: rgb(55, 65, 81); line-height: 26px; margin-bottom: 16px; font-family: 'Georgia', 'Times New Roman', Times, serif;">
                             Entreprise de droit centrafricain, CEGME est implanté dans la capitale Bangui et exerce ses activités sur l'ensemble du territoire national de la République Centrafricaine.
                         </p>
-                        <p class="text-gray-700 mb-6" style="font-size: 16px; color: rgb(55, 65, 81); line-height: 26px; margin-bottom: 24px;">
+                        <p class="text-gray-700 mb-6" style="font-size: 16px; color: rgb(55, 65, 81); line-height: 26px; margin-bottom: 24px; font-family: 'Georgia', 'Times New Roman', Times, serif;">
                             Nous nous appuyons sur un réseau de compétence nationale constitué d'un puzzle de spécialistes. Nous combinons le point de vue du client, la compétence du cabinet, la connaissance des exigences de l'administration et les bonnes pratiques pour produire des résultats durables et rentables.
                         </p>
                         <!-- Location -->
