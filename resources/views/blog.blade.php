@@ -68,7 +68,7 @@
                                 Blog
                             </a>
                             <a href="{{ route('appels-offres.index') }}" class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal transition-colors {{ request()->is('appels-offres') || request()->is('appels-offres/*') ? 'text-white bg-green-600' : 'hover:text-gray-700' }}" style="font-size: 15px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; {{ request()->is('appels-offres') || request()->is('appels-offres/*') ? 'background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); border-radius: 6px;' : 'color: rgb(55, 65, 81); text-decoration: none;' }}">
-                                Appels d'Offres
+                                Offres
                             </a>
                             <a href="/contact" class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal transition-colors {{ request()->is('contact') || request()->is('contact/*') ? 'text-white bg-green-600' : 'hover:text-gray-700' }}" style="font-size: 15px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; {{ request()->is('contact') || request()->is('contact/*') ? 'background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); border-radius: 6px;' : 'color: rgb(55, 65, 81); text-decoration: none;' }}">
                                 Contact
@@ -101,8 +101,8 @@
         </header>
 
         <!-- Hero Section - Page Header -->
-        <section class="relative w-full flex items-center justify-center overflow-hidden" style="min-height: 45vh; padding: 60px 0; background: linear-gradient(135deg, rgb(15, 64, 62) 0%, rgb(10, 48, 46) 100%);">
-            <div class="relative z-10 w-full max-w-4xl mx-auto px-4 text-center" style="margin-top: 60px;">
+        <section class="relative w-full flex items-center justify-center overflow-hidden" style="min-height: 45vh; padding: 60px 0; background: linear-gradient(to right bottom, rgb(6, 78, 59), rgb(17, 94, 89), rgb(15, 23, 42));">
+            <div class="relative z-10 w-full max-w-4xl mx-auto px-4 text-center" style="margin-top: 100px;">
                 <h1 class="mb-6" style="font-size: 60px; font-weight: 700; color: rgb(255, 255, 255); margin-bottom: 24px; text-align: center; line-height: 72px;">
                     Blog & Actualités
                 </h1>
@@ -143,13 +143,13 @@
                     </div>
 
                     <!-- Filter Buttons - Right -->
-                    <div class="flex flex-wrap gap-3 justify-end" style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: flex-end;">
-                        <a href="{{ route('blog.index') }}" class="px-4 py-2 rounded-lg font-medium transition-colors {{ !request()->has('category') && !request()->has('tag') ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}" style="padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500; text-decoration: none; display: inline-block;">
+                    <div class="flex flex-wrap gap-3 justify-end" style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: flex-end; align-items: center;">
+                        <a href="{{ route('blog.index') }}" class="px-6 py-2.5 rounded-full font-bold transition-all duration-200 {{ !request()->has('category') && !request()->has('tag') ? 'bg-teal-500 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}" style="padding: 10px 24px; border-radius: 9999px; font-size: 14px; font-weight: 700; text-decoration: none; display: inline-block; {{ !request()->has('category') && !request()->has('tag') ? 'background-color: rgb(20, 184, 166); color: rgb(255, 255, 255); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);' : 'background-color: rgb(243, 244, 246); color: rgb(55, 65, 81);' }}">
                             Tous
                         </a>
                         @foreach($categories as $category)
                             @if($category->posts_count > 0)
-                                <a href="{{ route('blog.index', ['category' => $category->slug]) }}" class="px-4 py-2 rounded-lg font-medium transition-colors {{ request()->get('category') === $category->slug ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}" style="padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500; text-decoration: none; display: inline-block;">
+                                <a href="{{ route('blog.index', ['category' => $category->slug]) }}" class="px-6 py-2.5 rounded-full font-bold transition-all duration-200 {{ request()->get('category') === $category->slug ? 'bg-teal-500 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}" style="padding: 10px 24px; border-radius: 9999px; font-size: 14px; font-weight: 700; text-decoration: none; display: inline-block; {{ request()->get('category') === $category->slug ? 'background-color: rgb(20, 184, 166); color: rgb(255, 255, 255); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);' : 'background-color: rgb(243, 244, 246); color: rgb(55, 65, 81);' }}">
                                     {{ $category->name }}
                                 </a>
                             @endif

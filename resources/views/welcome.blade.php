@@ -799,7 +799,7 @@
                                 Blog
                             </a>
                             <a href="{{ route('appels-offres.index') }}" class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal transition-colors {{ request()->is('appels-offres') || request()->is('appels-offres/*') ? 'text-white bg-green-600' : 'hover:text-gray-700' }}" style="font-size: 15px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; {{ request()->is('appels-offres') || request()->is('appels-offres/*') ? 'background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); border-radius: 6px;' : 'color: rgb(55, 65, 81); text-decoration: none;' }}">
-                                Appels d'Offres
+                                Offres
                             </a>
                             <a href="/contact" class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal transition-colors {{ request()->is('contact') || request()->is('contact/*') ? 'text-white bg-green-600' : 'hover:text-gray-700' }}" style="font-size: 15px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; {{ request()->is('contact') || request()->is('contact/*') ? 'background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); border-radius: 6px;' : 'color: rgb(55, 65, 81); text-decoration: none;' }}">
                                 Contact
@@ -815,7 +815,7 @@
                         <a
                             href="{{ route('login') }}"
                             class="inline-flex items-center justify-center gap-1.5 px-4 py-2 text-white font-medium transition-all duration-200 hover:opacity-90 rounded-full desktop-login-button"
-                            style="background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); padding: 8px 18px; font-size: 14px; border-radius: 8px;"
+                            style="background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); padding: 8px 18px; font-size: 14px; border-radius: 8px; flex-shrink: 0; white-space: nowrap;"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
                                 <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
@@ -1345,9 +1345,9 @@
                         <div class="absolute top-0 right-0 w-32 h-32 bg-orange-50 rounded-full -mr-16 -mt-16 opacity-50" style="position: absolute; top: 0; right: 0; width: 128px; height: 128px; background-color: rgb(255, 247, 237); border-radius: 50%; margin-right: -64px; margin-top: -64px; opacity: 0.5;"></div>
                         <div class="relative z-10" style="position: relative; z-index: 10;">
                         <!-- Icon -->
-                            <div class="flex items-center justify-center mb-6" style="display: flex; align-items: center; justify-content: center; width: 72px; height: 72px; border-radius: 16px; background: linear-gradient(135deg, rgb(249, 115, 22) 0%, rgb(234, 88, 12) 100%); box-shadow: 0 8px 20px rgba(249, 115, 22, 0.35); margin-bottom: 24px;">
+                            <div class="flex items-center justify-center mb-6" style="display: flex; align-items: center; justify-content: center; width: 72px; height: 72px; border-radius: 16px; background: linear-gradient(to top, rgb(249, 115, 22) 0%, rgb(251, 146, 60) 100%); box-shadow: 0 8px 20px rgba(249, 115, 22, 0.35); margin-bottom: 24px;">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 32px; height: 32px; color: #ffffff;">
-                                    <path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                                    <path d="M3 20h6l2-6 4 6h8l-3-8-3-4-2 4-2-2z"></path>
                             </svg>
                         </div>
                         <!-- Title -->
@@ -1375,9 +1375,12 @@
                         <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full -mr-16 -mt-16 opacity-50" style="position: absolute; top: 0; right: 0; width: 128px; height: 128px; background-color: rgb(239, 246, 255); border-radius: 50%; margin-right: -64px; margin-top: -64px; opacity: 0.5;"></div>
                         <div class="relative z-10" style="position: relative; z-index: 10;">
                         <!-- Icon -->
-                            <div class="flex items-center justify-center mb-6" style="display: flex; align-items: center; justify-content: center; width: 72px; height: 72px; border-radius: 16px; background: linear-gradient(135deg, rgb(59, 130, 246) 0%, rgb(37, 99, 235) 100%); box-shadow: 0 8px 20px rgba(59, 130, 246, 0.35); margin-bottom: 24px;">
+                            <div class="flex items-center justify-center mb-6" style="display: flex; align-items: center; justify-content: center; width: 72px; height: 72px; border-radius: 16px; background: linear-gradient(to bottom, rgb(59, 130, 246) 0%, rgb(96, 165, 250) 100%); box-shadow: 0 8px 20px rgba(59, 130, 246, 0.35); margin-bottom: 24px;">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 32px; height: 32px; color: #ffffff;">
-                                    <path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
+                                    <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+                                    <path d="M9 8a3 3 0 0 1 6 0c0 1.5-3 4-3 4s-3-2.5-3-4z"></path>
+                                    <path d="M7 14a3 3 0 0 1 6 0c0 1.5-3 4-3 4s-3-2.5-3-4z"></path>
+                                    <path d="M11 18a2 2 0 0 1 2 0c0 1-2 2.5-2 2.5s-2-1.5-2-2.5z"></path>
                             </svg>
                         </div>
                         <!-- Title -->
@@ -1405,12 +1408,10 @@
                         <div class="absolute top-0 right-0 w-32 h-32 bg-purple-50 rounded-full -mr-16 -mt-16 opacity-50" style="position: absolute; top: 0; right: 0; width: 128px; height: 128px; background-color: rgb(250, 245, 255); border-radius: 50%; margin-right: -64px; margin-top: -64px; opacity: 0.5;"></div>
                         <div class="relative z-10" style="position: relative; z-index: 10;">
                         <!-- Icon -->
-                            <div class="flex items-center justify-center mb-6" style="display: flex; align-items: center; justify-content: center; width: 72px; height: 72px; border-radius: 16px; background: linear-gradient(135deg, rgb(147, 51, 234) 0%, rgb(126, 34, 206) 100%); box-shadow: 0 8px 20px rgba(147, 51, 234, 0.35); margin-bottom: 24px;">
+                            <div class="flex items-center justify-center mb-6" style="display: flex; align-items: center; justify-content: center; width: 72px; height: 72px; border-radius: 16px; background: linear-gradient(to bottom, rgb(168, 85, 247) 0%, rgb(147, 51, 234) 100%); box-shadow: 0 8px 20px rgba(168, 85, 247, 0.35); margin-bottom: 24px;">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 32px; height: 32px; color: #ffffff;">
-                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                    <circle cx="9" cy="7" r="4"></circle>
-                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                    <rect width="20" height="14" x="2" y="5" rx="2" ry="2"></rect>
+                                    <path d="M2 10h20"></path>
                             </svg>
                         </div>
                         <!-- Title -->
