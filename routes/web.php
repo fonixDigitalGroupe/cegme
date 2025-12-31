@@ -65,6 +65,15 @@ Route::middleware(['auth', 'adminOrEditor'])->prefix('admin')->name('admin.')->g
     
     // Tags
     Route::resource('tags', \App\Http\Controllers\Admin\TagController::class);
+    
+    // Règles de filtrage des offres
+    Route::resource('filtering-rules', \App\Http\Controllers\Admin\FilteringRuleController::class);
+    Route::post('/filtering-rules/reapply', [\App\Http\Controllers\Admin\FilteringRuleController::class, 'reapplyFiltering'])->name('filtering-rules.reapply');
+    
+    // Pôles d'activité
+    Route::resource('activity-poles', \App\Http\Controllers\Admin\ActivityPoleController::class);
+    Route::post('/activity-poles/{activityPole}/keywords', [\App\Http\Controllers\Admin\ActivityPoleController::class, 'addKeyword'])->name('activity-poles.keywords.add');
+    Route::delete('/activity-poles/{activityPole}/keywords/{keyword}', [\App\Http\Controllers\Admin\ActivityPoleController::class, 'removeKeyword'])->name('activity-poles.keywords.remove');
 });
 
 // Admin Only Routes

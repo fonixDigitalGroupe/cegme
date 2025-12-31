@@ -27,9 +27,8 @@ class AFDScraperService
      */
     public function scrape(): array
     {
-        // Vider la base de données avant chaque scraping
-        $deletedCount = Offre::where('source', 'AFD')->delete();
-        Log::info("AFD Scraper: Base de données vidée", ['offres_supprimees' => $deletedCount]);
+        // Note: Le vidage de la table est géré par la commande principale (app:scrape-active-sources)
+        // Ici on scrappe uniquement les offres AFD
         
         $totalCount = 0;
         $page = 0; // Commencer à page=0 (première page)

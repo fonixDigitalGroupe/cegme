@@ -353,6 +353,22 @@
                     Utilisateurs
                 </a>
                 @endif
+                <div class="dropdown {{ request()->routeIs('admin.filtering-rules.*') || request()->routeIs('admin.activity-poles.*') ? 'active' : '' }}">
+                    <a href="#" class="dropdown-toggle {{ request()->routeIs('admin.filtering-rules.*') || request()->routeIs('admin.activity-poles.*') ? 'active' : '' }}" onclick="event.preventDefault(); toggleDropdown(this);">
+                        Offres
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="dropdown-arrow">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </a>
+                    <div class="dropdown-menu">
+                        <a href="{{ route('admin.filtering-rules.index') }}" class="dropdown-item {{ request()->routeIs('admin.filtering-rules.*') ? 'active' : '' }}">
+                            Règles de filtrage
+                        </a>
+                        <a href="{{ route('admin.activity-poles.index') }}" class="dropdown-item {{ request()->routeIs('admin.activity-poles.*') ? 'active' : '' }}">
+                            Pôles d'activité
+                        </a>
+                    </div>
+                </div>
                 <div class="dropdown {{ request()->routeIs('admin.categories.*') || request()->routeIs('admin.tags.*') ? 'active' : '' }}">
                     <a href="#" class="dropdown-toggle {{ request()->routeIs('admin.categories.*') || request()->routeIs('admin.tags.*') ? 'active' : '' }}" onclick="event.preventDefault(); toggleDropdown(this);">
                         Paramètres

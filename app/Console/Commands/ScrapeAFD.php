@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Services\AFDScraperService;
+use App\Services\ScraperHelper;
 use Illuminate\Console\Command;
 
 class ScrapeAFD extends Command
@@ -12,20 +13,29 @@ class ScrapeAFD extends Command
      *
      * @var string
      */
-    protected $signature = 'scrape:afd';
+    protected $signature = 'scrape:afd {--force : Forcer le scraping même si aucune règle active}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Scrape les appels à projets depuis le site AFD';
+    protected $description = 'Scrape les appels à projets depuis le site AFD (uniquement si une règle active existe)';
 
     /**
      * Execute the console command.
      */
     public function handle(AFDScraperService $scraper)
     {
+        $source = 'AFD';
+        
+        // Vérifier si une règle active existe pour cette source
+        if (!$this->option('force') && !ScraperHelper::hasActiveRule($source)) {
+            $this->warn("⚠ Aucune règle de filtrage active trouvée pour la source '{$source}'.");
+            $this->info("💡 Le scraping ne sera pas exécuté. Activez une règle de filtrage dans l'admin ou utilisez --force pour forcer le scraping.");
+            return Command::FAILURE;
+        }
+
         $this->info('Début du scraping des appels à projets AFD...');
 
         try {

@@ -261,10 +261,14 @@
                     </span>
                 </div>
 
-                @if($offre->pays)
+                @php
+                    // Afficher seulement les pays filtrés si disponibles, sinon tous les pays
+                    $paysToDisplay = $offre->filtered_pays ?? $offre->pays;
+                @endphp
+                @if($paysToDisplay)
                 <div class="meta-item">
                     <span class="meta-label">Pays / Région</span>
-                    <span class="meta-value">{{ $offre->pays }}</span>
+                    <span class="meta-value">{{ $paysToDisplay }}</span>
                 </div>
                 @endif
 

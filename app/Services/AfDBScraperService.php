@@ -28,9 +28,8 @@ class AfDBScraperService
      */
     public function scrape(): array
     {
-        // Vider la base de données avant chaque scraping
-        $deletedCount = Offre::where('source', 'African Development Bank')->delete();
-        Log::info("AfDB Scraper: Base de données vidée", ['offres_supprimees' => $deletedCount]);
+        // Note: Le vidage de la table est géré par la commande principale (app:scrape-active-sources)
+        // Ici on scrappe uniquement les offres African Development Bank
         
         $totalCount = 0;
         $page = 0;

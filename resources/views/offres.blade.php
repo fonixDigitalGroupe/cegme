@@ -261,8 +261,12 @@
                                     @endif
                                 </td>
                                 <td>
-                                    @if($offre->pays)
-                                        <span style="color: #1a1a1a; font-size: 0.875rem;">{{ $offre->pays }}</span>
+                                    @php
+                                        // Afficher seulement les pays filtrés si disponibles, sinon tous les pays
+                                        $paysToDisplay = $offre->filtered_pays ?? $offre->pays;
+                                    @endphp
+                                    @if($paysToDisplay)
+                                        <span style="color: #1a1a1a; font-size: 0.875rem;">{{ $paysToDisplay }}</span>
                                     @else
                                         <span style="color: #9ca3af;">-</span>
                                     @endif

@@ -27,9 +27,8 @@ class WorldBankScraperService
      */
     public function scrape(): array
     {
-        // Vider la base de données avant chaque scraping
-        $deletedCount = Offre::where('source', 'World Bank')->delete();
-        Log::info("World Bank Scraper: Base de données vidée", ['offres_supprimees' => $deletedCount]);
+        // Note: Le vidage de la table est géré par la commande principale (app:scrape-active-sources)
+        // Ici on scrappe uniquement les offres World Bank
         
         $totalCount = 0;
         $totalNoticesFound = 0;
