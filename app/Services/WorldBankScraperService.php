@@ -500,38 +500,12 @@ class WorldBankScraperService
             $projectClosingDate = null;
             
             // 1. PRIORITÉ: Récupérer la "Closing Date" depuis la page de détail du projet
-            // OPTIMISATION: Désactivable via variable d'environnement WORLD_BANK_FETCH_CLOSING_DATE=false
-            // pour améliorer la vitesse (Browsershot prend ~20-30 secondes par projet)
-            $fetchClosingDate = env('WORLD_BANK_FETCH_CLOSING_DATE', true);
+            // OPTIMISATION: Browsershot est très lent (~20-30 secondes par projet)
+            // On utilise d'abord l'API (rapide), puis Browsershot seulement si l'API ne fournit pas de date
+            // Désactivable via variable d'environnement WORLD_BANK_FETCH_CLOSING_DATE=false
+            $fetchClosingDate = env('WORLD_BANK_FETCH_CLOSING_DATE', false);
             
-            if ($fetchClosingDate && !empty($projectId)) {
-                try {
-                    $projectDetail = $this->fetchProjectDetailFields($projectId);
-                    if (!empty($projectDetail['closing_date'])) {
-                        $projectClosingDate = $projectDetail['closing_date'];
-                        $submissionDate = $projectClosingDate;
-                        $submissionRaw = $projectDetail['closing_raw'] ?? $projectClosingDate;
-                        Log::info('World Bank Scraper: ✅ Date récupérée depuis la page de détail du projet (Closing Date)', [
-                            'source' => 'Page Project Detail (Closing Date) - PRIORITÉ',
-                            'project_id' => $projectId,
-                            'raw_value' => $submissionRaw,
-                            'normalized' => $submissionDate,
-                            'titre' => $titre,
-                        ]);
-                    }
-                } catch (\Exception $e) {
-                    Log::debug('World Bank Scraper: Project detail page parse failed', [
-                        'project_id' => $projectId,
-                        'error' => $e->getMessage(),
-                    ]);
-                }
-            } elseif (!$fetchClosingDate && !empty($projectId)) {
-                Log::debug('World Bank Scraper: Récupération de Closing Date désactivée (WORLD_BANK_FETCH_CLOSING_DATE=false)', [
-                    'project_id' => $projectId,
-                ]);
-            }
-            
-            // 2. FALLBACK: Si la "Closing Date" n'est pas trouvée sur la page du projet, utiliser l'API
+            // 1. PRIORITÉ: Utiliser d'abord l'API (rapide, pas de Browsershot)
             if (empty($submissionDate) && isset($doc['submission_deadline_date']) && !empty($doc['submission_deadline_date'])) {
                 try {
                     $apiDateValue = $doc['submission_deadline_date'];
@@ -569,8 +543,8 @@ class WorldBankScraperService
                     
                     if ($apiDate) {
                         $submissionDate = $apiDate;
-                        Log::info('World Bank Scraper: ✅ Date récupérée depuis l\'API (fallback)', [
-                            'source' => 'API (submission_deadline_date) - FALLBACK',
+                        Log::info('World Bank Scraper: ✅ Date récupérée depuis l\'API', [
+                            'source' => 'API (submission_deadline_date) - PRIORITÉ',
                             'raw_value' => $submissionRaw,
                             'normalized' => $submissionDate,
                             'project_id' => $doc['project_id'] ?? null,
@@ -581,6 +555,31 @@ class WorldBankScraperService
                 } catch (\Exception $e) {
                     Log::debug('World Bank Scraper: Failed to parse API date', [
                         'date' => $doc['submission_deadline_date'] ?? null,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+            
+            // 2. FALLBACK: Si l'API ne fournit pas de date ET que Browsershot est activé, utiliser Browsershot
+            // (Browsershot est très lent, donc on l'utilise seulement si nécessaire)
+            if (empty($submissionDate) && $fetchClosingDate && !empty($projectId)) {
+                try {
+                    $projectDetail = $this->fetchProjectDetailFields($projectId);
+                    if (!empty($projectDetail['closing_date'])) {
+                        $projectClosingDate = $projectDetail['closing_date'];
+                        $submissionDate = $projectClosingDate;
+                        $submissionRaw = $projectDetail['closing_raw'] ?? $projectClosingDate;
+                        Log::info('World Bank Scraper: ✅ Date récupérée depuis la page de détail du projet (Closing Date)', [
+                            'source' => 'Page Project Detail (Closing Date) - FALLBACK (Browsershot)',
+                            'project_id' => $projectId,
+                            'raw_value' => $submissionRaw,
+                            'normalized' => $submissionDate,
+                            'titre' => $titre,
+                        ]);
+                    }
+                } catch (\Exception $e) {
+                    Log::debug('World Bank Scraper: Project detail page parse failed', [
+                        'project_id' => $projectId,
                         'error' => $e->getMessage(),
                     ]);
                 }
@@ -825,8 +824,8 @@ class WorldBankScraperService
             
             $html = \Spatie\Browsershot\Browsershot::url($url)
                 ->waitUntilNetworkIdle() // Attendre que le réseau soit inactif (JS chargé)
-                ->delay(2000) // Attendre 2 secondes pour le chargement Angular
-                ->timeout(60) // Timeout de 60 secondes
+                ->delay(1000) // Réduire à 1 seconde pour le chargement Angular (optimisation)
+                ->timeout(30) // Réduire le timeout à 30 secondes (optimisation)
                 ->setOption('args', [
                     '--no-sandbox',
                     '--disable-setuid-sandbox',
@@ -863,20 +862,20 @@ class WorldBankScraperService
             
             // Fallback vers HTTP simple si Browsershot échoue
             try {
-                $response = Http::withoutVerifying()
-                    ->timeout(30)
-                    ->withHeaders([
-                        'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                        'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-                        'Accept-Language' => 'en-US,en;q=0.9,fr;q=0.8',
-                    ])
-                    ->get($url);
+        $response = Http::withoutVerifying()
+            ->timeout(30)
+            ->withHeaders([
+                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                'Accept-Language' => 'en-US,en;q=0.9,fr;q=0.8',
+            ])
+            ->get($url);
 
-                if (!$response->successful()) {
-                    return [];
-                }
+        if (!$response->successful()) {
+            return [];
+        }
 
-                $html = $response->body();
+        $html = $response->body();
             } catch (\Exception $httpError) {
                 Log::error('World Bank Scraper: HTTP fallback also failed', [
                     'project_id' => $projectId,
@@ -1070,34 +1069,34 @@ class WorldBankScraperService
         
         // 2) Essayer aussi dans la section "Key Details" (ou FR)
         if ($closingRaw === null) {
-            $sectionNodes = $xpath->query(
-                "//section[.//h2[contains(translate(normalize-space(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZÀÂÄÇÉÈÊËÎÏÔŒÙÛÜŸ', 'abcdefghijklmnopqrstuvwxyzàâäçéèêëîïôœùûüÿ'), 'key details')
-                                  or contains(translate(normalize-space(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZÀÂÄÇÉÈÊËÎÏÔŒÙÛÜŸ', 'abcdefghijklmnopqrstuvwxyzàâäçéèêëîïôœùûüÿ'), 'détails clés')
-                                  or contains(translate(normalize-space(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZÀÂÄÇÉÈÊËÎÏÔŒÙÛÜŸ', 'abcdefghijklmnopqrstuvwxyzàâäçéèêëîïôœùûüÿ'), 'details cles')]]"
-            );
-            if ($sectionNodes && $sectionNodes->length > 0) {
-                $keyDetails = $sectionNodes->item(0);
-                $sx = new \DOMXPath($dom);
-                // Country
-                foreach ($countryLabels as $lbl) {
-                    $n = $sx->query(".//th[normalize-space()='{$lbl}' or starts-with(normalize-space(), '{$lbl}:')]/following-sibling::td[1]", $keyDetails);
-                    if ($n && $n->length > 0) { $country = trim(preg_replace('/\s+/', ' ', $n->item(0)->textContent)); break; }
-                    $n = $sx->query(".//dt[normalize-space()='{$lbl}' or starts-with(normalize-space(), '{$lbl}:')]/following-sibling::dd[1]", $keyDetails);
-                    if ($n && $n->length > 0) { $country = trim(preg_replace('/\s+/', ' ', $n->item(0)->textContent)); break; }
-                }
-                // Region
-                foreach ($regionLabels as $lbl) {
-                    $n = $sx->query(".//th[normalize-space()='{$lbl}' or starts-with(normalize-space(), '{$lbl}:')]/following-sibling::td[1]", $keyDetails);
-                    if ($n && $n->length > 0) { $region = trim(preg_replace('/\s+/', ' ', $n->item(0)->textContent)); break; }
-                    $n = $sx->query(".//dt[normalize-space()='{$lbl}' or starts-with(normalize-space(), '{$lbl}:')]/following-sibling::dd[1]", $keyDetails);
-                    if ($n && $n->length > 0) { $region = trim(preg_replace('/\s+/', ' ', $n->item(0)->textContent)); break; }
-                }
-                // Closing Date
-                foreach ($closingLabels as $lbl) {
-                    $n = $sx->query(".//th[normalize-space()='{$lbl}' or starts-with(normalize-space(), '{$lbl}:')]/following-sibling::td[1]", $keyDetails);
-                    if ($n && $n->length > 0) { $closingRaw = trim(preg_replace('/\s+/', ' ', $n->item(0)->textContent)); break; }
-                    $n = $sx->query(".//dt[normalize-space()='{$lbl}' or starts-with(normalize-space(), '{$lbl}:')]/following-sibling::dd[1]", $keyDetails);
-                    if ($n && $n->length > 0) { $closingRaw = trim(preg_replace('/\s+/', ' ', $n->item(0)->textContent)); break; }
+        $sectionNodes = $xpath->query(
+            "//section[.//h2[contains(translate(normalize-space(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZÀÂÄÇÉÈÊËÎÏÔŒÙÛÜŸ', 'abcdefghijklmnopqrstuvwxyzàâäçéèêëîïôœùûüÿ'), 'key details')
+                              or contains(translate(normalize-space(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZÀÂÄÇÉÈÊËÎÏÔŒÙÛÜŸ', 'abcdefghijklmnopqrstuvwxyzàâäçéèêëîïôœùûüÿ'), 'détails clés')
+                              or contains(translate(normalize-space(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZÀÂÄÇÉÈÊËÎÏÔŒÙÛÜŸ', 'abcdefghijklmnopqrstuvwxyzàâäçéèêëîïôœùûüÿ'), 'details cles')]]"
+        );
+        if ($sectionNodes && $sectionNodes->length > 0) {
+            $keyDetails = $sectionNodes->item(0);
+            $sx = new \DOMXPath($dom);
+            // Country
+            foreach ($countryLabels as $lbl) {
+                $n = $sx->query(".//th[normalize-space()='{$lbl}' or starts-with(normalize-space(), '{$lbl}:')]/following-sibling::td[1]", $keyDetails);
+                if ($n && $n->length > 0) { $country = trim(preg_replace('/\s+/', ' ', $n->item(0)->textContent)); break; }
+                $n = $sx->query(".//dt[normalize-space()='{$lbl}' or starts-with(normalize-space(), '{$lbl}:')]/following-sibling::dd[1]", $keyDetails);
+                if ($n && $n->length > 0) { $country = trim(preg_replace('/\s+/', ' ', $n->item(0)->textContent)); break; }
+            }
+            // Region
+            foreach ($regionLabels as $lbl) {
+                $n = $sx->query(".//th[normalize-space()='{$lbl}' or starts-with(normalize-space(), '{$lbl}:')]/following-sibling::td[1]", $keyDetails);
+                if ($n && $n->length > 0) { $region = trim(preg_replace('/\s+/', ' ', $n->item(0)->textContent)); break; }
+                $n = $sx->query(".//dt[normalize-space()='{$lbl}' or starts-with(normalize-space(), '{$lbl}:')]/following-sibling::dd[1]", $keyDetails);
+                if ($n && $n->length > 0) { $region = trim(preg_replace('/\s+/', ' ', $n->item(0)->textContent)); break; }
+            }
+            // Closing Date
+            foreach ($closingLabels as $lbl) {
+                $n = $sx->query(".//th[normalize-space()='{$lbl}' or starts-with(normalize-space(), '{$lbl}:')]/following-sibling::td[1]", $keyDetails);
+                if ($n && $n->length > 0) { $closingRaw = trim(preg_replace('/\s+/', ' ', $n->item(0)->textContent)); break; }
+                $n = $sx->query(".//dt[normalize-space()='{$lbl}' or starts-with(normalize-space(), '{$lbl}:')]/following-sibling::dd[1]", $keyDetails);
+                if ($n && $n->length > 0) { $closingRaw = trim(preg_replace('/\s+/', ' ', $n->item(0)->textContent)); break; }
                 }
             }
         }

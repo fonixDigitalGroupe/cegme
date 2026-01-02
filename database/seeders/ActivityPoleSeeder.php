@@ -22,11 +22,13 @@ class ActivityPoleSeeder extends Seeder
             ['keyword' => 'EIES'],
             ['keyword' => 'Impact environnemental'],
             ['keyword' => 'Audit environnemental'],
-            ['keyword' => 'Plan de Gestion Environnementale et Sociale'],
+            ['keyword' => 'Plan de Gestion Environnementale et Sociale (PGES)'],
             ['keyword' => 'PGES'],
+            ['keyword' => 'Plan de Gestion Environnementale et Sociale'],
             ['keyword' => 'Environnement'],
             ['keyword' => 'Vulnérabilité climatique'],
             ['keyword' => 'Climat'],
+            ['keyword' => 'Audit'],
         ]);
 
         // Pôle Mines & Technique
@@ -54,8 +56,9 @@ class ActivityPoleSeeder extends Seeder
         $eau->keywords()->createMany([
             ['keyword' => 'Hydrogéologie'],
             ['keyword' => 'Forages'],
-            ['keyword' => 'Alimentation en Eau Potable'],
+            ['keyword' => 'Alimentation en Eau Potable (AEP)'],
             ['keyword' => 'AEP'],
+            ['keyword' => 'Alimentation en Eau Potable'],
             ['keyword' => 'Hydraulique'],
             ['keyword' => 'Eau'],
             ['keyword' => 'Assainissement'],
@@ -96,6 +99,9 @@ class ActivityPoleSeeder extends Seeder
         
         $securite->keywords()->createMany([
             ['keyword' => 'HSSE'],
+            ['keyword' => 'Hygiène et Sécurité'],
+            ['keyword' => 'Risques professionnels'],
+            ['keyword' => 'Surveillance de chantier'],
             ['keyword' => 'Sécurité'],
             ['keyword' => 'Santé'],
             ['keyword' => 'Hygiène'],

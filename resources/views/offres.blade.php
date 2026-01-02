@@ -305,7 +305,7 @@
 
         <!-- Filtres -->
         <div class="filters-container" style="background-color: #ffffff; border: 1px solid #dee2e6; border-radius: 4px; padding: 1.5rem; margin-bottom: 2rem;">
-            <form method="GET" action="{{ route('appels-offres.index') }}" class="filters-form" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; align-items: end;">
+            <form method="GET" action="{{ route('appels-offres.index') }}" id="filters-form" class="filters-form" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; align-items: end;">
                 <!-- Type de marché -->
                 <div class="filter-group">
                     <label for="market_type" style="display: block; font-size: 0.875rem; font-weight: 600; color: #495057; margin-bottom: 0.5rem;">Type de marché</label>
@@ -344,6 +344,49 @@
                 </div>
             </form>
         </div>
+
+        <script>
+        // Auto-submit des filtres à chaque changement
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('filters-form');
+            const marketType = document.getElementById('market_type');
+            const activityPoleId = document.getElementById('activity_pole_id');
+            const keyword = document.getElementById('keyword');
+            let keywordTimeout = null;
+
+            // Auto-submit quand on change les selects
+            if (marketType) {
+                marketType.addEventListener('change', function() {
+                    form.submit();
+                });
+            }
+
+            if (activityPoleId) {
+                activityPoleId.addEventListener('change', function() {
+                    form.submit();
+                });
+            }
+
+            // Auto-submit pour le mot-clé avec un délai (debounce) pour éviter trop de requêtes
+            if (keyword) {
+                keyword.addEventListener('input', function() {
+                    clearTimeout(keywordTimeout);
+                    keywordTimeout = setTimeout(function() {
+                        form.submit();
+                    }, 500); // Attendre 500ms après la dernière frappe
+                });
+
+                // Soumettre aussi quand on appuie sur Enter
+                keyword.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        clearTimeout(keywordTimeout);
+                        form.submit();
+                    }
+                });
+            }
+        });
+        </script>
 
         <!-- Offres Table -->
         @if($offres->count() > 0)

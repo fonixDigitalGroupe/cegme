@@ -114,18 +114,26 @@ class OffreController extends Controller
             ]);
         }
 
-        // Trier par date limite (les plus proches en premier), puis mettre les WB sans date après
+        // Trier par date limite (les plus proches en premier), indépendamment de la source
+        // Les offres sont mélangées par date, pas par source
         $filteredOffres = $filteredOffres->sortBy(function ($offre) {
             try {
                 if (!is_null($offre->date_limite_soumission)) {
                     if (is_object($offre->date_limite_soumission) && method_exists($offre->date_limite_soumission, 'format')) {
-                        return '0-' . $offre->date_limite_soumission->format('Y-m-d'); // groupe 0 = datés
+                        // Groupe 0 = avec date, trier par date croissante (plus proche en premier)
+                        return '0-' . $offre->date_limite_soumission->format('Y-m-d');
                     }
-                    return '0-' . (string) $offre->date_limite_soumission;
+                    // Essayer de parser la date si c'est une string
+                    try {
+                        $date = \Carbon\Carbon::parse($offre->date_limite_soumission);
+                        return '0-' . $date->format('Y-m-d');
+                    } catch (\Exception $e) {
+                        return '0-' . (string) $offre->date_limite_soumission;
+                    }
                 }
             } catch (\Exception $e) {}
-            // Groupe 1 = WB sans date, Groupe 2 = autres sans date (devraient déjà être filtrées)
-            return ($offre->source === 'World Bank') ? '1-9999-12-31' : '2-9999-12-31';
+            // Groupe 1 = sans date (World Bank ou autres), mettre à la fin
+            return '1-9999-12-31';
         });
 
         // Paginer les résultats filtrés
