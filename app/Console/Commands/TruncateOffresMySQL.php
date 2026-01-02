@@ -61,3 +61,6 @@ class TruncateOffresMySQL extends Command
     }
 }
 
+
+
+

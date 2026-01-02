@@ -16,10 +16,16 @@ class FilteringRuleController extends Controller
      */
     public function index()
     {
-        $rules = FilteringRule::with(['countries', 'activityPoles'])
-            ->orderBy('source')
-            ->orderBy('created_at', 'desc')
-            ->get();
+        try {
+            $rules = FilteringRule::with(['countries', 'activityPoles'])
+                ->orderBy('source')
+                ->orderBy('created_at', 'desc')
+                ->get();
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Si la table n'existe pas encore, renvoyer une collection vide et logguer
+            \Log::warning('FilteringRuleController@index: table filtering_rules manquante', ['error' => $e->getMessage()]);
+            $rules = collect();
+        }
 
         // Liste des sources disponibles
         $sources = [
@@ -50,7 +56,13 @@ class FilteringRuleController extends Controller
             'IFAD',
         ];
 
-        $activityPoles = ActivityPole::with('keywords')->get();
+        try {
+            $activityPoles = ActivityPole::with('keywords')->get();
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Si la table n'existe pas encore, logguer et renvoyer une collection vide
+            \Log::warning('FilteringRuleController@create: table activity_poles manquante', ['error' => $e->getMessage()]);
+            $activityPoles = collect();
+        }
 
         return view('admin.filtering-rules.create', compact('sources', 'activityPoles'));
     }

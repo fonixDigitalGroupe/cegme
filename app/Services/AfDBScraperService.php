@@ -36,7 +36,8 @@ class AfDBScraperService
         $pagesStats = [];
 
         try {
-            while ($page <= self::MAX_PAGES) {
+            $maxPages = max(1, min((int) env('AFDB_MAX_PAGES', 5), self::MAX_PAGES));
+            while ($page < $maxPages) {
                 Log::debug("AfDB Scraper: Fetching page {$page}");
                 
                 $result = $this->scrapePage($page);
@@ -566,8 +567,13 @@ class AfDBScraperService
             // Extraire la date de publication
             $datePublication = $this->extractPublicationDate($item, $xpath);
             
-            // Date limite (peut ne pas être disponible)
-            $dateLimite = $datePublication; // Utiliser la date de publication par défaut
+            // Date limite - extraire depuis la page de détail pour avoir la vraie date
+            $dateLimite = $this->extractDeadlineFromDetailPage($lien);
+            
+            // Si pas trouvée dans la page de détail, utiliser la date de publication
+            if (empty($dateLimite)) {
+                $dateLimite = $datePublication;
+            }
             
             // Acheteur
             $acheteur = "African Development Bank";
@@ -639,31 +645,67 @@ class AfDBScraperService
     }
 
     /**
-     * Extrait la date de publication
+     * Extrait la date de publication ou deadline
      */
     private function extractPublicationDate(\DOMElement $item, DOMXPath $xpath): ?string
     {
         $text = $item->textContent;
+        $html = $item->ownerDocument->saveHTML($item);
         
-        // Patterns de date
+        // Patterns de date plus complets (ajouter plus de variations)
         $patterns = [
-            '/(\d{1,2})\/(\d{1,2})\/(\d{4})/',
-            '/(\d{4})-(\d{2})-(\d{2})/',
+            // Formats américains
             '/(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{1,2}),\s+(\d{4})/i',
+            '/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\.?\s+(\d{1,2}),?\s+(\d{4})/i',
+            // Formats européens
+            '/(\d{1,2})\/(\d{1,2})\/(\d{4})/',
+            '/(\d{1,2})-(\d{1,2})-(\d{4})/',
+            // Formats ISO
+            '/(\d{4})-(\d{2})-(\d{2})/',
+            // Formats avec mots-clés (deadline, closing, due date)
+            '/(deadline|closing|due|submission)[\s:]+(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{1,2}),?\s+(\d{4})/i',
+            '/(deadline|closing|due|submission)[\s:]+(\d{1,2})\/(\d{1,2})\/(\d{4})/i',
         ];
         
+        // Chercher dans le texte brut
         foreach ($patterns as $pattern) {
             if (preg_match($pattern, $text, $matches)) {
                 try {
                     $dateStr = $matches[0];
+                    // Nettoyer la chaîne de date
+                    $dateStr = preg_replace('/^(deadline|closing|due|submission)[\s:]+/i', '', $dateStr);
+                    $dateStr = trim($dateStr);
                     $date = \Carbon\Carbon::parse($dateStr);
-                    return $date->format('Y-m-d');
+                    // Vérifier que la date n'est pas trop ancienne (rejeter les dates > 5 ans)
+                    if ($date->isFuture() || $date->gt(now()->subYears(5))) {
+                        return $date->format('Y-m-d');
+                    }
                 } catch (\Exception $e) {
                     continue;
                 }
             }
         }
         
+        // Chercher aussi dans les attributs HTML (data-date, datetime, etc.)
+        $dateAttributes = ['data-date', 'datetime', 'data-deadline', 'data-closing'];
+        foreach ($dateAttributes as $attr) {
+            $elements = $xpath->query(".//*[@{$attr}]", $item);
+            foreach ($elements as $element) {
+                $dateValue = $element->getAttribute($attr);
+                if (!empty($dateValue)) {
+                    try {
+                        $date = \Carbon\Carbon::parse($dateValue);
+                        if ($date->isFuture() || $date->gt(now()->subYears(5))) {
+                            return $date->format('Y-m-d');
+                        }
+                    } catch (\Exception $e) {
+                        continue;
+                    }
+                }
+            }
+        }
+        
+        // Si aucune date trouvée, retourner null (sera géré plus haut)
         return null;
     }
 
@@ -929,6 +971,272 @@ class AfDBScraperService
         
         // Sinon c'est une page de détail
         return 'detail';
+    }
+
+    /**
+     * Extrait la date limite de soumission depuis la page de détail
+     * 
+     * @param string $url URL de la page de détail
+     * @return string|null Date au format Y-m-d ou null si non trouvée
+     */
+    private function extractDeadlineFromDetailPage(string $url): ?string
+    {
+        try {
+            // Petit délai pour ne pas surcharger le serveur
+            usleep(100000); // 0.1 seconde
+            
+            $html = '';
+            
+            // Essayer d'abord avec Browsershot pour les pages JavaScript
+            try {
+                Log::debug('AfDB Scraper: Using Browsershot to fetch detail page for deadline', ['url' => $url]);
+                
+                $html = Browsershot::url($url)
+                    ->waitUntilNetworkIdle()
+                    ->timeout(30)
+                    ->setOption('args', [
+                        '--no-sandbox',
+                        '--disable-setuid-sandbox',
+                        '--disable-dev-shm-usage',
+                        '--disable-accelerated-2d-canvas',
+                        '--disable-gpu',
+                    ])
+                    ->userAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
+                    ->bodyHtml();
+                
+                if (empty($html)) {
+                    Log::debug('AfDB Scraper: Browsershot returned empty HTML, trying HTTP fallback', ['url' => $url]);
+                    throw new \Exception('Empty HTML from Browsershot');
+                }
+            } catch (\Exception $e) {
+                // Fallback vers HTTP simple
+                Log::debug('AfDB Scraper: Browsershot failed, using HTTP fallback', ['url' => $url, 'error' => $e->getMessage()]);
+                
+                $response = Http::withoutVerifying()
+                    ->timeout(15)
+                    ->retry(1, 500)
+                    ->withHeaders([
+                        'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                        'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                    ])
+                    ->get($url);
+
+                if (!$response->successful()) {
+                    Log::debug('AfDB Scraper: Failed to fetch detail page for deadline', ['url' => $url, 'status' => $response->status()]);
+                    return null;
+                }
+
+                $html = $response->body();
+            }
+
+            if (empty($html)) {
+                return null;
+            }
+
+            // Parser le HTML
+            $dom = new DOMDocument();
+            libxml_use_internal_errors(true);
+            @$dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
+            libxml_clear_errors();
+            $xpath = new DOMXPath($dom);
+
+            // Chercher la date limite avec plusieurs stratégies
+            
+            // Stratégie 1: Chercher dans les éléments avec icônes de calendrier ou attributs de date
+            $dateSelectors = [
+                "//*[contains(@class, 'date')]",
+                "//*[contains(@class, 'deadline')]",
+                "//*[contains(@class, 'calendar')]",
+                "//*[@data-date]",
+                "//*[@datetime]",
+                "//*[contains(@class, 'icon-calendar')]/following-sibling::*",
+                "//*[contains(@class, 'fa-calendar')]/parent::*",
+                "//*[contains(@class, 'calendar-icon')]/following-sibling::*",
+            ];
+
+            foreach ($dateSelectors as $selector) {
+                try {
+                    $elements = $xpath->query($selector);
+                    foreach ($elements as $element) {
+                        $text = trim($element->textContent);
+                        $date = $this->parseDateFromText($text);
+                        if ($date) {
+                            Log::debug('AfDB Scraper: Found deadline date via selector', ['url' => $url, 'selector' => $selector, 'date' => $date]);
+                            return $date;
+                        }
+                    }
+                } catch (\Exception $e) {
+                    continue;
+                }
+            }
+
+            // Stratégie 2: Chercher près des mots-clés de deadline dans le HTML
+            $deadlineKeywords = [
+                'deadline',
+                'closing date',
+                'submission deadline',
+                'due date',
+                'date limite',
+                'date de clôture',
+                'date limite de soumission',
+                'closing',
+                'submission date',
+                'closing date for submission',
+                'deadline for submission',
+            ];
+
+            $text = $html; // Garder le HTML original pour la recherche
+            $textLower = strtolower($html);
+            $textContent = strtolower($dom->textContent ?? '');
+
+            // Patterns de date améliorés (incluant le format DD-MMM-YYYY)
+            $datePatterns = [
+                // Format DD-MMM-YYYY (19-Dec-2025)
+                '/(\d{1,2})[\s-](Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*[\s-](\d{4})/i',
+                // Format DD/MMM/YYYY
+                '/(\d{1,2})\/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\/(\d{4})/i',
+                // Formats américains complets
+                '/(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{1,2}),?\s+(\d{4})/i',
+                '/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\.?\s+(\d{1,2}),?\s+(\d{4})/i',
+                // Formats européens
+                '/(\d{1,2})\/(\d{1,2})\/(\d{4})/',
+                '/(\d{1,2})-(\d{1,2})-(\d{4})/',
+                // Formats ISO
+                '/(\d{4})-(\d{2})-(\d{2})/',
+                // Format avec jour de la semaine
+                '/(\d{1,2})\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{4})/i',
+            ];
+
+            // Chercher près des mots-clés de deadline
+            foreach ($deadlineKeywords as $keyword) {
+                $keywordPos = stripos($textLower, $keyword);
+                if ($keywordPos !== false) {
+                    // Extraire 300 caractères autour du mot-clé (plus large pour capturer la date)
+                    $context = substr($text, max(0, $keywordPos - 100), 400);
+                    $contextLower = strtolower($context);
+                    
+                    // Chercher une date dans ce contexte
+                    foreach ($datePatterns as $pattern) {
+                        if (preg_match($pattern, $context, $matches)) {
+                            try {
+                                $dateStr = $matches[0];
+                                // Nettoyer la chaîne de date
+                                $dateStr = preg_replace('/^(deadline|closing|due|submission)[\s:]+/i', '', $dateStr);
+                                $dateStr = trim($dateStr);
+                                
+                                $date = \Carbon\Carbon::parse($dateStr);
+                                // Vérifier que la date est dans le futur ou pas trop ancienne (max 2 ans)
+                                if ($date->isFuture() || $date->gt(now()->subYears(2))) {
+                                    Log::debug('AfDB Scraper: Found deadline date near keyword', [
+                                        'url' => $url,
+                                        'keyword' => $keyword,
+                                        'date' => $date->format('Y-m-d'),
+                                        'original' => $dateStr
+                                    ]);
+                                    return $date->format('Y-m-d');
+                                }
+                            } catch (\Exception $e) {
+                                continue;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Stratégie 3: Chercher toutes les dates dans la page et prendre la plus récente future
+            $allDates = [];
+            foreach ($datePatterns as $pattern) {
+                if (preg_match_all($pattern, $textContent, $matches, PREG_SET_ORDER)) {
+                    foreach ($matches as $match) {
+                        try {
+                            $dateStr = $match[0];
+                            $date = \Carbon\Carbon::parse($dateStr);
+                            // Garder seulement les dates futures ou récentes (max 2 ans)
+                            if ($date->isFuture() || $date->gt(now()->subYears(2))) {
+                                $allDates[] = [
+                                    'date' => $date,
+                                    'str' => $dateStr,
+                                    'pos' => stripos($textContent, $dateStr)
+                                ];
+                            }
+                        } catch (\Exception $e) {
+                            continue;
+                        }
+                    }
+                }
+            }
+
+            // Si plusieurs dates trouvées, prendre la plus récente (probablement la deadline)
+            if (!empty($allDates)) {
+                usort($allDates, function($a, $b) {
+                    return $a['date']->gt($b['date']) ? -1 : 1;
+                });
+                
+                $bestDate = $allDates[0]['date'];
+                Log::debug('AfDB Scraper: Found date in page (most recent)', [
+                    'url' => $url,
+                    'date' => $bestDate->format('Y-m-d'),
+                    'total_dates_found' => count($allDates)
+                ]);
+                return $bestDate->format('Y-m-d');
+            }
+
+            Log::debug('AfDB Scraper: No deadline date found in detail page', ['url' => $url]);
+            return null;
+
+        } catch (\Exception $e) {
+            Log::debug('AfDB Scraper: Error extracting deadline from detail page', [
+                'url' => $url,
+                'error' => $e->getMessage(),
+            ]);
+            return null;
+        }
+    }
+
+    /**
+     * Parse une date depuis un texte
+     * 
+     * @param string $text
+     * @return string|null Date au format Y-m-d ou null
+     */
+    private function parseDateFromText(string $text): ?string
+    {
+        if (empty($text)) {
+            return null;
+        }
+
+        // Patterns de date
+        $datePatterns = [
+            // Format DD-MMM-YYYY (19-Dec-2025)
+            '/(\d{1,2})[\s-](Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*[\s-](\d{4})/i',
+            // Format DD/MMM/YYYY
+            '/(\d{1,2})\/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\/(\d{4})/i',
+            // Formats américains
+            '/(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{1,2}),?\s+(\d{4})/i',
+            '/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\.?\s+(\d{1,2}),?\s+(\d{4})/i',
+            // Formats européens
+            '/(\d{1,2})\/(\d{1,2})\/(\d{4})/',
+            '/(\d{1,2})-(\d{1,2})-(\d{4})/',
+            // Formats ISO
+            '/(\d{4})-(\d{2})-(\d{2})/',
+        ];
+
+        foreach ($datePatterns as $pattern) {
+            if (preg_match($pattern, $text, $matches)) {
+                try {
+                    $dateStr = $matches[0];
+                    $date = \Carbon\Carbon::parse($dateStr);
+                    // Vérifier que la date est dans le futur ou pas trop ancienne (max 2 ans)
+                    if ($date->isFuture() || $date->gt(now()->subYears(2))) {
+                        return $date->format('Y-m-d');
+                    }
+                } catch (\Exception $e) {
+                    continue;
+                }
+            }
+        }
+
+        return null;
     }
 }
 

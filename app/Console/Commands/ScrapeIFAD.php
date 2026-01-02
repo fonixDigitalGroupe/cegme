@@ -3,15 +3,25 @@
 namespace App\Console\Commands;
 
 use App\Services\IFADScraperService;
+use App\Services\ScraperHelper;
 use Illuminate\Console\Command;
 
 class ScrapeIFAD extends Command
 {
-    protected $signature = 'app:scrape-ifad';
-    protected $description = 'Scrape IFAD procurement notices from UNGM';
+    protected $signature = 'app:scrape-ifad {--force : Forcer le scraping même si aucune règle active}';
+    protected $description = 'Scrape IFAD procurement notices from UNGM (uniquement si une règle active existe)';
 
     public function handle(IFADScraperService $scraper)
     {
+        $source = 'IFAD';
+        
+        // Vérifier si une règle active existe pour cette source
+        if (!$this->option('force') && !ScraperHelper::hasActiveRule($source)) {
+            $this->warn("⚠ Aucune règle de filtrage active trouvée pour la source '{$source}'.");
+            $this->info("💡 Le scraping ne sera pas exécuté. Activez une règle de filtrage dans l'admin ou utilisez --force pour forcer le scraping.");
+            return Command::FAILURE;
+        }
+
         $this->info('Début du scraping des appels d\'offres IFAD...');
         
         try {

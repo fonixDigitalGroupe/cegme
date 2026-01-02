@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Services\AfDBScraperService;
+use App\Services\ScraperHelper;
 use Illuminate\Console\Command;
 
 class ScrapeAfDB extends Command
@@ -12,20 +13,29 @@ class ScrapeAfDB extends Command
      *
      * @var string
      */
-    protected $signature = 'app:scrape-afdb';
+    protected $signature = 'app:scrape-afdb {--force : Forcer le scraping même si aucune règle active}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Scrape African Development Bank (AfDB) procurement notices';
+    protected $description = 'Scrape African Development Bank (AfDB) procurement notices (uniquement si une règle active existe)';
 
     /**
      * Execute the console command.
      */
     public function handle(AfDBScraperService $scraper)
     {
+        $source = 'African Development Bank';
+        
+        // Vérifier si une règle active existe pour cette source
+        if (!$this->option('force') && !ScraperHelper::hasActiveRule($source)) {
+            $this->warn("⚠ Aucune règle de filtrage active trouvée pour la source '{$source}'.");
+            $this->info("💡 Le scraping ne sera pas exécuté. Activez une règle de filtrage dans l'admin ou utilisez --force pour forcer le scraping.");
+            return Command::FAILURE;
+        }
+
         $this->info('Début du scraping des appels d\'offres African Development Bank (AfDB)...');
 
         try {

@@ -3,15 +3,25 @@
 namespace App\Console\Commands;
 
 use App\Services\BDEACScraperService;
+use App\Services\ScraperHelper;
 use Illuminate\Console\Command;
 
 class ScrapeBDEAC extends Command
 {
-    protected $signature = 'app:scrape-bdeac';
-    protected $description = 'Scrape BDEAC procurement notices';
+    protected $signature = 'app:scrape-bdeac {--force : Forcer le scraping même si aucune règle active}';
+    protected $description = 'Scrape BDEAC procurement notices (uniquement si une règle active existe)';
 
     public function handle(BDEACScraperService $scraper)
     {
+        $source = 'BDEAC';
+        
+        // Vérifier si une règle active existe pour cette source
+        if (!$this->option('force') && !ScraperHelper::hasActiveRule($source)) {
+            $this->warn("⚠ Aucune règle de filtrage active trouvée pour la source '{$source}'.");
+            $this->info("💡 Le scraping ne sera pas exécuté. Activez une règle de filtrage dans l'admin ou utilisez --force pour forcer le scraping.");
+            return Command::FAILURE;
+        }
+
         $this->info('Début du scraping des appels d\'offres BDEAC...');
         
         try {
@@ -40,6 +50,10 @@ class ScrapeBDEAC extends Command
         }
     }
 }
+
+
+
+
 
 
 

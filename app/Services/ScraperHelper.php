@@ -47,7 +47,8 @@ class ScraperHelper
             'DGMarket' => 'DGMarket',
             'BDEAC' => 'BDEAC',
             'IFAD' => 'IFAD',
-            'TED' => 'TED',
+            'DG Market (TED)' => 'DG Market (TED)',
+            'TED' => 'DG Market (TED)', // Alias pour compatibilité
         ];
 
         return $mapping[$scraperSource] ?? $scraperSource;

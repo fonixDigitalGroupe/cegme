@@ -3,15 +3,25 @@
 namespace App\Console\Commands;
 
 use App\Services\TEDScraperService;
+use App\Services\ScraperHelper;
 use Illuminate\Console\Command;
 
 class ScrapeTED extends Command
 {
-    protected $signature = 'app:scrape-ted';
-    protected $description = 'Scrape DG Market (TED) procurement notices for African countries';
+    protected $signature = 'app:scrape-ted {--force : Forcer le scraping même si aucune règle active}';
+    protected $description = 'Scrape DG Market (TED) procurement notices for African countries (uniquement si une règle active existe)';
 
     public function handle(TEDScraperService $scraper)
     {
+        $source = 'DG Market (TED)';
+        
+        // Vérifier si une règle active existe pour cette source
+        if (!$this->option('force') && !ScraperHelper::hasActiveRule($source)) {
+            $this->warn("⚠ Aucune règle de filtrage active trouvée pour la source '{$source}'.");
+            $this->info("💡 Le scraping ne sera pas exécuté. Activez une règle de filtrage dans l'admin ou utilisez --force pour forcer le scraping.");
+            return Command::FAILURE;
+        }
+
         $this->info('Début du scraping des appels d\'offres DG Market (TED) pour l\'Afrique...');
         
         try {
@@ -40,6 +50,7 @@ class ScrapeTED extends Command
         }
     }
 }
+
 
 
 

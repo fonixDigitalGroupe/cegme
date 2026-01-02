@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name'); // Nom de la règle (ex: "Règle BAD - Bureau d'études")
             $table->string('source'); // Source du scraper (ex: "African Development Bank", "AFD", etc.)
-            $table->enum('market_type', ['bureau_d_etude', 'consultant_individuel']); // Type de marché obligatoire
+            $table->enum('market_type', ['bureau_d_etude', 'consultant_individuel'])->nullable(); // Type de marché facultatif
             $table->boolean('is_active')->default(true); // Activer/désactiver la règle
             $table->timestamps();
         });

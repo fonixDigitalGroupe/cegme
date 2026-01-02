@@ -35,8 +35,11 @@ class AFDScraperService
         $pagesStats = []; // Statistiques par page
 
         try {
+            // Nombre de pages max configurable
+            $maxPages = (int) env('AFD_MAX_PAGES', 5);
+            $maxPages = max(1, min($maxPages, self::MAX_PAGES));
             // Pagination: commencer à page=0, incrémenter jusqu'à ce qu'une page retourne 0 offres
-            while ($page <= self::MAX_PAGES) {
+            while ($page < $maxPages) {
                 Log::info("AFD Scraper: Scraping page {$page}");
                 
                 $result = $this->scrapePage($page);
@@ -597,8 +600,13 @@ class AFDScraperService
             // Extraire le pays (chercher dans les textes de l'élément)
             $pays = $this->extractCountry($item, $xpath);
 
-            // Extraire la date limite
+            // Extraire la date limite depuis la liste (tentative rapide)
             $dateLimite = $this->extractDeadline($item, $xpath);
+            
+            // Si pas trouvée dans la liste, extraire depuis la page de détail
+            if (empty($dateLimite) && $lien) {
+                $dateLimite = $this->extractDeadlineFromDetailPage($lien);
+            }
 
             // Acheteur est toujours AFD pour ce site
             $acheteur = "Agence Française de Développement (AFD)";
@@ -798,6 +806,156 @@ class AFDScraperService
         }
 
         return 'https://www.afd.fr/' . $url;
+    }
+
+    /**
+     * Extrait la date limite de soumission depuis la page de détail
+     * 
+     * @param string $url URL de la page de détail
+     * @return string|null Date au format Y-m-d ou null si non trouvée
+     */
+    private function extractDeadlineFromDetailPage(string $url): ?string
+    {
+        try {
+            // Petit délai pour ne pas surcharger le serveur
+            usleep(100000); // 0.1 seconde
+            
+            $html = '';
+            
+            // Essayer d'abord avec Browsershot pour les pages JavaScript
+            try {
+                $html = \Spatie\Browsershot\Browsershot::url($url)
+                    ->waitUntilNetworkIdle()
+                    ->timeout(30)
+                    ->setOption('args', [
+                        '--no-sandbox',
+                        '--disable-setuid-sandbox',
+                        '--disable-dev-shm-usage',
+                        '--disable-accelerated-2d-canvas',
+                        '--disable-gpu',
+                    ])
+                    ->userAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
+                    ->bodyHtml();
+                
+                if (empty($html)) {
+                    throw new \Exception('Empty HTML from Browsershot');
+                }
+            } catch (\Exception $e) {
+                // Fallback vers HTTP simple
+                $response = \Illuminate\Support\Facades\Http::withoutVerifying()
+                    ->timeout(15)
+                    ->retry(1, 500)
+                    ->withHeaders([
+                        'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                        'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                    ])
+                    ->get($url);
+
+                if (!$response->successful()) {
+                    return null;
+                }
+
+                $html = $response->body();
+            }
+
+            if (empty($html)) {
+                return null;
+            }
+
+            // Parser le HTML
+            $dom = new \DOMDocument();
+            libxml_use_internal_errors(true);
+            @$dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
+            libxml_clear_errors();
+            $xpath = new \DOMXPath($dom);
+
+            // Chercher la date limite avec plusieurs stratégies
+            $deadlineKeywords = [
+                'date limite',
+                'date de clôture',
+                'clôture',
+                'deadline',
+                'closing date',
+                'échéance',
+            ];
+
+            $text = strtolower($html);
+            $textContent = strtolower($dom->textContent ?? '');
+
+            // Patterns de date français
+            $datePatterns = [
+                '/(\d{1,2})\s+(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\s+(\d{4})/i',
+                '/(\d{1,2})\/(\d{1,2})\/(\d{4})/',
+                '/(\d{4})-(\d{2})-(\d{2})/',
+            ];
+
+            // Chercher près des mots-clés de deadline
+            foreach ($deadlineKeywords as $keyword) {
+                $keywordPos = stripos($text, $keyword);
+                if ($keywordPos !== false) {
+                    // Extraire 300 caractères autour du mot-clé
+                    $context = substr($text, max(0, $keywordPos - 100), 400);
+                    
+                    // Chercher une date dans ce contexte
+                    foreach ($datePatterns as $pattern) {
+                        if (preg_match($pattern, $context, $matches)) {
+                            try {
+                                $dateStr = $matches[0];
+                                
+                                // Essayer de parser la date française
+                                try {
+                                    $date = \Carbon\Carbon::createFromLocaleFormat('d F Y', 'fr', $dateStr);
+                                } catch (\Exception $e) {
+                                    // Essayer format d/m/Y
+                                    $date = \Carbon\Carbon::createFromFormat('d/m/Y', $dateStr);
+                                }
+                                
+                                // Vérifier que la date est dans le futur ou pas trop ancienne (max 2 ans)
+                                if ($date->isFuture() || $date->gt(now()->subYears(2))) {
+                                    return $date->format('Y-m-d');
+                                }
+                            } catch (\Exception $e) {
+                                continue;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Si pas trouvé près des mots-clés, chercher toutes les dates dans la page
+            foreach ($datePatterns as $pattern) {
+                if (preg_match_all($pattern, $textContent, $matches, PREG_SET_ORDER)) {
+                    // Prendre la dernière date trouvée (souvent la deadline est mentionnée en dernier)
+                    foreach (array_reverse($matches) as $match) {
+                        try {
+                            $dateStr = $match[0];
+                            
+                            try {
+                                $date = \Carbon\Carbon::createFromLocaleFormat('d F Y', 'fr', $dateStr);
+                            } catch (\Exception $e) {
+                                $date = \Carbon\Carbon::createFromFormat('d/m/Y', $dateStr);
+                            }
+                            
+                            // Vérifier que la date est dans le futur ou pas trop ancienne
+                            if ($date->isFuture() || $date->gt(now()->subYears(2))) {
+                                return $date->format('Y-m-d');
+                            }
+                        } catch (\Exception $e) {
+                            continue;
+                        }
+                    }
+                }
+            }
+
+            return null;
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::debug('AFD Scraper: Error extracting deadline from detail page', [
+                'url' => $url,
+                'error' => $e->getMessage(),
+            ]);
+            return null;
+        }
     }
 }
 

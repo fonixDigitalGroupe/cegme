@@ -3,15 +3,25 @@
 namespace App\Console\Commands;
 
 use App\Services\DGMarketScraperService;
+use App\Services\ScraperHelper;
 use Illuminate\Console\Command;
 
 class ScrapeDGMarket extends Command
 {
-    protected $signature = 'app:scrape-dgmarket';
-    protected $description = 'Scrape DGMarket procurement notices for African countries';
+    protected $signature = 'app:scrape-dgmarket {--force : Forcer le scraping même si aucune règle active}';
+    protected $description = 'Scrape DGMarket procurement notices for African countries (uniquement si une règle active existe)';
 
     public function handle(DGMarketScraperService $scraper)
     {
+        $source = 'DGMarket';
+        
+        // Vérifier si une règle active existe pour cette source
+        if (!$this->option('force') && !ScraperHelper::hasActiveRule($source)) {
+            $this->warn("⚠ Aucune règle de filtrage active trouvée pour la source '{$source}'.");
+            $this->info("💡 Le scraping ne sera pas exécuté. Activez une règle de filtrage dans l'admin ou utilisez --force pour forcer le scraping.");
+            return Command::FAILURE;
+        }
+
         $this->info('Début du scraping des appels d\'offres DGMarket pour l\'Afrique...');
         
         try {
@@ -40,6 +50,10 @@ class ScrapeDGMarket extends Command
         }
     }
 }
+
+
+
+
 
 
 

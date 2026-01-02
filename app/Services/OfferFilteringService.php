@@ -24,9 +24,18 @@ class OfferFilteringService
         }
 
         // Récupérer toutes les règles actives
-        $rules = FilteringRule::with(['countries', 'activityPoles.keywords'])
-            ->active()
-            ->get();
+        try {
+            $rules = FilteringRule::with(['countries', 'activityPoles.keywords'])
+                ->active()
+                ->get();
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Si la table n'existe pas (migrations non exécutées), ne pas provoquer une 500
+            Log::warning('OfferFilteringService: table filtering_rules manquante, retour des offres sans filtrage', ['error' => $e->getMessage()]);
+            return $offres;
+        } catch (\Exception $e) {
+            Log::warning('OfferFilteringService: erreur lors de la récupération des règles de filtrage', ['error' => $e->getMessage()]);
+            return $offres;
+        }
 
         if ($rules->isEmpty()) {
             // Si aucune règle active, retourner toutes les offres

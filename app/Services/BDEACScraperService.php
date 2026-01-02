@@ -28,7 +28,8 @@ class BDEACScraperService
             $totalCount = 0;
             $pagesStats = [];
             
-            while ($page <= self::MAX_PAGES) {
+            $maxPages = max(1, min((int) env('BDEAC_MAX_PAGES', 5), self::MAX_PAGES));
+            while ($page < $maxPages) {
                 Log::debug("BDEAC Scraper: Fetching page {$page}");
                 
                 $result = $this->scrapePage($page);

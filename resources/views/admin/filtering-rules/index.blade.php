@@ -6,10 +6,13 @@
 <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
     <h1 style="font-size: 1.5rem; font-weight: 600; color: #1a1a1a; margin: 0;">Règles de filtrage des offres</h1>
     <div style="display: flex; gap: 0.5rem;">
-        <form method="POST" action="{{ route('admin.filtering-rules.reapply') }}" style="display: inline;">
+        <button id="start-scraping-simple" type="button" style="background-color: #3b82f6; color: white; border: none; padding: 0.625rem 1.25rem; font-weight: 500; font-size: 0.875rem; border-radius: 4px; cursor: pointer;">
+            Lancer le scraping
+        </button>
+        <form id="truncate-offres-form" method="POST" action="{{ route('admin.scraping.truncate') }}" style="display: inline;" onsubmit="return confirm('Cette action va supprimer toutes les offres. Continuer ?');">
             @csrf
-            <button type="submit" style="background-color: #3b82f6; color: white; border: none; padding: 0.625rem 1.25rem; font-weight: 500; font-size: 0.875rem; border-radius: 4px; cursor: pointer;">
-                🔄 Relancer le filtrage
+            <button type="submit" style="background-color: #ef4444; color: white; border: none; padding: 0.625rem 1.25rem; font-weight: 500; font-size: 0.875rem; border-radius: 4px; cursor: pointer;">
+                Vider la table offres
             </button>
         </form>
         <a href="{{ route('admin.filtering-rules.create') }}" class="btn" style="background-color: #00C853; color: white; border: none; padding: 0.625rem 1.25rem; font-weight: 500; font-size: 0.875rem; border-radius: 4px; text-decoration: none; display: inline-flex; align-items: center;">
@@ -93,5 +96,108 @@
         </tbody>
     </table>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const btn = document.getElementById('start-scraping-simple');
+    // Le vidage utilise désormais un formulaire POST classique avec confirmation
+    if (!btn) return;
+
+    let polling = null;
+    let jobId = null;
+    let dots = 0;
+    let dotsTimer = null;
+
+    function setRunningState(running) {
+        if (running) {
+            btn.disabled = true;
+            btn.style.opacity = '0.85';
+            btn.textContent = 'Lancement du scraping...';
+            if (dotsTimer) clearInterval(dotsTimer);
+            dots = 0;
+            dotsTimer = setInterval(() => {
+                dots = (dots + 1) % 4;
+                const suffix = '.'.repeat(dots);
+                btn.textContent = 'Scraping en cours' + suffix;
+            }, 600);
+        } else {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            if (dotsTimer) clearInterval(dotsTimer);
+            btn.textContent = 'Lancer le scraping';
+        }
+    }
+
+    function stopPolling() {
+        if (polling) {
+            clearInterval(polling);
+            polling = null;
+        }
+    }
+
+    btn.addEventListener('click', function() {
+        // démarrer
+        setRunningState(true);
+        fetch('{{ route("admin.scraping.start") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify({})
+        })
+        .then(r => {
+            if (!r.ok) { throw new Error('HTTP ' + r.status); }
+            return r.json();
+        })
+        .then(data => {
+            if (!data.success) {
+                alert(data.message || 'Erreur lors du démarrage du scraping');
+                setRunningState(false);
+                return;
+            }
+            jobId = data.job_id;
+            // Poll minimal pour savoir quand c'est fini
+            polling = setInterval(() => {
+                fetch('{{ route("admin.scraping.progress") }}?job_id=' + encodeURIComponent(jobId), {
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin'
+                })
+                .then(r => r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status)))
+                .then(p => {
+                    if (p && p.success && p.progress) {
+                        const status = p.progress.status;
+                        if (status === 'completed' || status === 'failed' || status === 'cancelled') {
+                            stopPolling();
+                            setRunningState(false);
+                            if (status === 'completed') {
+                                alert('Scraping terminé avec succès. Offres mises à jour.');
+                            } else if (status === 'cancelled') {
+                                alert('Scraping annulé.');
+                            } else {
+                                alert('Le scraping a échoué.');
+                            }
+                            // Optionnel: recharger la page pour voir l'effet des règles si nécessaire
+                            // location.reload();
+                        }
+                    }
+                })
+                .catch(() => {});
+            }, 1000);
+        })
+        .catch(() => {
+            alert('Erreur lors du démarrage du scraping');
+            setRunningState(false);
+        });
+    });
+
+    // (Pas de JS nécessaire ici pour le bouton de vidage)
+});
+</script>
 @endsection
 

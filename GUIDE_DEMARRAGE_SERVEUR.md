@@ -77,3 +77,6 @@ Pour arrêter le serveur :
 
 **Gardez toujours une fenêtre de terminal ouverte avec le serveur qui tourne** pendant que vous développez. C'est normal et nécessaire !
 
+
+
+

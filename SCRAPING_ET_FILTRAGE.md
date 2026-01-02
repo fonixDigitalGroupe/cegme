@@ -121,3 +121,6 @@ php artisan scrape:afd --force
 - Si aucune règle active n'existe pour une source, le scraping ne s'exécute pas (sauf avec `--force`)
 - Le filtrage utilise un système de fallback pour garantir qu'il y a toujours des offres affichées
 
+
+
+

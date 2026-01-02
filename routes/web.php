@@ -74,6 +74,13 @@ Route::middleware(['auth', 'adminOrEditor'])->prefix('admin')->name('admin.')->g
     Route::resource('activity-poles', \App\Http\Controllers\Admin\ActivityPoleController::class);
     Route::post('/activity-poles/{activityPole}/keywords', [\App\Http\Controllers\Admin\ActivityPoleController::class, 'addKeyword'])->name('activity-poles.keywords.add');
     Route::delete('/activity-poles/{activityPole}/keywords/{keyword}', [\App\Http\Controllers\Admin\ActivityPoleController::class, 'removeKeyword'])->name('activity-poles.keywords.remove');
+    
+    // Scraping des offres
+    Route::get('/scraping', [\App\Http\Controllers\Admin\ScrapingController::class, 'index'])->name('scraping.index');
+    Route::post('/scraping/start', [\App\Http\Controllers\Admin\ScrapingController::class, 'start'])->name('scraping.start');
+    Route::get('/scraping/progress', [\App\Http\Controllers\Admin\ScrapingController::class, 'progress'])->name('scraping.progress');
+    Route::post('/scraping/cancel', [\App\Http\Controllers\Admin\ScrapingController::class, 'cancel'])->name('scraping.cancel');
+    Route::post('/scraping/truncate', [\App\Http\Controllers\Admin\ScrapingController::class, 'truncate'])->name('scraping.truncate');
 });
 
 // Admin Only Routes

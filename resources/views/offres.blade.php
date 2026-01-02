@@ -63,36 +63,69 @@
         }
         .offres-table-container {
             background-color: #ffffff;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
             overflow: hidden;
             margin-bottom: 2rem;
+            box-shadow: 0 0 1px rgba(0, 0, 0, 0.05);
+        }
+        .table-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 1.25rem;
+            text-align: center;
+            padding: 1.5rem 2rem 0;
+            letter-spacing: -0.01em;
         }
         .offres-table {
             width: 100%;
             border-collapse: collapse;
+            margin: 0;
         }
         .offres-table thead {
-            background-color: #f9fafb;
-            border-bottom: 2px solid #d1d5db;
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
         }
         .offres-table th {
-            padding: 1rem;
+            padding: 0.75rem 1rem;
             text-align: left;
             font-weight: 600;
             font-size: 0.875rem;
-            color: #374151;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+            color: #495057;
+            text-transform: none;
+            letter-spacing: normal;
+            border-right: 1px solid #dee2e6;
+            white-space: nowrap;
+        }
+        .offres-table th:last-child {
+            border-right: none;
         }
         .offres-table td {
-            padding: 1rem;
-            border-bottom: 1px solid #e5e7eb;
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid #dee2e6;
+            border-right: 1px solid #dee2e6;
             font-size: 0.875rem;
-            color: #1a1a1a;
+            color: #212529;
+            vertical-align: middle;
+        }
+        .offres-table td:last-child {
+            border-right: none;
+        }
+        .offres-table tbody tr {
+            transition: background-color 0.1s ease;
         }
         .offres-table tbody tr:hover {
-            background-color: #f9fafb;
+            background-color: #f8f9fa;
+        }
+        .offres-table tbody tr:nth-child(even) {
+            background-color: #ffffff;
+        }
+        .offres-table tbody tr:nth-child(odd) {
+            background-color: #f8f9fa;
+        }
+        .offres-table tbody tr:nth-child(odd):hover {
+            background-color: #e9ecef;
         }
         .offres-table tbody tr:last-child td {
             border-bottom: none;
@@ -124,24 +157,61 @@
                 max-width: 250px;
             }
         }
+        .pagination-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            padding: 1rem 0;
+            border-top: 1px solid #dee2e6;
+        }
+        .pagination-info {
+            font-size: 0.875rem;
+            color: #6c757d;
+            font-weight: 400;
+        }
         .pagination {
             display: flex;
-            justify-content: center;
+            justify-content: flex-end;
+            align-items: center;
             gap: 0.5rem;
-            margin-top: 2rem;
         }
-        .pagination a,
-        .pagination span {
-            padding: 0.5rem 1rem;
-            border: 1px solid #d1d5db;
+        .pagination-button {
+            padding: 0.375rem 0.75rem;
+            border: 1px solid #dee2e6;
             border-radius: 4px;
             text-decoration: none;
-            color: #374151;
+            color: #495057;
+            font-size: 0.875rem;
+            font-weight: 400;
+            background-color: #ffffff;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            min-width: 38px;
+            justify-content: center;
         }
-        .pagination .active {
-            background-color: #059669;
-            color: white;
-            border-color: #059669;
+        .pagination-button:hover:not(.disabled):not(.active) {
+            background-color: #e9ecef;
+            border-color: #adb5bd;
+            color: #212529;
+        }
+        .pagination-button.active {
+            background: linear-gradient(180deg, #0a9678 0%, #10b981 100%);
+            border-color: #10b981;
+            color: #ffffff;
+            font-weight: 500;
+        }
+        .pagination-button.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: #f8f9fa;
+            border-color: #dee2e6;
+            color: #adb5bd;
+        }
+        .pagination-button svg {
+            width: 14px;
+            height: 14px;
         }
         .empty-state {
             text-align: center;
@@ -219,7 +289,7 @@
     </header>
 
     <!-- Hero Section - Page Header -->
-    <section class="relative w-full flex items-center justify-center overflow-hidden" style="min-height: 45vh; padding: 60px 0; background: linear-gradient(to right bottom, rgb(6, 78, 59), rgb(17, 94, 89), rgb(15, 23, 42)); margin-top: 80px;">
+    <section class="relative w-full flex items-center justify-center overflow-hidden" style="min-height: 45vh; padding: 60px 0; background: linear-gradient(to right bottom, rgb(6, 78, 59), rgb(17, 94, 89), rgb(15, 23, 42));">
         <div class="relative z-10 w-full max-w-4xl mx-auto px-4 text-center" style="margin-top: 100px;">
             <h1 class="mb-6" style="font-size: 60px; font-weight: 700; color: rgb(255, 255, 255); margin-bottom: 24px; text-align: center; line-height: 72px;">
                 Appels d'Offres
@@ -233,26 +303,65 @@
     <!-- Main Content -->
     <div class="container" style="padding-top: 48px;">
 
+        <!-- Filtres -->
+        <div class="filters-container" style="background-color: #ffffff; border: 1px solid #dee2e6; border-radius: 4px; padding: 1.5rem; margin-bottom: 2rem;">
+            <form method="GET" action="{{ route('appels-offres.index') }}" class="filters-form" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; align-items: end;">
+                <!-- Type de marché -->
+                <div class="filter-group">
+                    <label for="market_type" style="display: block; font-size: 0.875rem; font-weight: 600; color: #495057; margin-bottom: 0.5rem;">Type de marché</label>
+                    <select name="market_type" id="market_type" style="width: 100%; padding: 0.625rem 0.75rem; border: 1px solid #dee2e6; border-radius: 4px; font-size: 0.875rem; color: #495057; background-color: #ffffff;">
+                        <option value="">Tous</option>
+                        <option value="bureau_d_etude" {{ request('market_type') === 'bureau_d_etude' ? 'selected' : '' }}>Bureau d'études</option>
+                        <option value="consultant_individuel" {{ request('market_type') === 'consultant_individuel' ? 'selected' : '' }}>Consultant individuel</option>
+                    </select>
+                </div>
+
+                <!-- Pôle d'activité -->
+                <div class="filter-group">
+                    <label for="activity_pole_id" style="display: block; font-size: 0.875rem; font-weight: 600; color: #495057; margin-bottom: 0.5rem;">Pôle d'activité</label>
+                    <select name="activity_pole_id" id="activity_pole_id" style="width: 100%; padding: 0.625rem 0.75rem; border: 1px solid #dee2e6; border-radius: 4px; font-size: 0.875rem; color: #495057; background-color: #ffffff;">
+                        <option value="">Tous</option>
+                        @foreach($activityPoles ?? [] as $pole)
+                            <option value="{{ $pole->id }}" {{ request('activity_pole_id') == $pole->id ? 'selected' : '' }}>{{ $pole->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Mot-clé -->
+                <div class="filter-group">
+                    <label for="keyword" style="display: block; font-size: 0.875rem; font-weight: 600; color: #495057; margin-bottom: 0.5rem;">Mot-clé</label>
+                    <input type="text" name="keyword" id="keyword" value="{{ request('keyword') }}" placeholder="Rechercher..." style="width: 100%; padding: 0.625rem 0.75rem; border: 1px solid #dee2e6; border-radius: 4px; font-size: 0.875rem; color: #495057;">
+                </div>
+
+                <!-- Boutons -->
+                <div class="filter-actions" style="display: flex; gap: 0.5rem;">
+                    <button type="submit" style="padding: 0.625rem 1.5rem; background: linear-gradient(180deg, #0a9678 0%, #10b981 100%); color: #ffffff; border: none; border-radius: 4px; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                        Filtrer
+                    </button>
+                    <a href="{{ route('appels-offres.index') }}" style="padding: 0.625rem 1.5rem; background-color: #6c757d; color: #ffffff; border: none; border-radius: 4px; font-size: 0.875rem; font-weight: 600; text-decoration: none; display: inline-block; transition: all 0.2s;">
+                        Réinitialiser
+                    </a>
+                </div>
+            </form>
+        </div>
+
         <!-- Offres Table -->
         @if($offres->count() > 0)
             <div class="offres-table-container">
+                <h2 class="table-title">Tableau de Veille Stratégique : Appels d'Offres & AMI</h2>
                 <table class="offres-table">
                     <thead>
                         <tr>
-                            <th>Titre</th>
                             <th>Source</th>
-                            <th>Pays</th>
-                            <th>Acheteur</th>
+                            <th>Intitulé de la Mission</th>
+                            <th>Zone Géographique</th>
                             <th>Date limite</th>
-                            <th>Action</th>
+                            <th>Lien</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($offres as $offre)
                             <tr>
-                                <td>
-                                    <div class="offre-title" style="color: #1a1a1a;">{{ $offre->titre }}</div>
-                                </td>
                                 <td>
                                     @if($offre->source)
                                         <span style="color: #1a1a1a; font-size: 0.875rem;">{{ $offre->source }}</span>
@@ -261,19 +370,15 @@
                                     @endif
                                 </td>
                                 <td>
+                                    <div class="offre-title" style="color: #1a1a1a;">{{ $offre->titre }}</div>
+                                </td>
+                                <td>
                                     @php
                                         // Afficher seulement les pays filtrés si disponibles, sinon tous les pays
                                         $paysToDisplay = $offre->filtered_pays ?? $offre->pays;
                                     @endphp
                                     @if($paysToDisplay)
                                         <span style="color: #1a1a1a; font-size: 0.875rem;">{{ $paysToDisplay }}</span>
-                                    @else
-                                        <span style="color: #9ca3af;">-</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    @if($offre->acheteur)
-                                        <span style="color: #1a1a1a; font-size: 0.875rem;">{{ Str::limit($offre->acheteur, 40) }}</span>
                                     @else
                                         <span style="color: #9ca3af;">-</span>
                                     @endif
@@ -288,13 +393,17 @@
                                             @endif
                                         </span>
                                     @else
-                                        <span style="color: #9ca3af;">-</span>
+                                        @if(($offre->source ?? '') === 'World Bank')
+                                            <span style="color: #9ca3af;">Date limite : À confirmer (World Bank)</span>
+                                        @else
+                                            <span style="color: #9ca3af;">-</span>
+                                        @endif
                                     @endif
                                 </td>
                                 <td>
                                     @if($offre->lien_source)
                                         <a href="{{ $offre->lien_source }}" target="_blank" rel="noopener noreferrer" style="color: #2563eb; text-decoration: underline; font-size: 0.875rem;">
-                                            +
+                                            Lire plus
                                         </a>
                                     @else
                                         <span style="color: #9ca3af;">-</span>
@@ -307,8 +416,47 @@
             </div>
 
             <!-- Pagination -->
-            <div class="pagination">
-                {{ $offres->links() }}
+            <div class="pagination-wrapper">
+                <div class="pagination-info">
+                    Lignes {{ $offres->firstItem() ?? 0 }} à {{ $offres->lastItem() ?? 0 }} sur {{ $offres->total() }}
+                </div>
+                <div class="pagination">
+                    @if($offres->onFirstPage())
+                        <span class="pagination-button disabled">Préc</span>
+                    @else
+                        <a href="{{ $offres->previousPageUrl() }}" class="pagination-button">Préc</a>
+                    @endif
+                    
+                    @if($offres->currentPage() > 1)
+                        <a href="{{ $offres->url(1) }}" class="pagination-button">1</a>
+                    @endif
+                    
+                    @if($offres->currentPage() > 3)
+                        <span class="pagination-button disabled">...</span>
+                    @endif
+                    
+                    @for($i = max(1, $offres->currentPage() - 1); $i <= min($offres->lastPage(), $offres->currentPage() + 1); $i++)
+                        @if($i == $offres->currentPage())
+                            <span class="pagination-button active">{{ $i }}</span>
+                        @else
+                            <a href="{{ $offres->url($i) }}" class="pagination-button">{{ $i }}</a>
+                        @endif
+                    @endfor
+                    
+                    @if($offres->currentPage() < $offres->lastPage() - 2)
+                        <span class="pagination-button disabled">...</span>
+                    @endif
+                    
+                    @if($offres->currentPage() < $offres->lastPage() && $offres->lastPage() > 1)
+                        <a href="{{ $offres->url($offres->lastPage()) }}" class="pagination-button">{{ $offres->lastPage() }}</a>
+                    @endif
+                    
+                    @if($offres->hasMorePages())
+                        <a href="{{ $offres->nextPageUrl() }}" class="pagination-button">Suiv</a>
+                    @else
+                        <span class="pagination-button disabled">Suiv</span>
+                    @endif
+                </div>
             </div>
         @else
             <div class="empty-state">
