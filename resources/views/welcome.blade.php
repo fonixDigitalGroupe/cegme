@@ -103,8 +103,37 @@
                 /* Afficher le bouton hamburger */
                 .mobile-menu-button {
                     display: flex !important;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    width: 44px;
+                    height: 44px;
+                    background: transparent;
+                    border: none !important;
+                    border-radius: 0;
+                    cursor: pointer;
+                    padding: 0;
+                    z-index: 1001;
+                    position: relative;
                     visibility: visible !important;
                     opacity: 1 !important;
+                    gap: 6px;
+                }
+
+                .mobile-menu-button span {
+                    width: 24px;
+                    height: 3px;
+                    background-color: #000000 !important;
+                    border-radius: 0;
+                    transition: all 0.3s ease;
+                    display: block;
+                    position: relative;
+                }
+
+                .mobile-menu-button:hover,
+                .mobile-menu-button:active {
+                    background: transparent !important;
+                    border: none !important;
                 }
                 
                 /* Menu mobile - masqué par défaut avec animation slide */
@@ -213,22 +242,22 @@
                     width: 44px;
                     height: 44px;
                     background: transparent;
-                    border: 2px solid rgba(55, 65, 81, 0.2);
-                    border-radius: 8px;
+                    border: none !important;
+                    border-radius: 0;
                     cursor: pointer;
                     padding: 0;
                     z-index: 1001;
                     position: relative;
                     visibility: visible !important;
                     opacity: 1 !important;
-                    gap: 5px;
+                    gap: 6px;
                 }
                 
                 .mobile-menu-button span {
                     width: 24px;
                     height: 3px;
-                    background-color: rgb(55, 65, 81);
-                    border-radius: 2px;
+                    background-color: #000000 !important;
+                    border-radius: 0;
                     transition: all 0.3s ease;
                     display: block;
                     position: relative;
@@ -236,16 +265,16 @@
                 
                 /* Améliorer la visibilité du bouton hamburger */
                 .mobile-menu-button:hover {
-                    border-color: rgb(5, 150, 105);
-                    background-color: rgba(5, 150, 105, 0.05);
+                    border-color: transparent;
+                    background-color: transparent;
                 }
                 
                 .mobile-menu-button:hover span {
-                    background-color: rgb(5, 150, 105);
+                    background-color: #000000 !important;
                 }
                 
                 .mobile-menu-button:active span {
-                    background-color: rgb(5, 150, 105);
+                    background-color: #000000 !important;
                 }
                 
                 .mobile-menu-button.active span:nth-child(1) {
@@ -348,6 +377,10 @@
                     max-width: 344px !important;
                     width: 100% !important;
                 }
+
+                .hero-section > div[style*="padding-top: 120px"] > .hero-buttons {
+                    max-width: 100% !important;
+                }
                 
                 .hero-section > div[style*="padding-top: 120px"] > .inline-block {
                     max-width: none !important;
@@ -361,10 +394,10 @@
                 
                 /* Badge Hero mobile - Pixel perfect site de référence */
                 .hero-section .inline-block {
-                    padding: 14px 36px !important;
-                    font-size: 18px !important;
-                    margin-bottom: 33px !important;
-                    margin-top: 40px !important;
+                    padding: 4px 16px !important;
+                    font-size: 13px !important;
+                    margin-bottom: 24px !important;
+                    margin-top: 30px !important;
                     background-color: rgba(16, 185, 129, 0.3) !important;
                     border: 1px solid rgb(5, 150, 105) !important;
                     border-radius: 9999px !important;
@@ -378,7 +411,7 @@
                 }
                 
                 .hero-section .inline-block p {
-                    font-size: 18px !important;
+                    font-size: 16px !important;
                     line-height: 28px !important;
                     color: rgb(110, 231, 183) !important;
                     font-weight: 500 !important;
@@ -409,6 +442,10 @@
                     line-height: 60px !important;
                     font-weight: 700 !important;
                 }
+
+                .hero-title span.hidden {
+                    display: none !important;
+                }
                 
                 .hero-title span.text-white {
                     font-size: 48px !important;
@@ -428,8 +465,8 @@
                 
                 /* Description Hero mobile - Pixel perfect site de référence */
                 .hero-description {
-                    font-size: 20px !important;
-                    line-height: 32.5px !important;
+                    font-size: 24px !important;
+                    line-height: 48px !important;
                     padding: 0 !important;
                     margin-bottom: 40px !important;
                     margin-top: 0 !important;
@@ -446,6 +483,7 @@
                     gap: 16px !important;
                     padding: 0 !important;
                     margin-top: 0 !important;
+                    margin-bottom: 32px !important;
                     width: 100% !important;
                     max-width: 100% !important;
                     align-items: stretch !important;
@@ -495,6 +533,10 @@
                     gap: 8px !important;
                     flex-shrink: 0 !important;
                     box-sizing: border-box !important;
+                }
+
+                .hero-buttons > span.hidden {
+                    display: none !important;
                 }
                 
                 .hero-buttons a svg {
@@ -552,20 +594,9 @@
                 
                 /* Styles Hero déjà définis plus haut - suppression dupliqués */
                 
-                /* Badge Hero mobile */
-                .hero-section .inline-block {
-                    padding: 6px 16px !important;
-                    font-size: 14px !important;
-                    margin-bottom: 16px !important;
-                }
+
                 
-                /* Description Hero mobile */
-                .hero-description {
-                    font-size: 16px !important;
-                    line-height: 24px !important;
-                    padding: 0 16px !important;
-                    margin-bottom: 24px !important;
-                }
+
                 
                 /* Images mobile */
                 img {
@@ -581,6 +612,12 @@
                     padding: 12px 20px !important;
                     font-size: 16px !important;
                 }
+
+                .mobile-menu-button {
+                    min-height: unset !important;
+                    padding: 0 !important;
+                    font-size: inherit !important;
+                }
                 
                 /* Footer mobile */
                 footer {
@@ -595,6 +632,14 @@
                 footer h3 {
                     font-size: 18px !important;
                     margin-bottom: 16px !important;
+                }
+
+                footer img[alt="CEGME Logo"] {
+                    height: 36px !important;
+                    max-height: 36px !important;
+                    width: auto !important;
+                    max-width: 100% !important;
+                    object-fit: contain !important;
                 }
                 
                 /* About section mobile - empiler image et texte */
@@ -616,14 +661,27 @@
                     width: 100% !important;
                     margin-bottom: 24px !important;
                 }
+
+                section[style*="background: linear-gradient(to bottom, rgb(248, 250, 252)"] div[style*="min-height: 550px"] {
+                    height: 320px !important;
+                    min-height: 0 !important;
+                    max-height: none !important;
+                }
+
+                section[style*="background: linear-gradient(to bottom, rgb(248, 250, 252)"] div[style*="overflow: hidden"][style*="min-height: 550px"] {
+                    box-shadow: none !important;
+                    border-radius: 0 !important;
+                    overflow: hidden !important;
+                }
                 
                 section[style*="background: linear-gradient(to bottom, rgb(248, 250, 252)"] img[alt="Équipe CEGME"] {
                     width: 100% !important;
-                    height: auto !important;
-                    min-height: 300px !important;
-                    max-height: 400px !important;
+                    height: 100% !important;
+                    min-height: 0 !important;
+                    max-height: none !important;
                     object-fit: cover !important;
                     object-position: center !important;
+                    display: block !important;
                 }
                 
                 /* Grid mobile pour section About */
@@ -709,6 +767,52 @@
                 .gap-12,
                 .gap-16 {
                     gap: 24px !important;
+                }
+
+                /* Statistiques mobile - affichage vertical */
+                section[style*="padding: 40px 0"][style*="background-color: #ffffff"] div[style*="grid-template-columns: repeat(4"] {
+                    grid-template-columns: 1fr !important;
+                    gap: 24px !important;
+                }
+
+                section[style*="padding: 40px 0"][style*="background-color: #ffffff"] div[style*="width: 55px"][style*="height: 55px"] {
+                    width: 72px !important;
+                    height: 72px !important;
+                    margin-bottom: 12px !important;
+                }
+
+                section[style*="padding: 40px 0"][style*="background-color: #ffffff"] div[style*="width: 55px"][style*="height: 55px"] svg {
+                    width: 34px !important;
+                    height: 34px !important;
+                }
+
+                section[style*="padding: 40px 0"][style*="background-color: #ffffff"] div.text-center {
+                    padding: 12px 0 !important;
+                }
+
+                section[style*="padding: 60px 0"][style*="background-color: #f3f4f6"] div[style*="grid-template-columns: repeat(2"] {
+                    grid-template-columns: 1fr !important;
+                    gap: 24px !important;
+                }
+
+                section[style*="padding: 80px 0"][style*="background-color: #f9fafb"] div[style*="grid-template-columns: repeat(3"] {
+                    grid-template-columns: 1fr !important;
+                    gap: 24px !important;
+                }
+
+                section[style*="padding: 80px 0"][style*="background-color: #ffffff"][style*="border: none"] div[style*="grid-template-columns: repeat(2"] {
+                    grid-template-columns: 1fr !important;
+                    gap: 24px !important;
+                }
+
+                section[style*="padding: 80px 0"][style*="background-color: #ffffff"] div[style*="grid-template-columns: repeat(3"][style*="gap: 32px"] {
+                    grid-template-columns: 1fr !important;
+                    gap: 24px !important;
+                }
+
+                section[style*="padding: 32px 0"][style*="background-color: #f9fafb"] div[style*="grid-template-columns: repeat(4"][style*="gap: 16px"] {
+                    grid-template-columns: 1fr !important;
+                    gap: 20px !important;
                 }
             }
             
@@ -852,7 +956,10 @@
                 <!-- Main Title - Exact Typography from Site -->
                 <h1 class="hero-title mb-6 text-center" style="font-size: 84px; font-weight: 700; line-height: 84px; margin-bottom: 24px; margin-top: 40px; color: #ffffff;">
                     <span class="block text-white">Expertise en Géosciences,</span>
-                    <span class="block text-center" style="background: linear-gradient(to right, rgb(52, 211, 153), rgb(45, 212, 191)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; color: transparent; text-align: center;">Mines & Environnement</span>
+                    <span class="block text-center" style="background: linear-gradient(to right, rgb(52, 211, 153), rgb(45, 212, 191)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; color: transparent; text-align: center;">
+                        <span class="hidden md:inline">Mines &amp; Environnement</span>
+                        <span class="md:hidden">Mines &amp;<br>Environnement</span>
+                    </span>
                 </h1>
                 
                 <!-- Descriptive Paragraph - Exact from Site -->
@@ -880,11 +987,21 @@
         
         <!-- About Section - Before Statistics -->
         <section class="w-full" style="padding: 100px 0; margin: 0; background: linear-gradient(to bottom, rgb(248, 250, 252), rgb(255, 255, 255));">
+            <style>
+                /* Mobile-only styles: emphasize and reorganize hero text without touching desktop */
+                @media (max-width: 639px) {
+                    .mobile-hero-block { background: transparent; padding: 0; border-radius: 0; }
+                    .mobile-hero-title { font-size: 1.5rem !important; line-height: 1.15 !important; margin-bottom: 0.5rem !important; text-align: left !important; }
+                    .mobile-hero-decor { width: 4.5rem !important; height: 4px !important; margin-bottom: 1rem !important; margin-left: 0 !important; margin-right: auto !important; }
+                    .mobile-hero-para { font-size: 20px !important; line-height: 36px !important; text-align: justify !important; }
+                }
+            </style>
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 64px; align-items: stretch;">
                     <!-- Image à gauche -->
                     <div class="relative w-full flex items-stretch" style="position: relative; width: 100%; display: flex; align-items: stretch;">
-                        <div class="absolute -inset-4 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl opacity-20 blur-xl" style="position: absolute; top: -16px; right: -16px; bottom: -16px; left: -16px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.3) 0%, rgba(5, 150, 105, 0.3) 100%); border-radius: 16px; opacity: 0.2; filter: blur(20px); z-index: 0;"></div>
+                        <!-- Decorative card/glow: hidden on small screens to avoid 'card effect' under image -->
+                        <div class="hidden sm:block absolute -inset-4 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl opacity-20 blur-xl" style="position: absolute; top: -16px; right: -16px; bottom: -16px; left: -16px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.3) 0%, rgba(5, 150, 105, 0.3) 100%); border-radius: 16px; opacity: 0.2; filter: blur(20px); z-index: 0;"></div>
                         <div class="relative overflow-hidden rounded-2xl shadow-2xl w-full" style="position: relative; overflow: hidden; border-radius: 16px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03); z-index: 1; width: 100%; height: 100%; min-height: 550px;">
                             <img src="{{ asset('Image/Personnel.jpg') }}" alt="Équipe CEGME" class="w-full h-full object-cover transition-transform duration-700 hover:scale-105" style="width: 100%; height: 100%; min-height: 550px; object-fit: cover; transition: transform 0.7s ease; display: block;">
                         </div>
@@ -892,18 +1009,18 @@
                     
                     <!-- Texte à droite -->
                     <div class="w-full" style="width: 100%;">
-                        <h2 class="text-4xl font-bold mb-6 leading-tight" style="font-size: 42px; font-weight: 800; color: rgb(17, 24, 39); margin-bottom: 24px; line-height: 1.2; letter-spacing: -0.5px;">
+                        <h2 class="text-4xl font-bold mb-6 leading-tight mobile-hero-title" style="font-size: 42px; font-weight: 800; color: rgb(17, 24, 39); margin-bottom: 24px; line-height: 1.2; letter-spacing: -0.5px;">
                             L'Expertise au Service de l'Émergence
                         </h2>
                         
                         <!-- Ligne décorative -->
-                        <div class="w-20 h-1 bg-gradient-to-r from-green-500 to-green-600 rounded-full mb-8" style="width: 80px; height: 4px; background: linear-gradient(90deg, rgb(5, 150, 105) 0%, rgb(16, 185, 129) 100%); border-radius: 9999px; margin-bottom: 32px;"></div>
+                        <div class="w-20 h-1 bg-gradient-to-r from-green-500 to-green-600 rounded-full mb-8 mobile-hero-decor" style="width: 80px; height: 4px; background: linear-gradient(90deg, rgb(5, 150, 105) 0%, rgb(16, 185, 129) 100%); border-radius: 9999px; margin-bottom: 32px;"></div>
                         
-                        <div class="space-y-6" style="display: flex; flex-direction: column; gap: 24px;">
-                            <p class="text-lg text-gray-700 leading-relaxed" style="font-size: 17px; color: rgb(55, 65, 81); line-height: 32px; margin: 0; font-weight: 400;">
+                        <div class="space-y-6 mobile-hero-block" style="display: flex; flex-direction: column; gap: 24px;">
+                            <p class="text-lg text-gray-700 leading-relaxed mobile-hero-para" style="font-size: 17px; color: rgb(55, 65, 81); line-height: 32px; margin: 0; font-weight: 400;">
                                 Le <strong style="font-weight: 700; color: rgb(17, 24, 39);">Cabinet d'Études Géologiques, Minières et Environnementales (CEGME) Sarl.</strong>, est le partenaire de référence pour la conception et la concrétisation de projets stratégiques en République Centrafricaine (RCA) et en Afrique Centrale. Spécialisé dans les géosciences, les mines et le développement durable, le cabinet transforme les enjeux complexes en leviers de croissance responsable pour les investisseurs et les institutions.
                             </p>
-                            <p class="text-lg text-gray-700 leading-relaxed" style="font-size: 17px; color: rgb(55, 65, 81); line-height: 32px; margin: 0; font-weight: 400;">
+                            <p class="text-lg text-gray-700 leading-relaxed mobile-hero-para" style="font-size: 17px; color: rgb(55, 65, 81); line-height: 32px; margin: 0; font-weight: 400;">
                                 Enregistré sous le numéro <strong style="font-weight: 700; color: rgb(17, 24, 39);">N°RCCM : CA/BG/2015B541</strong>, le CEGME est une structure multidisciplinaire agréée et accréditée par le Ministère de l'Environnement et du Développement Durable (<strong style="font-weight: 700; color: rgb(17, 24, 39);">N°004/MEEDD/DIR.CAB_21</strong> et <strong style="font-weight: 700; color: rgb(17, 24, 39);">N°29/MEEDD/DIR.CAB</strong>).
                             </p>
                         </div>
@@ -1903,7 +2020,7 @@
                                     </div>
                                     <div>
                                         <span class="text-white font-semibold block mb-1" style="color: rgb(255, 255, 255); font-weight: 600; font-size: 14px; display: block; margin-bottom: 4px;">Email</span>
-                                        <a href="mailto:contact@cegme.net" class="text-gray-200 text-sm hover:text-green-300 transition-colors" style="color: rgb(229, 231, 235); font-size: 14px; text-decoration: none; transition: color 0.2s ease;">contact@cegme.net</a>
+                                        <a href="mailto:cabinet.rca@cegme.net" class="text-gray-200 text-sm hover:text-green-300 transition-colors" style="color: rgb(229, 231, 235); font-size: 14px; text-decoration: none; transition: color 0.2s ease;">cabinet.rca@cegme.net / cegme.sarl@gmail.com</a>
                                     </div>
                                 </div>
                             </li>

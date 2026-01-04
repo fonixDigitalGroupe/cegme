@@ -74,6 +74,10 @@
             * {
                 box-sizing: border-box;
             }
+
+            footer.mobile-footer-home {
+                display: none;
+            }
             
             /* MOBILE ONLY STYLES - Ne pas affecter le desktop */
             @media (max-width: 768px) {
@@ -85,6 +89,101 @@
                 
                 * {
                     max-width: 100% !important;
+                }
+
+                .pole-header-flex {
+                    flex-direction: column !important;
+                    align-items: stretch !important;
+                }
+
+                .pole-contact-link {
+                    margin-left: 0 !important;
+                    margin-top: 16px !important;
+                    width: 100% !important;
+                }
+
+                .pole-contact-button {
+                    width: 100% !important;
+                    justify-content: center !important;
+                }
+
+                .services-proposes-grid {
+                    grid-template-columns: 1fr !important;
+                }
+
+                section[style*="min-height: 45vh"] {
+                    padding: 40px 0 !important;
+                }
+
+                section[style*="min-height: 45vh"] h1 {
+                    font-size: 34px !important;
+                    line-height: 1.15 !important;
+                    margin-bottom: 16px !important;
+                }
+
+                section[style*="min-height: 45vh"] p {
+                    font-size: 15px !important;
+                    line-height: 22px !important;
+                }
+
+                section[style*="padding: 96px 0"] {
+                    padding: 56px 0 !important;
+                }
+
+                div[role="tablist"] {
+                    gap: 10px !important;
+                }
+
+                div[role="tablist"] > button {
+                    width: 100% !important;
+                    justify-content: center !important;
+                }
+
+                .standards-grid {
+                    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+                    gap: 12px !important;
+                }
+
+                .livrables-grid {
+                    grid-template-columns: 1fr !important;
+                    gap: 24px !important;
+                }
+
+                .livrables-image-wrapper {
+                    border-radius: 16px !important;
+                    overflow: hidden !important;
+                }
+
+                .livrables-image {
+                    width: 100% !important;
+                    height: 240px !important;
+                    object-fit: cover !important;
+                    object-position: center !important;
+                    display: block !important;
+                }
+
+                footer .grid {
+                    gap: 32px !important;
+                }
+
+                footer.mobile-footer-home .grid {
+                    grid-template-columns: 1fr !important;
+                }
+
+                footer.mobile-footer-home img[alt="CEGME Logo"] {
+                    height: 36px !important;
+                    max-height: 36px !important;
+                    width: auto !important;
+                    max-width: 100% !important;
+                    object-fit: contain !important;
+                }
+
+                footer.desktop-footer {
+                    display: none !important;
+                }
+
+                footer.mobile-footer-home {
+                    display: block !important;
                 }
                 /* Masquer le menu desktop sur mobile */
                 .desktop-menu {
@@ -99,8 +198,37 @@
                 /* Afficher le bouton hamburger */
                 .mobile-menu-button {
                     display: flex !important;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    width: 44px;
+                    height: 44px;
+                    background: transparent;
+                    border: none !important;
+                    border-radius: 0;
+                    cursor: pointer;
+                    padding: 0;
+                    z-index: 1001;
+                    position: relative;
                     visibility: visible !important;
                     opacity: 1 !important;
+                    gap: 6px;
+                }
+                
+                .mobile-menu-button span {
+                    width: 24px;
+                    height: 3px;
+                    background-color: #000000 !important;
+                    border-radius: 0;
+                    transition: all 0.3s ease;
+                    display: block;
+                    position: relative;
+                }
+                
+                .mobile-menu-button:hover,
+                .mobile-menu-button:active {
+                    background: transparent !important;
+                    border: none !important;
                 }
                 
                 /* Menu mobile - masqué par défaut avec animation slide */
@@ -209,22 +337,22 @@
                     width: 44px;
                     height: 44px;
                     background: transparent;
-                    border: 2px solid rgba(55, 65, 81, 0.2);
-                    border-radius: 8px;
+                    border: none !important;
+                    border-radius: 0;
                     cursor: pointer;
                     padding: 0;
                     z-index: 1001;
                     position: relative;
                     visibility: visible !important;
                     opacity: 1 !important;
-                    gap: 5px;
+                    gap: 6px;
                 }
                 
                 .mobile-menu-button span {
                     width: 24px;
                     height: 3px;
-                    background-color: rgb(55, 65, 81);
-                    border-radius: 2px;
+                    background-color: #000000 !important;
+                    border-radius: 0;
                     transition: all 0.3s ease;
                     display: block;
                     position: relative;
@@ -232,16 +360,16 @@
                 
                 /* Améliorer la visibilité du bouton hamburger */
                 .mobile-menu-button:hover {
-                    border-color: rgb(5, 150, 105);
-                    background-color: rgba(5, 150, 105, 0.05);
+                    border-color: transparent;
+                    background-color: transparent;
                 }
                 
                 .mobile-menu-button:hover span {
-                    background-color: rgb(5, 150, 105);
+                    background-color: #000000 !important;
                 }
                 
                 .mobile-menu-button:active span {
-                    background-color: rgb(5, 150, 105);
+                    background-color: #000000 !important;
                 }
                 
                 .mobile-menu-button.active span:nth-child(1) {
@@ -475,7 +603,7 @@
                     <div x-show="activeTab === 'environnement'" x-transition role="tabpanel">
                         <!-- Carte d'en-tête avec fond vert clair -->
                         <div class="bg-emerald-50 rounded-2xl p-8 mb-8 border border-gray-100" style="background-color: rgb(236, 253, 245); border-radius: 16px; padding: 32px; margin-bottom: 32px; border: 1px solid rgb(243, 244, 246); box-shadow: none;">
-                            <div class="flex flex-col md:flex-row md:items-center gap-6" style="display: flex; flex-direction: row; align-items: center; gap: 24px;">
+                            <div class="flex flex-col md:flex-row md:items-center gap-6 pole-header-flex" style="display: flex; flex-direction: row; align-items: center; gap: 24px;">
                                 <!-- Icône -->
                                 <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center shadow-lg flex-shrink-0" style="width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(135deg, rgb(34, 197, 94) 0%, rgb(22, 163, 74) 100%); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(34, 197, 94, 0.35); flex-shrink: 0;">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 32px; height: 32px; color: #ffffff;">
@@ -493,8 +621,8 @@
                                 </p>
                             </div>
                                 <!-- Bouton -->
-                                <a href="/contact" class="md:ml-auto" style="margin-left: auto; display: block; text-decoration: none;">
-                                    <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; border-radius: 6px; font-size: 14px; font-weight: 500; padding: 8px 16px; background-color: transparent; color: rgb(27, 77, 62); border: 1px solid rgb(27, 77, 62); cursor: pointer;">
+                                <a href="/contact" class="md:ml-auto pole-contact-link" style="margin-left: auto; display: block; text-decoration: none;">
+                                    <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors pole-contact-button" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; border-radius: 6px; font-size: 14px; font-weight: 500; padding: 8px 16px; background-color: transparent; color: rgb(27, 77, 62); border: 1px solid rgb(27, 77, 62); cursor: pointer;">
                                         <span>Nous contacter</span>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
                                             <path d="M5 12h14"></path>
@@ -516,7 +644,7 @@
                             <h4 class="text-xl font-semibold mt-8 mb-4" style="font-size: 20px; font-weight: 600; color: rgb(17, 24, 39); margin-top: 32px; margin-bottom: 16px;">
                                     Services proposés :
                                 </h4>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px;">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 services-proposes-grid" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px;">
                                     <!-- Service 1: EIES -->
                                     <div class="bg-white rounded-lg p-6 border border-gray-200" style="background-color: rgb(255, 255, 255); border-radius: 8px; padding: 24px; border: 1px solid rgb(229, 231, 235);">
                                         <div class="mb-4" style="margin-bottom: 16px;">
@@ -621,7 +749,7 @@
                     <div x-show="activeTab === 'recherche'" x-transition role="tabpanel">
                         <!-- Carte d'en-tête avec fond beige clair -->
                         <div class="bg-amber-50 rounded-2xl p-8 mb-8 border border-gray-100" style="background-color: rgb(255, 251, 235); border-radius: 16px; padding: 32px; margin-bottom: 32px; border: 1px solid rgb(243, 244, 246); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
-                            <div class="flex flex-col md:flex-row md:items-center gap-6" style="display: flex; flex-direction: row; align-items: center; gap: 24px;">
+                            <div class="flex flex-col md:flex-row md:items-center gap-6 pole-header-flex" style="display: flex; flex-direction: row; align-items: center; gap: 24px;">
                                 <!-- Icône -->
                                 <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-400 flex items-center justify-center shadow-lg flex-shrink-0" style="width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(to top, rgb(249, 115, 22) 0%, rgb(251, 146, 60) 100%); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(249, 115, 22, 0.35); flex-shrink: 0;">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 32px; height: 32px; color: #ffffff;">
@@ -638,8 +766,8 @@
                                     </p>
                                 </div>
                                 <!-- Bouton -->
-                                <a href="/contact" class="md:ml-auto" style="margin-left: auto; display: block; text-decoration: none;">
-                                    <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; border-radius: 6px; font-size: 14px; font-weight: 500; padding: 8px 16px; background-color: transparent; color: rgb(27, 77, 62); border: 1px solid rgb(27, 77, 62); cursor: pointer;">
+                                <a href="/contact" class="md:ml-auto pole-contact-link" style="margin-left: auto; display: block; text-decoration: none;">
+                                    <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors pole-contact-button" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; border-radius: 6px; font-size: 14px; font-weight: 500; padding: 8px 16px; background-color: transparent; color: rgb(27, 77, 62); border: 1px solid rgb(27, 77, 62); cursor: pointer;">
                                         <span>Nous contacter</span>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
                                             <path d="M5 12h14"></path>
@@ -661,7 +789,7 @@
                             <h4 class="text-xl font-semibold mt-8 mb-4" style="font-size: 20px; font-weight: 600; color: rgb(17, 24, 39); margin-top: 32px; margin-bottom: 16px;">
                                 Services proposés :
                             </h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px;">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 services-proposes-grid" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px;">
                                 <!-- Service 1: Exploration géologique -->
                                 <div class="bg-white rounded-lg p-6 border border-gray-200" style="background-color: rgb(255, 255, 255); border-radius: 8px; padding: 24px; border: 1px solid rgb(229, 231, 235);">
                                     <div class="mb-4" style="margin-bottom: 16px;">
@@ -769,7 +897,7 @@
                     <div x-show="activeTab === 'geo-ingenierie'" x-transition role="tabpanel">
                         <!-- Carte d'en-tête avec fond bleu clair -->
                         <div class="bg-blue-50 rounded-2xl p-8 mb-8 border border-gray-100" style="background-color: rgb(239, 246, 255); border-radius: 16px; padding: 32px; margin-bottom: 32px; border: 1px solid rgb(243, 244, 246); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
-                            <div class="flex flex-col md:flex-row md:items-center gap-6" style="display: flex; flex-direction: row; align-items: center; gap: 24px;">
+                            <div class="flex flex-col md:flex-row md:items-center gap-6 pole-header-flex" style="display: flex; flex-direction: row; align-items: center; gap: 24px;">
                                 <!-- Icône -->
                                 <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-400 flex items-center justify-center shadow-lg flex-shrink-0" style="width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(to bottom, rgb(59, 130, 246) 0%, rgb(96, 165, 250) 100%); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(59, 130, 246, 0.35); flex-shrink: 0;">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 32px; height: 32px; color: #ffffff;">
@@ -789,8 +917,8 @@
                                     </p>
                                 </div>
                                 <!-- Bouton -->
-                                <a href="/contact" class="md:ml-auto" style="margin-left: auto; display: block; text-decoration: none;">
-                                    <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; border-radius: 6px; font-size: 14px; font-weight: 500; padding: 8px 16px; background-color: transparent; color: rgb(27, 77, 62); border: 1px solid rgb(27, 77, 62); cursor: pointer;">
+                                <a href="/contact" class="md:ml-auto pole-contact-link" style="margin-left: auto; display: block; text-decoration: none;">
+                                    <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors pole-contact-button" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; border-radius: 6px; font-size: 14px; font-weight: 500; padding: 8px 16px; background-color: transparent; color: rgb(27, 77, 62); border: 1px solid rgb(27, 77, 62); cursor: pointer;">
                                         <span>Nous contacter</span>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
                                             <path d="M5 12h14"></path>
@@ -838,7 +966,7 @@
                             <h4 class="text-xl font-semibold mt-8 mb-4" style="font-size: 20px; font-weight: 600; color: rgb(17, 24, 39); margin-top: 32px; margin-bottom: 16px;">
                                 Services proposés :
                             </h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px;">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 services-proposes-grid" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px;">
                                 <!-- Service 1: Études hydrogéologiques -->
                                 <div class="bg-white rounded-lg p-6 border border-gray-200" style="background-color: rgb(255, 255, 255); border-radius: 8px; padding: 24px; border: 1px solid rgb(229, 231, 235);">
                                     <div class="mb-4" style="margin-bottom: 16px;">
@@ -925,7 +1053,7 @@
                     <div x-show="activeTab === 'negoce'" x-transition role="tabpanel">
                         <!-- Carte d'en-tête avec fond violet clair -->
                         <div class="bg-purple-50 rounded-2xl p-8 mb-8 border border-gray-100" style="background-color: rgb(250, 245, 255); border-radius: 16px; padding: 32px; margin-bottom: 32px; border: 1px solid rgb(243, 244, 246); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
-                            <div class="flex flex-col md:flex-row md:items-center gap-6" style="display: flex; flex-direction: row; align-items: center; gap: 24px;">
+                            <div class="flex flex-col md:flex-row md:items-center gap-6 pole-header-flex" style="display: flex; flex-direction: row; align-items: center; gap: 24px;">
                                 <!-- Icône -->
                                 <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg flex-shrink-0" style="width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(to bottom, rgb(168, 85, 247) 0%, rgb(147, 51, 234) 100%); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(168, 85, 247, 0.35); flex-shrink: 0;">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 32px; height: 32px; color: #ffffff;">
@@ -943,8 +1071,8 @@
                         </p>
                     </div>
                                 <!-- Bouton -->
-                                <a href="/contact" class="md:ml-auto" style="margin-left: auto; display: block; text-decoration: none;">
-                                    <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; border-radius: 6px; font-size: 14px; font-weight: 500; padding: 8px 16px; background-color: transparent; color: rgb(27, 77, 62); border: 1px solid rgb(27, 77, 62); cursor: pointer;">
+                                <a href="/contact" class="md:ml-auto pole-contact-link" style="margin-left: auto; display: block; text-decoration: none;">
+                                    <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors pole-contact-button" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; border-radius: 6px; font-size: 14px; font-weight: 500; padding: 8px 16px; background-color: transparent; color: rgb(27, 77, 62); border: 1px solid rgb(27, 77, 62); cursor: pointer;">
                                         <span>Nous contacter</span>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
                                             <path d="M5 12h14"></path>
@@ -963,7 +1091,7 @@
                             <h4 class="text-xl font-semibold mt-8 mb-4" style="font-size: 20px; font-weight: 600; color: rgb(17, 24, 39); margin-top: 32px; margin-bottom: 16px;">
                                 Services proposés :
                             </h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px;">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 services-proposes-grid" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px;">
                                 <!-- Service 1: Accompagnement investisseurs -->
                                 <div class="bg-white rounded-lg p-6 border border-gray-200" style="background-color: rgb(255, 255, 255); border-radius: 8px; padding: 24px; border: 1px solid rgb(229, 231, 235);">
                                     <div class="mb-4" style="margin-bottom: 16px;">
@@ -1054,7 +1182,7 @@
                         Nos livrables respectent les exigences nationales et internationales les plus strictes
                     </p>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px;">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 standards-grid" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px;">
                     <!-- Card 1: MEEDD - RCA -->
                     <div class="bg-gray-50 rounded-lg p-4 text-center" style="background-color: rgb(248, 250, 252); border-radius: 8px; padding: 20px; text-align: center;">
                         <div class="flex justify-center mb-3" style="display: flex; justify-content: center; margin-bottom: 12px;">
@@ -1129,7 +1257,7 @@
         <!-- Nos livrables Section -->
         <section class="w-full bg-white px-4 sm:px-6 lg:px-8" style="padding: 96px 0; background-color: rgb(255, 255, 255);">
             <div class="max-w-7xl mx-auto">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px; align-items: center;">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center livrables-grid" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px; align-items: center;">
                     <!-- Left Section: Text Content -->
                     <div>
                         <h2 class="text-4xl font-bold mb-6" style="font-size: 36px; font-weight: 700; color: rgb(17, 24, 39); margin-bottom: 24px;">
@@ -1194,8 +1322,8 @@
                     
                     <!-- Right Section: Image -->
                     <div class="relative" style="position: relative;">
-                        <div class="rounded-2xl overflow-hidden shadow-lg" style="border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);">
-                            <img src="{{ asset('Image/Livrable.jpg') }}" alt="Nos livrables" class="w-full h-auto object-cover" style="width: 100%; height: auto; object-fit: cover; display: block;">
+                        <div class="rounded-2xl overflow-hidden shadow-lg livrables-image-wrapper" style="border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);">
+                            <img src="{{ asset('Image/Livrable.jpg') }}" alt="Nos livrables" class="w-full h-auto object-cover livrables-image" style="width: 100%; height: auto; object-fit: cover; display: block;">
                     </div>
                     </div>
                 </div>
@@ -1203,7 +1331,7 @@
         </section>
 
         <!-- Footer - Exact from Site -->
-        <footer class="w-full text-white px-4 sm:px-6 lg:px-8" style="background: linear-gradient(180deg, rgb(15, 64, 62) 0%, rgb(22, 78, 75) 50%, rgb(25, 85, 82) 100%); padding: 64px 0 32px; color: rgb(255, 255, 255);">
+        <footer class="w-full text-white px-4 sm:px-6 lg:px-8 desktop-footer" style="background: linear-gradient(180deg, rgb(15, 64, 62) 0%, rgb(22, 78, 75) 50%, rgb(25, 85, 82) 100%); padding: 64px 0 32px; color: rgb(255, 255, 255);">
             <div class="max-w-7xl mx-auto" style="padding: 0px;">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-12" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 48px; margin-bottom: 32px; padding: 0px;">
                     <!-- Company Info -->
@@ -1251,7 +1379,7 @@
                             </li>
                             <li style="padding: 4px 0;">
                                 <span class="text-white font-semibold" style="color: rgb(255, 255, 255); font-weight: 600; font-size: 14px; display: block;">Email</span>
-                                <p class="text-gray-300 text-sm" style="color: rgb(209, 213, 219); font-size: 14px; margin-top: 4px;">contact@cegme.net</p>
+                                <p class="text-gray-300 text-sm" style="color: rgb(209, 213, 219); font-size: 14px; margin-top: 4px;">cabinet.rca@cegme.net / cegme.sarl@gmail.com</p>
                             </li>
                             <li style="padding: 4px 0;">
                                 <span class="text-white font-semibold" style="color: rgb(255, 255, 255); font-weight: 600; font-size: 14px; display: block;">Registre</span>
@@ -1266,6 +1394,171 @@
                     <p class="text-gray-400 text-sm" style="color: rgb(156, 163, 175); font-size: 14px;">
                         © 2025 CEGME SARL. Tous droits réservés.
                     </p>
+                </div>
+            </div>
+        </footer>
+
+        <footer class="w-full text-white px-4 sm:px-6 lg:px-8 mobile-footer-home" style="background: linear-gradient(to right bottom, rgb(15, 23, 42), rgb(6, 78, 59), rgb(19, 78, 74)); padding: 80px 0 32px; color: rgb(255, 255, 255); position: relative; overflow: hidden;">
+            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 20% 50%, rgba(16, 185, 129, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(5, 150, 105, 0.08) 0%, transparent 50%); pointer-events: none;"></div>
+            <div class="relative z-10" style="position: relative; z-index: 10;">
+            <div class="max-w-7xl mx-auto" style="padding: 0px;">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 48px; margin-bottom: 48px; padding: 0px;">
+                    <div>
+                        <div class="flex items-center gap-3 mb-6" style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
+                            <img src="{{ asset('Image/CEGME Logo.JPG') }}" alt="CEGME Logo" class="block h-12 w-auto" style="height: 48px; width: auto; object-fit: contain;">
+                            <div class="flex flex-col" style="display: flex; flex-direction: column;">
+                                <span class="text-2xl font-bold" style="font-size: 22px; font-weight: 800; background: linear-gradient(135deg, #34d399 0%, #10b981 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2;">CEGME</span>
+                                <span class="text-xs text-gray-200" style="font-size: 11px; color: rgb(229, 231, 235); line-height: 1.2; margin-top: 2px;">Géosciences • Mines • Environnement</span>
+                            </div>
+                        </div>
+                        <p class="text-white mb-5 leading-relaxed" style="font-size: 15px; color: rgb(255, 255, 255); margin-bottom: 20px; line-height: 26px; font-weight: 400;">
+                            Cabinet d'Études Géologiques, Minières et Environnementales
+                        </p>
+                        <p class="text-gray-200 text-sm leading-relaxed" style="font-size: 14px; color: rgb(229, 231, 235); line-height: 22px; margin: 0;">
+                            <strong style="font-weight: 600; color: rgb(255, 255, 255);">Plateforme d'experts nationaux agréée</strong><br>
+                            N° 004/MEDD/DIRCAB_21
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-xl font-bold mb-6" style="font-size: 20px; font-weight: 800; margin-bottom: 24px; color: rgb(255, 255, 255); letter-spacing: -0.3px;">
+                            Liens Rapides
+                        </h3>
+                        <ul class="space-y-3" style="list-style: none; padding: 0; margin: 0;">
+                            <li>
+                                <a href="/" class="text-gray-200 hover:text-green-300 transition-all duration-200 flex items-center gap-2 group" style="color: rgb(229, 231, 235); text-decoration: none; font-size: 15px; display: flex; align-items: center; gap: 8px; padding: 6px 0; transition: all 0.2s ease;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-hover:opacity-100 transition-opacity" style="width: 16px; height: 16px; opacity: 0; transition: opacity 0.2s ease;">
+                                        <path d="M5 12h14"></path>
+                                        <path d="m12 5 7 7-7 7"></path>
+                                    </svg>
+                                    <span>Accueil</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/a-propos" class="text-gray-300 hover:text-green-400 transition-all duration-200 flex items-center gap-2 group" style="color: rgb(209, 213, 219); text-decoration: none; font-size: 15px; display: flex; align-items: center; gap: 8px; padding: 6px 0; transition: all 0.2s ease;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-hover:opacity-100 transition-opacity" style="width: 16px; height: 16px; opacity: 0; transition: opacity 0.2s ease;">
+                                        <path d="M5 12h14"></path>
+                                        <path d="m12 5 7 7-7 7"></path>
+                                    </svg>
+                                    <span>À Propos</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/services" class="text-gray-300 hover:text-green-400 transition-all duration-200 flex items-center gap-2 group" style="color: rgb(209, 213, 219); text-decoration: none; font-size: 15px; display: flex; align-items: center; gap: 8px; padding: 6px 0; transition: all 0.2s ease;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-hover:opacity-100 transition-opacity" style="width: 16px; height: 16px; opacity: 0; transition: opacity 0.2s ease;">
+                                        <path d="M5 12h14"></path>
+                                        <path d="m12 5 7 7-7 7"></path>
+                                    </svg>
+                                    <span>Services</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/realisations" class="text-gray-300 hover:text-green-400 transition-all duration-200 flex items-center gap-2 group" style="color: rgb(209, 213, 219); text-decoration: none; font-size: 15px; display: flex; align-items: center; gap: 8px; padding: 6px 0; transition: all 0.2s ease;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-hover:opacity-100 transition-opacity" style="width: 16px; height: 16px; opacity: 0; transition: opacity 0.2s ease;">
+                                        <path d="M5 12h14"></path>
+                                        <path d="m12 5 7 7-7 7"></path>
+                                    </svg>
+                                    <span>Réalisations</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/actualites" class="text-gray-300 hover:text-green-400 transition-all duration-200 flex items-center gap-2 group" style="color: rgb(209, 213, 219); text-decoration: none; font-size: 15px; display: flex; align-items: center; gap: 8px; padding: 6px 0; transition: all 0.2s ease;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-hover:opacity-100 transition-opacity" style="width: 16px; height: 16px; opacity: 0; transition: opacity 0.2s ease;">
+                                        <path d="M5 12h14"></path>
+                                        <path d="m12 5 7 7-7 7"></path>
+                                    </svg>
+                                    <span>Actualités</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/blog" class="text-gray-300 hover:text-green-400 transition-all duration-200 flex items-center gap-2 group" style="color: rgb(209, 213, 219); text-decoration: none; font-size: 15px; display: flex; align-items: center; gap: 8px; padding: 6px 0; transition: all 0.2s ease;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-hover:opacity-100 transition-opacity" style="width: 16px; height: 16px; opacity: 0; transition: opacity 0.2s ease;">
+                                        <path d="M5 12h14"></path>
+                                        <path d="m12 5 7 7-7 7"></path>
+                                    </svg>
+                                    <span>Blog</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('appels-offres.index') }}" class="text-gray-300 hover:text-green-400 transition-all duration-200 flex items-center gap-2 group" style="color: rgb(209, 213, 219); text-decoration: none; font-size: 15px; display: flex; align-items: center; gap: 8px; padding: 6px 0; transition: all 0.2s ease;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-hover:opacity-100 transition-opacity" style="width: 16px; height: 16px; opacity: 0; transition: opacity 0.2s ease;">
+                                        <path d="M5 12h14"></path>
+                                        <path d="m12 5 7 7-7 7"></path>
+                                    </svg>
+                                    <span>Appels d'Offres</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/contact" class="text-gray-300 hover:text-green-400 transition-all duration-200 flex items-center gap-2 group" style="color: rgb(209, 213, 219); text-decoration: none; font-size: 15px; display: flex; align-items: center; gap: 8px; padding: 6px 0; transition: all 0.2s ease;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-hover:opacity-100 transition-opacity" style="width: 16px; height: 16px; opacity: 0; transition: opacity 0.2s ease;">
+                                        <path d="M5 12h14"></path>
+                                        <path d="m12 5 7 7-7 7"></path>
+                                    </svg>
+                                    <span>Contact</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-xl font-bold mb-6" style="font-size: 20px; font-weight: 800; margin-bottom: 24px; color: rgb(255, 255, 255); letter-spacing: -0.3px;">
+                            Contact
+                        </h3>
+                        <ul class="space-y-4" style="list-style: none; padding: 0; margin: 0;">
+                            <li style="padding: 0;">
+                                <div class="flex items-start gap-3" style="display: flex; align-items: flex-start; gap: 12px;">
+                                    <div class="w-10 h-10 bg-green-400 bg-opacity-25 rounded-lg flex items-center justify-center flex-shrink-0" style="width: 40px; height: 40px; background-color: rgba(52, 211, 153, 0.25); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px; color: rgb(52, 211, 153);">
+                                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                            <circle cx="12" cy="10" r="3"></circle>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <span class="text-white font-semibold block mb-1" style="color: rgb(255, 255, 255); font-weight: 600; font-size: 14px; display: block; margin-bottom: 4px;">Adresse</span>
+                                        <p class="text-gray-300 text-sm leading-relaxed" style="color: rgb(209, 213, 219); font-size: 14px; margin: 0; line-height: 22px;">Bangui, République Centrafricaine</p>
+                                    </div>
+                                </div>
+                            </li>
+                            <li style="padding: 0;">
+                                <div class="flex items-start gap-3" style="display: flex; align-items: flex-start; gap: 12px;">
+                                    <div class="w-10 h-10 bg-green-400 bg-opacity-25 rounded-lg flex items-center justify-center flex-shrink-0" style="width: 40px; height: 40px; background-color: rgba(52, 211, 153, 0.25); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px; color: rgb(52, 211, 153);">
+                                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                            <polyline points="22,6 12,13 2,6"></polyline>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <span class="text-white font-semibold block mb-1" style="color: rgb(255, 255, 255); font-weight: 600; font-size: 14px; display: block; margin-bottom: 4px;">Email</span>
+                                        <a href="mailto:cabinet.rca@cegme.net" class="text-gray-200 text-sm hover:text-green-300 transition-colors" style="color: rgb(229, 231, 235); font-size: 14px; text-decoration: none; transition: color 0.2s ease;">cabinet.rca@cegme.net / cegme.sarl@gmail.com</a>
+                                    </div>
+                                </div>
+                            </li>
+                            <li style="padding: 0;">
+                                <div class="flex items-start gap-3" style="display: flex; align-items: flex-start; gap: 12px;">
+                                    <div class="w-10 h-10 bg-green-400 bg-opacity-25 rounded-lg flex items-center justify-center flex-shrink-0" style="width: 40px; height: 40px; background-color: rgba(52, 211, 153, 0.25); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px; color: rgb(52, 211, 153);">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                            <polyline points="14 2 14 8 20 8"></polyline>
+                                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                                            <polyline points="10 9 9 9 8 9"></polyline>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <span class="text-white font-semibold block mb-1" style="color: rgb(255, 255, 255); font-weight: 600; font-size: 14px; display: block; margin-bottom: 4px;">Registre</span>
+                                        <p class="text-gray-300 text-sm leading-relaxed" style="color: rgb(209, 213, 219); font-size: 14px; margin: 0; line-height: 22px;">CA/BG/2015B514</p>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="text-center border-t border-white border-opacity-20 pt-8" style="border-top: 1px solid rgba(255, 255, 255, 0.2); padding-top: 32px; text-align: center; margin-top: 32px;">
+                    <p class="text-gray-400 text-sm" style="color: rgb(156, 163, 175); font-size: 14px; margin: 0;">
+                        © 2025 CEGME SARL. Tous droits réservés.
+                    </p>
+                </div>
                 </div>
             </div>
         </footer>

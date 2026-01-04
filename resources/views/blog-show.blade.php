@@ -25,6 +25,164 @@
             * {
                 box-sizing: border-box;
             }
+
+            @media (max-width: 768px) {
+                body {
+                    overflow-x: hidden !important;
+                    max-width: 100vw !important;
+                }
+
+                * {
+                    max-width: 100% !important;
+                }
+
+                .desktop-menu {
+                    display: none !important;
+                }
+
+                .mobile-header {
+                    display: flex !important;
+                }
+
+                .mobile-menu-button {
+                    display: flex !important;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    width: 44px;
+                    height: 44px;
+                    background: transparent;
+                    border: none !important;
+                    border-radius: 0;
+                    cursor: pointer;
+                    padding: 0;
+                    z-index: 1001;
+                    position: relative;
+                    visibility: visible !important;
+                    opacity: 1 !important;
+                    gap: 6px;
+                }
+
+                .mobile-menu-button span {
+                    width: 24px;
+                    height: 3px;
+                    background-color: #000000 !important;
+                    border-radius: 0;
+                    transition: all 0.3s ease;
+                    display: block;
+                    position: relative;
+                }
+
+                .mobile-menu-button:hover,
+                .mobile-menu-button:active {
+                    background: transparent !important;
+                    border: none !important;
+                }
+
+                .mobile-menu {
+                    display: block;
+                    position: fixed;
+                    top: calc(3px + 64px);
+                    left: 0;
+                    right: 0;
+                    background-color: rgb(255, 255, 255);
+                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                    z-index: 999;
+                    max-height: calc(100vh - 67px);
+                    overflow-y: auto;
+                    border-top: 1px solid rgba(229, 231, 235, 0.5);
+                    transform: translateY(-100%);
+                    opacity: 0;
+                    transition: transform 0.3s ease, opacity 0.3s ease;
+                    pointer-events: none;
+                }
+
+                .mobile-menu.active {
+                    transform: translateY(0);
+                    opacity: 1;
+                    pointer-events: auto;
+                }
+
+                .mobile-menu a {
+                    display: block;
+                    padding: 16px 20px;
+                    color: rgb(55, 65, 81);
+                    text-decoration: none;
+                    font-size: 16px;
+                    font-weight: 600;
+                    border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+                    transition: background-color 0.2s ease;
+                }
+
+                .mobile-menu a:hover,
+                .mobile-menu a:active {
+                    background-color: rgb(249, 250, 251);
+                }
+
+                .mobile-menu a.active {
+                    background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%);
+                    color: rgb(255, 255, 255);
+                }
+
+                .mobile-header {
+                    display: flex !important;
+                    align-items: center;
+                    justify-content: space-between;
+                    width: 100%;
+                    padding: 16px 24px;
+                    min-height: 64px;
+                    position: relative;
+                    z-index: 1000;
+                }
+
+                .mobile-logo {
+                    flex: 1;
+                    display: flex;
+                    align-items: center;
+                    justify-content: flex-start;
+                    min-width: 0;
+                }
+
+                .mobile-logo a {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    min-width: 0;
+                    flex: 1;
+                }
+
+                .mobile-logo img {
+                    height: 40px !important;
+                    width: auto !important;
+                    flex-shrink: 0;
+                }
+
+                .mobile-logo .flex.flex-col {
+                    min-width: 0;
+                    flex: 1;
+                }
+
+                .mobile-logo span.font-bold {
+                    font-size: 16px !important;
+                    line-height: 1.2 !important;
+                }
+
+                .mobile-logo .text-xs,
+                .mobile-logo .text-sm {
+                    font-size: 10px !important;
+                    line-height: 1.2 !important;
+                    margin-top: 2px !important;
+                }
+
+                .desktop-login-button {
+                    display: none !important;
+                }
+
+                .blog-footer-grid {
+                    grid-template-columns: 1fr !important;
+                    gap: 32px !important;
+                }
+            }
         </style>
 
         <!-- Fonts -->
@@ -39,7 +197,42 @@
             <div style="height: 3px; background-color: rgb(101, 64, 48);"></div>
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             @if (Route::has('login'))
-                    <nav class="py-4 flex items-center justify-between gap-4 flex-wrap">
+                    <div class="mobile-header">
+                        <div class="mobile-logo">
+                            <a href="/" class="flex items-center gap-2 shrink-0" style="text-decoration: none; color: inherit;">
+                                <img src="{{ asset('Image/CEGME Logo.JPG') }}" alt="CEGME Logo" class="block h-12 w-auto" style="height: 48px; width: auto; object-fit: contain;">
+                                <div class="flex flex-col" style="display: flex; flex-direction: column;">
+                                    <span class="font-bold" style="font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #10b981 0%, #059669 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2;">CEGME</span>
+                                    <span class="text-xs text-gray-600" style="font-size: 11px; color: rgb(75, 85, 99); line-height: 1.2; margin-top: 2px;">Géosciences • Mines • Environnement</span>
+                                </div>
+                            </a>
+                        </div>
+                        <button class="mobile-menu-button" id="mobileMenuButton" onclick="toggleMobileMenu()" aria-label="Menu">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </button>
+                    </div>
+
+                    <div class="mobile-menu" id="mobileMenu">
+                        <a href="/" class="{{ request()->is('/') ? 'active' : '' }}">Accueil</a>
+                        <a href="/a-propos" class="{{ request()->is('a-propos') || request()->is('a-propos/*') ? 'active' : '' }}">À Propos</a>
+                        <a href="/services" class="{{ request()->is('services') || request()->is('services/*') ? 'active' : '' }}">Services</a>
+                        <a href="/realisations" class="{{ request()->is('realisations') || request()->is('realisations/*') ? 'active' : '' }}">Réalisations</a>
+                        <a href="/actualites" class="{{ request()->is('actualites') || request()->is('actualites/*') ? 'active' : '' }}">Actualités</a>
+                        <a href="/blog" class="{{ request()->is('blog') || request()->is('blog/*') ? 'active' : '' }}">Blog</a>
+                        <a href="{{ route('appels-offres.index') }}" class="{{ request()->is('appels-offres') || request()->is('appels-offres/*') ? 'active' : '' }}">Appels d'Offres</a>
+                        <a href="/contact" class="{{ request()->is('contact') || request()->is('contact/*') ? 'active' : '' }}">Contact</a>
+                        @auth
+                            <a href="{{ url('/dashboard') }}">Dashboard</a>
+                        @else
+                            <a href="{{ route('login') }}" style="background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); margin: 12px 20px; border-radius: 8px; text-align: center;">
+                                Se connecter
+                            </a>
+                        @endauth
+                    </div>
+
+                    <nav class="py-4 flex items-center justify-between gap-4 flex-wrap desktop-menu">
                         <div class="flex items-center gap-4 flex-wrap" style="margin-left: -24px;">
                             <a href="/" class="flex items-center gap-3 shrink-0" style="text-decoration: none; color: inherit;">
                                 <img src="{{ asset('Image/CEGME Logo.JPG') }}" alt="CEGME Logo" class="block h-16 w-auto" style="height: 64px; width: auto; object-fit: contain;">
@@ -84,7 +277,7 @@
                     @else
                         <a
                             href="{{ route('login') }}"
-                            class="inline-flex items-center justify-center gap-1.5 px-4 py-2 text-white font-medium transition-all duration-200 hover:opacity-90 rounded-full"
+                            class="inline-flex items-center justify-center gap-1.5 px-4 py-2 text-white font-medium transition-all duration-200 hover:opacity-90 rounded-full desktop-login-button"
                             style="background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); padding: 8px 18px; font-size: 14px; border-radius: 8px;"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
@@ -100,6 +293,30 @@
             @endif
             </div>
         </header>
+
+        <script>
+            function toggleMobileMenu() {
+                const menu = document.getElementById('mobileMenu');
+                const button = document.getElementById('mobileMenuButton');
+                
+                if (menu && button) {
+                    menu.classList.toggle('active');
+                    button.classList.toggle('active');
+                }
+            }
+
+            document.addEventListener('click', function(event) {
+                const menu = document.getElementById('mobileMenu');
+                const button = document.getElementById('mobileMenuButton');
+                
+                if (menu && button && menu.classList.contains('active')) {
+                    if (!menu.contains(event.target) && !button.contains(event.target)) {
+                        menu.classList.remove('active');
+                        button.classList.remove('active');
+                    }
+                }
+            });
+        </script>
 
         <!-- Hero Section - Article Header -->
         <section class="relative w-full flex items-center justify-center overflow-hidden" style="min-height: 75vh; padding-top: 140px; padding-bottom: 120px; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%); position: relative;">
@@ -281,7 +498,7 @@
         <!-- Footer -->
         <footer class="w-full text-white px-4 sm:px-6 lg:px-8" style="background: linear-gradient(180deg, rgb(15, 64, 62) 0%, rgb(22, 78, 75) 50%, rgb(25, 85, 82) 100%); padding: 64px 0 32px; color: rgb(255, 255, 255);">
             <div class="max-w-7xl mx-auto" style="padding: 0px;">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-12" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 48px; margin-bottom: 32px; padding: 0px;">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-12 blog-footer-grid" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 48px; margin-bottom: 32px; padding: 0px;">
                     <!-- Company Info -->
                     <div>
                         <div class="flex items-center gap-3 mb-4" style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
@@ -325,7 +542,7 @@
                             </li>
                             <li style="padding: 4px 0;">
                                 <span class="text-white font-semibold" style="color: rgb(255, 255, 255); font-weight: 600; font-size: 14px; display: block;">Email</span>
-                                <p class="text-gray-300 text-sm" style="color: rgb(209, 213, 219); font-size: 14px; margin-top: 4px;">contact@cegme.net</p>
+                                <p class="text-gray-300 text-sm" style="color: rgb(209, 213, 219); font-size: 14px; margin-top: 4px;">cabinet.rca@cegme.net / cegme.sarl@gmail.com</p>
                             </li>
                             <li style="padding: 4px 0;">
                                 <span class="text-white font-semibold" style="color: rgb(255, 255, 255); font-weight: 600; font-size: 14px; display: block;">Registre</span>

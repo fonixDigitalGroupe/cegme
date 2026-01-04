@@ -136,10 +136,171 @@
             line-height: 1.4;
             max-width: 400px;
         }
+
+        footer.mobile-footer-home {
+            display: none;
+        }
+
         @media (max-width: 768px) {
+            body {
+                overflow-x: hidden !important;
+                max-width: 100vw !important;
+            }
+
+            * {
+                max-width: 100% !important;
+            }
+
+            .desktop-menu {
+                display: none !important;
+            }
+
+            .mobile-header {
+                display: flex !important;
+            }
+
+            .mobile-menu-button {
+                display: flex !important;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                width: 44px;
+                height: 44px;
+                background: transparent;
+                border: none !important;
+                border-radius: 0;
+                cursor: pointer;
+                padding: 0;
+                z-index: 1001;
+                position: relative;
+                visibility: visible !important;
+                opacity: 1 !important;
+                gap: 6px;
+            }
+
+            .mobile-menu-button span {
+                width: 24px;
+                height: 3px;
+                background-color: #000000 !important;
+                border-radius: 0;
+                transition: all 0.3s ease;
+                display: block;
+                position: relative;
+            }
+
+            .mobile-menu-button:hover,
+            .mobile-menu-button:active {
+                background: transparent !important;
+                border: none !important;
+            }
+
+            .mobile-menu {
+                display: block;
+                position: fixed;
+                top: calc(3px + 64px);
+                left: 0;
+                right: 0;
+                background-color: rgb(255, 255, 255);
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                z-index: 999;
+                max-height: calc(100vh - 67px);
+                overflow-y: auto;
+                border-top: 1px solid rgba(229, 231, 235, 0.5);
+                transform: translateY(-100%);
+                opacity: 0;
+                transition: transform 0.3s ease, opacity 0.3s ease;
+                pointer-events: none;
+            }
+
+            .mobile-menu.active {
+                transform: translateY(0);
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+            .mobile-menu a {
+                display: block;
+                padding: 16px 20px;
+                color: rgb(55, 65, 81);
+                text-decoration: none;
+                font-size: 16px;
+                font-weight: 600;
+                border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+                transition: background-color 0.2s ease;
+            }
+
+            .mobile-menu a:hover,
+            .mobile-menu a:active {
+                background-color: rgb(249, 250, 251);
+            }
+
+            .mobile-menu a.active {
+                background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%);
+                color: rgb(255, 255, 255);
+            }
+
+            .mobile-header {
+                display: flex !important;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
+                padding: 16px 24px;
+                min-height: 64px;
+                position: relative;
+                z-index: 1000;
+            }
+
+            .mobile-logo {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                min-width: 0;
+            }
+
+            .mobile-logo a {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                min-width: 0;
+                flex: 1;
+            }
+
+            .mobile-logo img {
+                height: 40px !important;
+                width: auto !important;
+                flex-shrink: 0;
+            }
+
+            .mobile-logo .flex.flex-col {
+                min-width: 0;
+                flex: 1;
+            }
+
+            .mobile-logo span.font-bold {
+                font-size: 16px !important;
+                line-height: 1.2 !important;
+            }
+
+            .mobile-logo .text-xs,
+            .mobile-logo .text-sm {
+                font-size: 10px !important;
+                line-height: 1.2 !important;
+                margin-top: 2px !important;
+            }
+
             /* Masquer le bouton Se connecter du header sur mobile */
             .desktop-login-button {
                 display: none !important;
+            }
+
+            footer.mobile-footer-home {
+                display: block !important;
+            }
+
+            footer.mobile-footer-home .grid {
+                grid-template-columns: 1fr !important;
+                gap: 32px !important;
             }
             
             .offres-table-container {
@@ -226,7 +387,42 @@
         <div style="height: 3px; background-color: rgb(101, 64, 48);"></div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         @if (Route::has('login'))
-                <nav class="py-4 flex items-center justify-between gap-4 flex-wrap">
+                <div class="mobile-header">
+                    <div class="mobile-logo">
+                        <a href="/" class="flex items-center gap-2 shrink-0" style="text-decoration: none; color: inherit;">
+                            <img src="{{ asset('Image/CEGME Logo.JPG') }}" alt="CEGME Logo" class="block h-12 w-auto" style="height: 48px; width: auto; object-fit: contain;">
+                            <div class="flex flex-col" style="display: flex; flex-direction: column;">
+                                <span class="font-bold" style="font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #10b981 0%, #059669 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2;">CEGME</span>
+                                <span class="text-xs text-gray-600" style="font-size: 11px; color: rgb(75, 85, 99); line-height: 1.2; margin-top: 2px;">Géosciences • Mines • Environnement</span>
+                            </div>
+                        </a>
+                    </div>
+                    <button class="mobile-menu-button" id="mobileMenuButton" onclick="toggleMobileMenu()" aria-label="Menu">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                </div>
+
+                <div class="mobile-menu" id="mobileMenu">
+                    <a href="/" class="{{ request()->is('/') ? 'active' : '' }}">Accueil</a>
+                    <a href="/a-propos" class="{{ request()->is('a-propos') || request()->is('a-propos/*') ? 'active' : '' }}">À Propos</a>
+                    <a href="/services" class="{{ request()->is('services') || request()->is('services/*') ? 'active' : '' }}">Services</a>
+                    <a href="/realisations" class="{{ request()->is('realisations') || request()->is('realisations/*') ? 'active' : '' }}">Réalisations</a>
+                    <a href="/actualites" class="{{ request()->is('actualites') || request()->is('actualites/*') ? 'active' : '' }}">Actualités</a>
+                    <a href="/blog" class="{{ request()->is('blog') || request()->is('blog/*') ? 'active' : '' }}">Blog</a>
+                    <a href="{{ route('appels-offres.index') }}" class="{{ request()->is('appels-offres') || request()->is('appels-offres/*') ? 'active' : '' }}">Appels d'Offres</a>
+                    <a href="/contact" class="{{ request()->is('contact') || request()->is('contact/*') ? 'active' : '' }}">Contact</a>
+                    @auth
+                        <a href="{{ url('/dashboard') }}">Dashboard</a>
+                    @else
+                        <a href="{{ route('login') }}" style="background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); margin: 12px 20px; border-radius: 8px; text-align: center;">
+                            Se connecter
+                        </a>
+                    @endauth
+                </div>
+
+                <nav class="py-4 flex items-center justify-between gap-4 flex-wrap desktop-menu">
                     <div class="flex items-center gap-4 flex-wrap" style="margin-left: -24px;">
                         <a href="/" class="flex items-center gap-3 shrink-0" style="text-decoration: none; color: inherit;">
                             <img src="{{ asset('Image/CEGME Logo.JPG') }}" alt="CEGME Logo" class="block h-16 w-auto" style="height: 64px; width: auto; object-fit: contain;">
@@ -464,5 +660,98 @@
             </div>
         @endif
     </div>
+</div>
+
+<footer class="w-full text-white px-4 sm:px-6 lg:px-8 mobile-footer-home" style="background: linear-gradient(to right bottom, rgb(15, 23, 42), rgb(6, 78, 59), rgb(19, 78, 74)); padding: 80px 0 32px; color: rgb(255, 255, 255); position: relative; overflow: hidden;">
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 20% 50%, rgba(16, 185, 129, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(5, 150, 105, 0.08) 0%, transparent 50%); pointer-events: none;"></div>
+    <div class="relative z-10" style="position: relative; z-index: 10;">
+    <div class="max-w-7xl mx-auto" style="padding: 0px;">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 48px; margin-bottom: 48px; padding: 0px;">
+            <div>
+                <div class="flex items-center gap-3 mb-6" style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
+                    <img src="{{ asset('Image/CEGME Logo.JPG') }}" alt="CEGME Logo" class="block h-12 w-auto" style="height: 48px; width: auto; object-fit: contain;">
+                    <div class="flex flex-col" style="display: flex; flex-direction: column;">
+                        <span class="text-2xl font-bold" style="font-size: 22px; font-weight: 800; background: linear-gradient(135deg, #34d399 0%, #10b981 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2;">CEGME</span>
+                        <span class="text-xs text-gray-200" style="font-size: 11px; color: rgb(229, 231, 235); line-height: 1.2; margin-top: 2px;">Géosciences • Mines • Environnement</span>
+                    </div>
+                </div>
+                <p class="text-white mb-5 leading-relaxed" style="font-size: 15px; color: rgb(255, 255, 255); margin-bottom: 20px; line-height: 26px; font-weight: 400;">
+                    Cabinet d'Études Géologiques, Minières et Environnementales
+                </p>
+                <p class="text-gray-200 text-sm leading-relaxed" style="font-size: 14px; color: rgb(229, 231, 235); line-height: 22px; margin: 0;">
+                    <strong style="font-weight: 600; color: rgb(255, 255, 255);">Plateforme d'experts nationaux agréée</strong><br>
+                    N° 004/MEDD/DIRCAB_21
+                </p>
+            </div>
+            
+            <div>
+                <h3 class="text-xl font-bold mb-6" style="font-size: 20px; font-weight: 800; margin-bottom: 24px; color: rgb(255, 255, 255); letter-spacing: -0.3px;">
+                    Liens Rapides
+                </h3>
+                <ul class="space-y-3" style="list-style: none; padding: 0; margin: 0;">
+                    <li><a href="/" style="color: rgb(229, 231, 235); text-decoration: none; font-size: 15px; display: block; padding: 6px 0;">Accueil</a></li>
+                    <li><a href="/a-propos" style="color: rgb(229, 231, 235); text-decoration: none; font-size: 15px; display: block; padding: 6px 0;">À Propos</a></li>
+                    <li><a href="/services" style="color: rgb(229, 231, 235); text-decoration: none; font-size: 15px; display: block; padding: 6px 0;">Services</a></li>
+                    <li><a href="/realisations" style="color: rgb(229, 231, 235); text-decoration: none; font-size: 15px; display: block; padding: 6px 0;">Réalisations</a></li>
+                    <li><a href="/actualites" style="color: rgb(229, 231, 235); text-decoration: none; font-size: 15px; display: block; padding: 6px 0;">Actualités</a></li>
+                    <li><a href="/blog" style="color: rgb(229, 231, 235); text-decoration: none; font-size: 15px; display: block; padding: 6px 0;">Blog</a></li>
+                    <li><a href="{{ route('appels-offres.index') }}" style="color: rgb(229, 231, 235); text-decoration: none; font-size: 15px; display: block; padding: 6px 0;">Appels d'Offres</a></li>
+                    <li><a href="/contact" style="color: rgb(229, 231, 235); text-decoration: none; font-size: 15px; display: block; padding: 6px 0;">Contact</a></li>
+                </ul>
+            </div>
+            
+            <div>
+                <h3 class="text-xl font-bold mb-6" style="font-size: 20px; font-weight: 800; margin-bottom: 24px; color: rgb(255, 255, 255); letter-spacing: -0.3px;">
+                    Contact
+                </h3>
+                <ul class="space-y-4" style="list-style: none; padding: 0; margin: 0;">
+                    <li style="padding: 0;">
+                        <span style="color: rgb(255, 255, 255); font-weight: 600; font-size: 14px; display: block; margin-bottom: 4px;">Adresse</span>
+                        <p style="color: rgb(209, 213, 219); font-size: 14px; margin: 0; line-height: 22px;">Bangui, République Centrafricaine</p>
+                    </li>
+                    <li style="padding: 0;">
+                        <span style="color: rgb(255, 255, 255); font-weight: 600; font-size: 14px; display: block; margin-bottom: 4px;">Email</span>
+                        <a href="mailto:cabinet.rca@cegme.net" style="color: rgb(229, 231, 235); font-size: 14px; text-decoration: none;">cabinet.rca@cegme.net / cegme.sarl@gmail.com</a>
+                    </li>
+                    <li style="padding: 0;">
+                        <span style="color: rgb(255, 255, 255); font-weight: 600; font-size: 14px; display: block; margin-bottom: 4px;">Registre</span>
+                        <p style="color: rgb(209, 213, 219); font-size: 14px; margin: 0; line-height: 22px;">CA/BG/2015B514</p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="text-center border-t border-white border-opacity-20 pt-8" style="border-top: 1px solid rgba(255, 255, 255, 0.2); padding-top: 32px; text-align: center; margin-top: 32px;">
+            <p class="text-gray-400 text-sm" style="color: rgb(156, 163, 175); font-size: 14px; margin: 0;">
+                © 2025 CEGME SARL. Tous droits réservés.
+            </p>
+        </div>
+        </div>
+    </div>
+</footer>
+
+<script>
+    function toggleMobileMenu() {
+        const menu = document.getElementById('mobileMenu');
+        const button = document.getElementById('mobileMenuButton');
+        
+        if (menu && button) {
+            menu.classList.toggle('active');
+            button.classList.toggle('active');
+        }
+    }
+
+    document.addEventListener('click', function(event) {
+        const menu = document.getElementById('mobileMenu');
+        const button = document.getElementById('mobileMenuButton');
+        
+        if (menu && button && menu.classList.contains('active')) {
+            if (!menu.contains(event.target) && !button.contains(event.target)) {
+                menu.classList.remove('active');
+                button.classList.remove('active');
+            }
+        }
+    });
+</script>
 </body>
 </html>
