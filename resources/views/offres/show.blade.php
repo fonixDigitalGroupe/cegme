@@ -165,6 +165,19 @@
             color: #92400e;
             line-height: 1.5;
         }
+
+        /* Desktop - masquer le menu mobile */
+        @media (min-width: 769px) {
+            .mobile-menu-button,
+            .mobile-menu,
+            .mobile-header {
+                display: none !important;
+            }
+
+            .desktop-menu {
+                display: flex !important;
+            }
+        }
     </style>
 </head>
 <body>

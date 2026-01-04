@@ -279,6 +279,19 @@
                     display: none !important;
                 }
             }
+
+            /* Desktop - masquer le menu mobile */
+            @media (min-width: 769px) {
+                .mobile-menu-button,
+                .mobile-menu,
+                .mobile-header {
+                    display: none !important;
+                }
+
+                .desktop-menu {
+                    display: flex !important;
+                }
+            }
         </style>
 
         <!-- Fonts -->

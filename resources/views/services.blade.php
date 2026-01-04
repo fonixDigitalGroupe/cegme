@@ -417,7 +417,19 @@
         <!-- Styles / Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="bg-white text-[#1b1b18] min-h-screen" x-data="{ activeTab: 'environnement' }" style="background-color: #ffffff !important;">
+    <body class="bg-white text-[#1b1b18] min-h-screen" x-data="{
+        activeTab: 'environnement',
+        setTabFromHash() {
+            const raw = (window.location.hash || '').replace('#', '').trim();
+            if (!raw) return;
+            const allowed = ['environnement', 'recherche', 'geo-ingenierie', 'negoce'];
+            if (allowed.includes(raw)) this.activeTab = raw;
+        },
+        init() {
+            this.setTabFromHash();
+            window.addEventListener('hashchange', () => this.setTabFromHash());
+        }
+    }" style="background-color: #ffffff !important;">
         <header class="w-full bg-white sticky top-0 z-50" style="position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000; background-color: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
             <div style="height: 3px; background-color: rgb(101, 64, 48);"></div>
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

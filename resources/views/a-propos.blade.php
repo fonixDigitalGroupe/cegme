@@ -299,6 +299,17 @@
                     padding: 12px 0 !important;
                 }
 
+                header {
+                    background-color: rgba(255, 255, 255, 0.95) !important;
+                    backdrop-filter: blur(10px) !important;
+                }
+
+                .mobile-logo a,
+                .mobile-logo span,
+                .mobile-menu a {
+                    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+                }
+
                 /* Ajustements spécifiques à la page À Propos sur mobile */
                 .grid {
                     grid-template-columns: 1fr !important;
@@ -319,6 +330,11 @@
                 h2 {
                     font-size: 28px !important;
                     line-height: 1.3 !important;
+                }
+
+                section[style*="min-height: 45vh"] h1,
+                section[style*="min-height: 45vh"] p {
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
                 }
                 
                 /* Images mobile */
@@ -372,6 +388,7 @@
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
         <!-- Styles / Scripts -->
