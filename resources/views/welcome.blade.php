@@ -6,6 +6,8 @@
 
         <title>{{ config('app.name', 'Laravel') }}</title>
 
+        <link rel="icon" href="{{ asset('Image/CEGME Logo.png') }}" type="image/png">
+
         <!-- Critical CSS to prevent white flash -->
         <style>
             html {
@@ -828,9 +830,73 @@
                     display: flex !important;
                 }
             }
+
+            #page-loader {
+                position: fixed;
+                inset: 0;
+                background: rgb(255, 255, 255);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+            }
+
+            body.loading * {
+                visibility: hidden;
+            }
+
+            body.loading #page-loader,
+            body.loading #page-loader * {
+                visibility: visible;
+            }
+
+            #page-loader.hidden {
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 200ms ease;
+            }
+
+            .spinner {
+                width: 56px;
+                height: 56px;
+                border-radius: 9999px;
+                border: 5px solid rgba(16, 185, 150, 0.25) !important;
+                border-color: rgba(16, 185, 150, 0.25) !important;
+                border-top-color: rgb(10, 150, 120) !important;
+                animation: spin 0.85s linear infinite;
+            }
+
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
             </style>
     </head>
-    <body class="bg-white text-[#1b1b18] min-h-screen" style="background-color: #ffffff !important;">
+    <body class="bg-white text-[#1b1b18] min-h-screen loading" style="background-color: #ffffff !important;">
+        <div id="page-loader" aria-label="Chargement">
+            <div class="spinner"></div>
+        </div>
+
+        <script>
+            var __loaderStart = Date.now();
+            var __minLoaderMs = 3000;
+
+            window.addEventListener('load', function () {
+                var loader = document.getElementById('page-loader');
+                if (!loader) return;
+                var elapsed = Date.now() - __loaderStart;
+                var remaining = Math.max(0, __minLoaderMs - elapsed);
+
+                window.setTimeout(function () {
+                    loader.classList.add('hidden');
+                    window.setTimeout(function () {
+                        document.body.classList.remove('loading');
+                        loader.remove();
+                    }, 250);
+                }, remaining);
+            });
+        </script>
+
         <header class="w-full bg-white sticky top-0 z-50" style="position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000; background-color: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
             <div style="height: 3px; background-color: rgb(101, 64, 48);"></div>
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -839,7 +905,7 @@
                     <div class="mobile-header">
                         <div class="mobile-logo">
                             <a href="/" class="flex items-center gap-2 shrink-0" style="text-decoration: none; color: inherit;">
-                                <img src="{{ asset('Image/CEGME Logo.JPG') }}" alt="CEGME Logo" class="block h-12 w-auto" style="height: 48px; width: auto; object-fit: contain;">
+                                <img src="{{ asset('Image/CEGME Logo.png') }}" alt="CEGME Logo" class="block h-12 w-auto" style="height: 48px; width: auto; object-fit: contain;">
                                 <div class="flex flex-col" style="display: flex; flex-direction: column;">
                                     <span class="font-bold" style="font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #10b981 0%, #059669 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2;">CEGME</span>
                                     <span class="text-xs text-gray-600" style="font-size: 11px; color: rgb(75, 85, 99); line-height: 1.2; margin-top: 2px;">Géosciences • Mines • Environnement</span>
@@ -876,7 +942,7 @@
                     <nav class="py-4 flex items-center justify-between gap-4 flex-wrap desktop-menu">
                         <div class="flex items-center gap-4 flex-wrap" style="margin-left: -24px;">
                             <a href="/" class="flex items-center gap-3 shrink-0" style="text-decoration: none; color: inherit;">
-                                <img src="{{ asset('Image/CEGME Logo.JPG') }}" alt="CEGME Logo" class="block h-16 w-auto" style="height: 64px; width: auto; object-fit: contain;">
+                                <img src="{{ asset('Image/CEGME Logo.png') }}" alt="CEGME Logo" class="block h-16 w-auto" style="height: 64px; width: auto; object-fit: contain;">
                                 <div class="flex flex-col" style="display: flex; flex-direction: column;">
                                     <span class="font-bold" style="font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #10b981 0%, #059669 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2;">CEGME</span>
                                     <span class="text-sm text-gray-600" style="font-size: 13px; color: rgb(75, 85, 99); line-height: 1.2; margin-top: 2px;">Géosciences • Mines • Environnement</span>
@@ -947,7 +1013,7 @@
             <!-- Content Container - Centered, Exact Positioning from Site -->
             <div class="relative z-10 w-full max-w-[1200px] mx-auto px-4 text-center flex flex-col items-center justify-start" style="min-height: 100vh; padding-top: 120px; z-index: 10; position: relative;">
                 <!-- Badge - Plateforme d'Experts Nationaux Agréée -->
-                <div class="inline-block px-6 py-2 mb-6 rounded-full" style="background-color: rgba(16, 185, 129, 0.3); border: 1px solid rgb(5, 150, 105) !important; border-radius: 9999px; padding: 8px 24px; margin-bottom: 24px; margin-top: 20px;">
+                <div class="inline-block px-6 py-2 mb-6 rounded-full hero-badge" style="background-color: rgba(16, 185, 129, 0.3); border: 1px solid rgb(5, 150, 105) !important; border-radius: 9999px; padding: 8px 24px; margin-bottom: 24px; margin-top: 20px;">
                     <p class="text-center" style="color: rgb(110, 231, 183) !important; font-size: 16px; font-weight: 500; margin: 0;">
                         Plateforme d'Experts Nationaux Agréée
                     </p>
@@ -957,8 +1023,8 @@
                 <h1 class="hero-title mb-6 text-center" style="font-size: 84px; font-weight: 700; line-height: 84px; margin-bottom: 24px; margin-top: 40px; color: #ffffff;">
                     <span class="block text-white">Expertise en Géosciences,</span>
                     <span class="block text-center" style="background: linear-gradient(to right, rgb(52, 211, 153), rgb(45, 212, 191)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; color: transparent; text-align: center;">
-                        <span class="hidden md:inline">Mines &amp; Environnement</span>
-                        <span class="md:hidden">Mines &amp;<br>Environnement</span>
+                        <span class="hidden md:inline hero-desktop-nowrap">Mines &amp; Environnement</span>
+                        <span class="md:hidden hero-mobile-linebreak">Mines &amp;<br>Environnement</span>
                     </span>
                 </h1>
                 
@@ -970,12 +1036,19 @@
                 <!-- Call-to-Action Buttons - Exact from Site -->
                 <div class="hero-buttons flex flex-row items-center justify-center" style="gap: 20px; margin-top: 20px;">
                     <!-- Nos Services Button - Exact from Site -->
-                    <a href="/services" class="inline-flex items-center justify-center gap-2 px-8 py-2 text-white font-medium transition-all duration-200 hover:opacity-90" style="background-color: rgb(5, 150, 105); border-radius: 9999px; padding: 10px 32px; font-size: 18px;">
+                    <a href="https://calendly.com/cegme" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 px-8 py-2 text-white font-medium transition-all duration-200 hover:opacity-90 md:hidden" style="background-color: rgb(5, 150, 105); border-radius: 9999px; padding: 10px 32px; font-size: 18px;">
+                        <span>Prendre un RDV</span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 20px; height: 20px; stroke-width: 2.5;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </a>
+
+                    <a href="/services" class="desktop-services-button hidden md:inline-flex items-center justify-center gap-2 px-8 py-2 text-white font-medium transition-all duration-200 hover:opacity-90" style="background-color: rgb(5, 150, 105); border-radius: 9999px; padding: 10px 32px; font-size: 18px;">
                         <span>Nos Services</span>
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 20px; height: 20px; stroke-width: 2.5;">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path>
-                                    </svg>
-                                </a>
+                        </svg>
+                    </a>
                     
                     <!-- Nous Contacter Button - Exact from Site -->
                     <span class="inline-flex items-center justify-center px-8 py-2 text-white font-medium" style="background-color: rgba(55, 65, 81, 0.8) !important; border: 2px solid rgb(255, 255, 255) !important; border-radius: 9999px; padding: 10px 32px; font-size: 18px; cursor: default; pointer-events: none;">
@@ -994,6 +1067,40 @@
                     .mobile-hero-title { font-size: 1.5rem !important; line-height: 1.15 !important; margin-bottom: 0.5rem !important; text-align: left !important; }
                     .mobile-hero-decor { width: 4.5rem !important; height: 4px !important; margin-bottom: 1rem !important; margin-left: 0 !important; margin-right: auto !important; }
                     .mobile-hero-para { font-size: 20px !important; line-height: 36px !important; text-align: justify !important; }
+                }
+
+                @media (max-width: 767px) {
+                    .hero-section .desktop-services-button {
+                        display: none !important;
+                    }
+                }
+
+                @media (min-width: 768px) {
+                    .hero-section > div[style*="padding-top: 120px"] {
+                        padding-top: 90px !important;
+                    }
+
+                    .hero-section .hero-badge {
+                        margin-top: 32px !important;
+                    }
+
+                    .hero-section .hero-desktop-nowrap {
+                        white-space: nowrap !important;
+                        display: inline-block !important;
+                    }
+
+                    .hero-section .hero-mobile-linebreak {
+                        display: none !important;
+                    }
+
+                    .hero-section .hero-title {
+                        margin-top: 16px !important;
+                    }
+
+                    .hero-section .hero-buttons {
+                        margin-top: 16px !important;
+                        transform: translateY(0) !important;
+                    }
                 }
             </style>
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1911,13 +2018,13 @@
                     naturelles de la Centrafrique
                 </p>
                 <div class="flex justify-center" style="display: flex; justify-content: center;">
-                    <span class="inline-flex items-center gap-2 px-8 py-3 bg-white text-black rounded-xl font-semibold shadow-lg" style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 32px; background-color: rgb(255, 255, 255); color: rgb(0, 0, 0); border-radius: 12px; font-size: 16px; font-weight: 600; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); cursor: default; pointer-events: none;">
+                    <a href="{{ route('contact') }}" class="inline-flex items-center gap-2 px-8 py-3 bg-white text-black rounded-xl font-semibold shadow-lg" style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 32px; background-color: rgb(255, 255, 255); color: rgb(0, 0, 0); border-radius: 12px; font-size: 16px; font-weight: 600; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); text-decoration: none;">
                         <span>Contactez-nous</span>
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
                             <path d="M5 12h14"></path>
                             <path d="m12 5 7 7-7 7"></path>
                         </svg>
-                    </span>
+                    </a>
                 </div>
             </div>
         </section>
@@ -1933,7 +2040,7 @@
                     <div>
                         <!-- Logo and Company Name -->
                         <div class="flex items-center gap-3 mb-6" style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
-                            <img src="{{ asset('Image/CEGME Logo.JPG') }}" alt="CEGME Logo" class="block h-12 w-auto" style="height: 48px; width: auto; object-fit: contain;">
+                            <img src="{{ asset('Image/CEGME Logo.png') }}" alt="CEGME Logo" class="block h-12 w-auto" style="height: 48px; width: auto; object-fit: contain;">
                             <div class="flex flex-col" style="display: flex; flex-direction: column;">
                                 <span class="text-2xl font-bold" style="font-size: 22px; font-weight: 800; background: linear-gradient(135deg, #34d399 0%, #10b981 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2;">CEGME</span>
                                 <span class="text-xs text-gray-200" style="font-size: 11px; color: rgb(229, 231, 235); line-height: 1.2; margin-top: 2px;">Géosciences • Mines • Environnement</span>

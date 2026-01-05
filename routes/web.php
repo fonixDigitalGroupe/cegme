@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ContactController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -31,6 +32,8 @@ Route::get('/appels-offres', [\App\Http\Controllers\OffreController::class, 'ind
 Route::get('/contact', function () {
     return view('contact');
 })->name('contact');
+
+Route::post('/contact', [ContactController::class, 'send'])->name('contact.send');
 
 Route::get('/dashboard', function () {
     // Rediriger les admins et éditeurs vers l'admin

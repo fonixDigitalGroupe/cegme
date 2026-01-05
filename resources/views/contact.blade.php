@@ -6,6 +6,8 @@
 
         <title>Contact - {{ config('app.name', 'Laravel') }}</title>
 
+        <link rel="icon" href="{{ asset('Image/CEGME Logo.png') }}" type="image/png">
+
         <!-- Critical CSS to prevent white flash -->
         <style>
             html {
@@ -137,7 +139,7 @@
                     <div class="mobile-header">
                         <div class="mobile-logo">
                             <a href="/" class="flex items-center gap-2 shrink-0" style="text-decoration: none; color: inherit;">
-                                <img src="{{ asset('Image/CEGME Logo.JPG') }}" alt="CEGME Logo" class="block h-12 w-auto" style="height: 48px; width: auto; object-fit: contain;">
+                                <img src="{{ asset('Image/CEGME Logo.png') }}" alt="CEGME Logo" class="block h-12 w-auto" style="height: 48px; width: auto; object-fit: contain;">
                                 <div class="flex flex-col" style="display: flex; flex-direction: column;">
                                     <span class="font-bold" style="font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #10b981 0%, #059669 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2;">CEGME</span>
                                     <span class="text-xs text-gray-600" style="font-size: 11px; color: rgb(75, 85, 99); line-height: 1.2; margin-top: 2px;">Géosciences • Mines • Environnement</span>
@@ -172,7 +174,7 @@
                     <nav class="py-4 flex items-center justify-between gap-4 flex-wrap desktop-menu">
                         <div class="flex items-center gap-4 flex-wrap" style="margin-left: -24px;">
                             <a href="/" class="flex items-center gap-3 shrink-0" style="text-decoration: none; color: inherit;">
-                                <img src="{{ asset('Image/CEGME Logo.JPG') }}" alt="CEGME Logo" class="block h-16 w-auto" style="height: 64px; width: auto; object-fit: contain;">
+                                <img src="{{ asset('Image/CEGME Logo.png') }}" alt="CEGME Logo" class="block h-16 w-auto" style="height: 64px; width: auto; object-fit: contain;">
                                 <div class="flex flex-col" style="display: flex; flex-direction: column;">
                                     <span class="font-bold" style="font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #10b981 0%, #059669 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2;">CEGME</span>
                                     <span class="text-sm text-gray-600" style="font-size: 13px; color: rgb(75, 85, 99); line-height: 1.2; margin-top: 2px;">Géosciences • Mines • Environnement</span>
@@ -232,12 +234,12 @@
         </header>
 
         <!-- Hero Section - Page Header -->
-        <section class="relative w-full flex items-center justify-center overflow-hidden" style="min-height: 60vh; padding: 80px 0; background: linear-gradient(135deg, rgb(15, 64, 62) 0%, rgb(10, 48, 46) 100%);">
-            <div class="relative z-10 w-full max-w-4xl mx-auto px-4 text-center">
-                <h1 class="text-white mb-6" style="font-size: 60px; font-weight: 700; color: rgb(255, 255, 255); margin-bottom: 24px; text-align: center; line-height: 72px;">
+        <section class="relative w-full flex items-center justify-center overflow-hidden" style="min-height: 45vh; padding: 60px 0; background: linear-gradient(to right bottom, rgb(6, 78, 59), rgb(17, 94, 89), rgb(15, 23, 42));">
+            <div class="relative z-10 w-full max-w-4xl mx-auto px-4 text-center" style="margin-top: 100px;">
+                <h1 class="mb-6" style="font-size: 60px; font-weight: 700; color: rgb(255, 255, 255); margin-bottom: 24px; text-align: center; line-height: 72px;">
                     Contactez-Nous
                 </h1>
-                <p class="text-white/90 mx-auto max-w-3xl" style="font-size: 20px; color: rgb(229, 231, 235); text-align: center; line-height: 32.5px;">
+                <p class="mx-auto max-w-3xl" style="font-size: 20px; color: rgb(229, 231, 235); text-align: center; line-height: 32.5px;">
                     Notre équipe est à votre disposition pour répondre à toutes vos questions
                 </p>
             </div>
@@ -309,7 +311,31 @@
                         </p>
                     </div>
 
-                    <form class="bg-white rounded-lg shadow-md p-8" style="background-color: rgb(255, 255, 255); border-radius: 8px; box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.1) 0px 4px 6px -4px; padding: 32px;">
+                    @if (session('success'))
+                        <div class="mb-6 p-4 rounded-lg" style="margin-bottom: 24px; padding: 16px; border-radius: 8px; background-color: rgb(209, 250, 229); color: rgb(5, 150, 105); font-weight: 600;">
+                            {{ session('success') }}
+                        </div>
+                    @endif
+
+                    @if (session('error'))
+                        <div class="mb-6 p-4 rounded-lg" style="margin-bottom: 24px; padding: 16px; border-radius: 8px; background-color: rgb(254, 226, 226); color: rgb(185, 28, 28); font-weight: 600;">
+                            {{ session('error') }}
+                        </div>
+                    @endif
+
+                    @if ($errors->any())
+                        <div class="mb-6 p-4 rounded-lg" style="margin-bottom: 24px; padding: 16px; border-radius: 8px; background-color: rgb(254, 226, 226); color: rgb(185, 28, 28);">
+                            <div style="font-weight: 700; margin-bottom: 8px;">Veuillez corriger les erreurs ci-dessous :</div>
+                            <ul style="margin: 0; padding-left: 18px;">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    <form method="POST" action="{{ route('contact.send') }}" class="bg-white rounded-lg shadow-md p-8" style="background-color: rgb(255, 255, 255); border-radius: 8px; box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.1) 0px 4px 6px -4px; padding: 32px;">
+                        @csrf
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-bottom: 24px;">
                             <!-- Nom complet -->
                             <div>
@@ -324,6 +350,7 @@
                                     placeholder="Votre nom"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                                     style="width: 100%; padding: 12px 16px; border: 1px solid rgb(209, 213, 219); border-radius: 8px; font-size: 16px;"
+                                    value="{{ old('name') }}"
                                 >
                             </div>
 
@@ -340,6 +367,7 @@
                                     placeholder="votre@email.com"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                                     style="width: 100%; padding: 12px 16px; border: 1px solid rgb(209, 213, 219); border-radius: 8px; font-size: 16px;"
+                                    value="{{ old('email') }}"
                                 >
                             </div>
                         </div>
@@ -357,6 +385,7 @@
                                     placeholder="(+236) 72 50 51 31 / 75 70 31 20"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                                     style="width: 100%; padding: 12px 16px; border: 1px solid rgb(209, 213, 219); border-radius: 8px; font-size: 16px;"
+                                    value="{{ old('phone') }}"
                                 >
                             </div>
 
@@ -373,6 +402,7 @@
                                     placeholder="Sujet de votre message"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                                     style="width: 100%; padding: 12px 16px; border: 1px solid rgb(209, 213, 219); border-radius: 8px; font-size: 16px;"
+                                    value="{{ old('subject') }}"
                                 >
                             </div>
                         </div>
@@ -390,7 +420,7 @@
                                 placeholder="Décrivez votre projet ou votre demande..."
                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 resize-none"
                                 style="width: 100%; padding: 12px 16px; border: 1px solid rgb(209, 213, 219); border-radius: 8px; font-size: 16px; resize: none; min-height: 150px;"
-                            ></textarea>
+                            >{{ old('message') }}</textarea>
                         </div>
 
                         <!-- Submit Button -->
@@ -420,7 +450,7 @@
                     <div>
                         <!-- Logo and Company Name -->
                         <div class="flex items-center gap-3 mb-4" style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-                            <img src="{{ asset('Image/CEGME Logo.JPG') }}" alt="CEGME Logo" class="block h-10 w-auto" style="height: 40px; width: auto; object-fit: contain;">
+                            <img src="{{ asset('Image/CEGME Logo.png') }}" alt="CEGME Logo" class="block h-10 w-auto" style="height: 40px; width: auto; object-fit: contain;">
                             <span class="text-xl font-bold" style="font-size: 20px; font-weight: 700; color: rgb(255, 255, 255);">CEGME</span>
                         </div>
                         <!-- Description -->

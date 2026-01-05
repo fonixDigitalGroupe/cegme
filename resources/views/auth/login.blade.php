@@ -2,6 +2,12 @@
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
+    <div class="flex justify-center mb-6">
+        <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white shadow-md flex items-center justify-center overflow-hidden p-2">
+            <img src="{{ asset('Image/CEGME Logo.png') }}" alt="CEGME" class="w-full h-full object-contain" />
+        </div>
+    </div>
+
     <form method="POST" action="{{ route('login') }}">
         @csrf
 
@@ -39,13 +45,11 @@
                 </x-primary-button>
             </div>
             
-            @if (Route::has('password.request'))
-                <div class="mt-4">
-                    <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
-                        {{ __('Mot de passe oublié ?') }}
-                    </a>
-                </div>
-            @endif
+            <div class="mt-4">
+                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('home') }}">
+                    {{ __('Retour à l\'accueil') }}
+                </a>
+            </div>
         </div>
     </form>
 </x-guest-layout>

@@ -338,7 +338,7 @@
     <header class="header">
         <div style="display: flex; align-items: center; justify-content: space-between;">
             <div style="display: flex; align-items: center; gap: 1rem;">
-                <img src="{{ asset('Image/CEGME Logo.JPG') }}" alt="CEGME Logo" style="height: 48px; width: auto; object-fit: contain;">
+                <img src="{{ asset('Image/CEGME Logo.png') }}" alt="CEGME Logo" style="height: 48px; width: auto; object-fit: contain;">
                 <div>
                     <h1 style="font-size: 1.25rem; font-weight: 700; margin: 0; letter-spacing: -0.02em; color: #00C853; line-height: 1.2; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">CEGME</h1>
                     <p style="font-size: 0.75rem; color: #6b7280; margin: 0.125rem 0 0 0; font-weight: 400; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">Géosciences • Mines • Environnement</p>
