@@ -34,7 +34,6 @@ class FilteringRuleController extends Controller
             'AFD',
             'BDEAC',
             'DGMarket',
-            'DG Market (TED)',
             'IFAD',
         ];
 
@@ -52,7 +51,6 @@ class FilteringRuleController extends Controller
             'AFD',
             'BDEAC',
             'DGMarket',
-            'DG Market (TED)',
             'IFAD',
         ];
 
@@ -143,7 +141,6 @@ class FilteringRuleController extends Controller
             'AFD',
             'BDEAC',
             'DGMarket',
-            'DG Market (TED)',
             'IFAD',
         ];
 

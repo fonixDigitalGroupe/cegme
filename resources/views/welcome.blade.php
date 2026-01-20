@@ -6,8 +6,6 @@
 
         <title>{{ config('app.name', 'Laravel') }}</title>
 
-        <link rel="icon" href="{{ asset('Image/CEGME Logo.png') }}" type="image/png">
-
         <!-- Critical CSS to prevent white flash -->
         <style>
             html {
@@ -105,50 +103,21 @@
                 /* Afficher le bouton hamburger */
                 .mobile-menu-button {
                     display: flex !important;
-                    flex-direction: column;
-                    justify-content: center;
-                    align-items: center;
-                    width: 44px;
-                    height: 44px;
-                    background: transparent;
-                    border: none !important;
-                    border-radius: 0;
-                    cursor: pointer;
-                    padding: 0;
-                    z-index: 1001;
-                    position: relative;
                     visibility: visible !important;
                     opacity: 1 !important;
-                    gap: 6px;
-                }
-
-                .mobile-menu-button span {
-                    width: 24px;
-                    height: 3px;
-                    background-color: #000000 !important;
-                    border-radius: 0;
-                    transition: all 0.3s ease;
-                    display: block;
-                    position: relative;
-                }
-
-                .mobile-menu-button:hover,
-                .mobile-menu-button:active {
-                    background: transparent !important;
-                    border: none !important;
                 }
                 
                 /* Menu mobile - masqué par défaut avec animation slide */
                 .mobile-menu {
                     display: block;
                     position: fixed;
-                    top: calc(3px + 64px);
+                    top: calc(3px + 80px);
                     left: 0;
                     right: 0;
                     background-color: rgb(255, 255, 255);
                     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
                     z-index: 999;
-                    max-height: calc(100vh - 67px);
+                    max-height: calc(100vh - 83px);
                     overflow-y: auto;
                     border-top: 1px solid rgba(229, 231, 235, 0.5);
                     transform: translateY(-100%);
@@ -191,7 +160,7 @@
                     justify-content: space-between;
                     width: 100%;
                     padding: 16px 24px;
-                    min-height: 64px;
+                    min-height: 80px;
                     position: relative;
                     z-index: 1000;
                 }
@@ -207,13 +176,13 @@
                 .mobile-logo a {
                     display: flex;
                     align-items: center;
-                    gap: 8px;
+                    gap: 12px;
                     min-width: 0;
                     flex: 1;
                 }
                 
                 .mobile-logo img {
-                    height: 40px !important;
+                    height: 60px !important;
                     width: auto !important;
                     flex-shrink: 0;
                 }
@@ -224,13 +193,13 @@
                 }
                 
                 .mobile-logo span.font-bold {
-                    font-size: 16px !important;
+                    font-size: 20px !important;
                     line-height: 1.2 !important;
                 }
                 
                 .mobile-logo .text-xs,
                 .mobile-logo .text-sm {
-                    font-size: 10px !important;
+                    font-size: 13px !important;
                     line-height: 1.2 !important;
                     margin-top: 2px !important;
                 }
@@ -614,12 +583,6 @@
                     padding: 12px 20px !important;
                     font-size: 16px !important;
                 }
-
-                .mobile-menu-button {
-                    min-height: unset !important;
-                    padding: 0 !important;
-                    font-size: inherit !important;
-                }
                 
                 /* Footer mobile */
                 footer {
@@ -634,14 +597,6 @@
                 footer h3 {
                     font-size: 18px !important;
                     margin-bottom: 16px !important;
-                }
-
-                footer img[alt="CEGME Logo"] {
-                    height: 36px !important;
-                    max-height: 36px !important;
-                    width: auto !important;
-                    max-width: 100% !important;
-                    object-fit: contain !important;
                 }
                 
                 /* About section mobile - empiler image et texte */
@@ -663,27 +618,14 @@
                     width: 100% !important;
                     margin-bottom: 24px !important;
                 }
-
-                section[style*="background: linear-gradient(to bottom, rgb(248, 250, 252)"] div[style*="min-height: 550px"] {
-                    height: 320px !important;
-                    min-height: 0 !important;
-                    max-height: none !important;
-                }
-
-                section[style*="background: linear-gradient(to bottom, rgb(248, 250, 252)"] div[style*="overflow: hidden"][style*="min-height: 550px"] {
-                    box-shadow: none !important;
-                    border-radius: 0 !important;
-                    overflow: hidden !important;
-                }
                 
                 section[style*="background: linear-gradient(to bottom, rgb(248, 250, 252)"] img[alt="Équipe CEGME"] {
                     width: 100% !important;
-                    height: 100% !important;
-                    min-height: 0 !important;
-                    max-height: none !important;
+                    height: auto !important;
+                    min-height: 300px !important;
+                    max-height: 400px !important;
                     object-fit: cover !important;
                     object-position: center !important;
-                    display: block !important;
                 }
                 
                 /* Grid mobile pour section About */
@@ -770,52 +712,6 @@
                 .gap-16 {
                     gap: 24px !important;
                 }
-
-                /* Statistiques mobile - affichage vertical */
-                section[style*="padding: 40px 0"][style*="background-color: #ffffff"] div[style*="grid-template-columns: repeat(4"] {
-                    grid-template-columns: 1fr !important;
-                    gap: 24px !important;
-                }
-
-                section[style*="padding: 40px 0"][style*="background-color: #ffffff"] div[style*="width: 55px"][style*="height: 55px"] {
-                    width: 72px !important;
-                    height: 72px !important;
-                    margin-bottom: 12px !important;
-                }
-
-                section[style*="padding: 40px 0"][style*="background-color: #ffffff"] div[style*="width: 55px"][style*="height: 55px"] svg {
-                    width: 34px !important;
-                    height: 34px !important;
-                }
-
-                section[style*="padding: 40px 0"][style*="background-color: #ffffff"] div.text-center {
-                    padding: 12px 0 !important;
-                }
-
-                section[style*="padding: 60px 0"][style*="background-color: #f3f4f6"] div[style*="grid-template-columns: repeat(2"] {
-                    grid-template-columns: 1fr !important;
-                    gap: 24px !important;
-                }
-
-                section[style*="padding: 80px 0"][style*="background-color: #f9fafb"] div[style*="grid-template-columns: repeat(3"] {
-                    grid-template-columns: 1fr !important;
-                    gap: 24px !important;
-                }
-
-                section[style*="padding: 80px 0"][style*="background-color: #ffffff"][style*="border: none"] div[style*="grid-template-columns: repeat(2"] {
-                    grid-template-columns: 1fr !important;
-                    gap: 24px !important;
-                }
-
-                section[style*="padding: 80px 0"][style*="background-color: #ffffff"] div[style*="grid-template-columns: repeat(3"][style*="gap: 32px"] {
-                    grid-template-columns: 1fr !important;
-                    gap: 24px !important;
-                }
-
-                section[style*="padding: 32px 0"][style*="background-color: #f9fafb"] div[style*="grid-template-columns: repeat(4"][style*="gap: 16px"] {
-                    grid-template-columns: 1fr !important;
-                    gap: 20px !important;
-                }
             }
             
                 /* Desktop - masquer le menu mobile */
@@ -830,73 +726,9 @@
                     display: flex !important;
                 }
             }
-
-            #page-loader {
-                position: fixed;
-                inset: 0;
-                background: rgb(255, 255, 255);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 9999;
-            }
-
-            body.loading * {
-                visibility: hidden;
-            }
-
-            body.loading #page-loader,
-            body.loading #page-loader * {
-                visibility: visible;
-            }
-
-            #page-loader.hidden {
-                opacity: 0;
-                pointer-events: none;
-                transition: opacity 200ms ease;
-            }
-
-            .spinner {
-                width: 56px;
-                height: 56px;
-                border-radius: 9999px;
-                border: 5px solid rgba(16, 185, 150, 0.25) !important;
-                border-color: rgba(16, 185, 150, 0.25) !important;
-                border-top-color: rgb(10, 150, 120) !important;
-                animation: spin 0.85s linear infinite;
-            }
-
-            @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-            }
             </style>
     </head>
-    <body class="bg-white text-[#1b1b18] min-h-screen loading" style="background-color: #ffffff !important;">
-        <div id="page-loader" aria-label="Chargement">
-            <div class="spinner"></div>
-        </div>
-
-        <script>
-            var __loaderStart = Date.now();
-            var __minLoaderMs = 3000;
-
-            window.addEventListener('load', function () {
-                var loader = document.getElementById('page-loader');
-                if (!loader) return;
-                var elapsed = Date.now() - __loaderStart;
-                var remaining = Math.max(0, __minLoaderMs - elapsed);
-
-                window.setTimeout(function () {
-                    loader.classList.add('hidden');
-                    window.setTimeout(function () {
-                        document.body.classList.remove('loading');
-                        loader.remove();
-                    }, 250);
-                }, remaining);
-            });
-        </script>
-
+    <body class="bg-white text-[#1b1b18] min-h-screen" style="background-color: #ffffff !important;">
         <header class="w-full bg-white sticky top-0 z-50" style="position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000; background-color: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
             <div style="height: 3px; background-color: rgb(101, 64, 48);"></div>
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -905,7 +737,7 @@
                     <div class="mobile-header">
                         <div class="mobile-logo">
                             <a href="/" class="flex items-center gap-2 shrink-0" style="text-decoration: none; color: inherit;">
-                                <img src="{{ asset('Image/CEGME Logo.png') }}" alt="CEGME Logo" class="block h-12 w-auto" style="height: 48px; width: auto; object-fit: contain;">
+                                <img src="{{ asset('Image/CEGME Logo.JPG') }}" alt="CEGME Logo" class="block h-12 w-auto" style="height: 48px; width: auto; object-fit: contain;">
                                 <div class="flex flex-col" style="display: flex; flex-direction: column;">
                                     <span class="font-bold" style="font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #10b981 0%, #059669 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2;">CEGME</span>
                                     <span class="text-xs text-gray-600" style="font-size: 11px; color: rgb(75, 85, 99); line-height: 1.2; margin-top: 2px;">Géosciences • Mines • Environnement</span>
@@ -942,7 +774,7 @@
                     <nav class="py-4 flex items-center justify-between gap-4 flex-wrap desktop-menu">
                         <div class="flex items-center gap-4 flex-wrap" style="margin-left: -24px;">
                             <a href="/" class="flex items-center gap-3 shrink-0" style="text-decoration: none; color: inherit;">
-                                <img src="{{ asset('Image/CEGME Logo.png') }}" alt="CEGME Logo" class="block h-16 w-auto" style="height: 64px; width: auto; object-fit: contain;">
+                                <img src="{{ asset('Image/CEGME Logo.JPG') }}" alt="CEGME Logo" class="block h-16 w-auto" style="height: 64px; width: auto; object-fit: contain;">
                                 <div class="flex flex-col" style="display: flex; flex-direction: column;">
                                     <span class="font-bold" style="font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #10b981 0%, #059669 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2;">CEGME</span>
                                     <span class="text-sm text-gray-600" style="font-size: 13px; color: rgb(75, 85, 99); line-height: 1.2; margin-top: 2px;">Géosciences • Mines • Environnement</span>
@@ -1013,7 +845,7 @@
             <!-- Content Container - Centered, Exact Positioning from Site -->
             <div class="relative z-10 w-full max-w-[1200px] mx-auto px-4 text-center flex flex-col items-center justify-start" style="min-height: 100vh; padding-top: 120px; z-index: 10; position: relative;">
                 <!-- Badge - Plateforme d'Experts Nationaux Agréée -->
-                <div class="inline-block px-6 py-2 mb-6 rounded-full hero-badge" style="background-color: rgba(16, 185, 129, 0.3); border: 1px solid rgb(5, 150, 105) !important; border-radius: 9999px; padding: 8px 24px; margin-bottom: 24px; margin-top: 20px;">
+                <div class="inline-block px-6 py-2 mb-6 rounded-full" style="background-color: rgba(16, 185, 129, 0.3); border: 1px solid rgb(5, 150, 105) !important; border-radius: 9999px; padding: 8px 24px; margin-bottom: 24px; margin-top: 20px;">
                     <p class="text-center" style="color: rgb(110, 231, 183) !important; font-size: 16px; font-weight: 500; margin: 0;">
                         Plateforme d'Experts Nationaux Agréée
                     </p>
@@ -1023,8 +855,8 @@
                 <h1 class="hero-title mb-6 text-center" style="font-size: 84px; font-weight: 700; line-height: 84px; margin-bottom: 24px; margin-top: 40px; color: #ffffff;">
                     <span class="block text-white">Expertise en Géosciences,</span>
                     <span class="block text-center" style="background: linear-gradient(to right, rgb(52, 211, 153), rgb(45, 212, 191)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; color: transparent; text-align: center;">
-                        <span class="hidden md:inline hero-desktop-nowrap">Mines &amp; Environnement</span>
-                        <span class="md:hidden hero-mobile-linebreak">Mines &amp;<br>Environnement</span>
+                        <span class="hidden md:inline">Mines &amp; Environnement</span>
+                        <span class="md:hidden">Mines &amp;<br>Environnement</span>
                     </span>
                 </h1>
                 
@@ -1036,19 +868,12 @@
                 <!-- Call-to-Action Buttons - Exact from Site -->
                 <div class="hero-buttons flex flex-row items-center justify-center" style="gap: 20px; margin-top: 20px;">
                     <!-- Nos Services Button - Exact from Site -->
-                    <a href="https://calendly.com/cegme" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 px-8 py-2 text-white font-medium transition-all duration-200 hover:opacity-90 md:hidden" style="background-color: rgb(5, 150, 105); border-radius: 9999px; padding: 10px 32px; font-size: 18px;">
-                        <span>Prendre un RDV</span>
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 20px; height: 20px; stroke-width: 2.5;">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path>
-                        </svg>
-                    </a>
-
-                    <a href="/services" class="desktop-services-button hidden md:inline-flex items-center justify-center gap-2 px-8 py-2 text-white font-medium transition-all duration-200 hover:opacity-90" style="background-color: rgb(5, 150, 105); border-radius: 9999px; padding: 10px 32px; font-size: 18px;">
+                    <a href="/services" class="inline-flex items-center justify-center gap-2 px-8 py-2 text-white font-medium transition-all duration-200 hover:opacity-90" style="background-color: rgb(5, 150, 105); border-radius: 9999px; padding: 10px 32px; font-size: 18px;">
                         <span>Nos Services</span>
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 20px; height: 20px; stroke-width: 2.5;">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path>
-                        </svg>
-                    </a>
+                                    </svg>
+                                </a>
                     
                     <!-- Nous Contacter Button - Exact from Site -->
                     <span class="inline-flex items-center justify-center px-8 py-2 text-white font-medium" style="background-color: rgba(55, 65, 81, 0.8) !important; border: 2px solid rgb(255, 255, 255) !important; border-radius: 9999px; padding: 10px 32px; font-size: 18px; cursor: default; pointer-events: none;">
@@ -1063,44 +888,10 @@
             <style>
                 /* Mobile-only styles: emphasize and reorganize hero text without touching desktop */
                 @media (max-width: 639px) {
-                    .mobile-hero-block { background: transparent; padding: 0; border-radius: 0; }
-                    .mobile-hero-title { font-size: 1.5rem !important; line-height: 1.15 !important; margin-bottom: 0.5rem !important; text-align: left !important; }
-                    .mobile-hero-decor { width: 4.5rem !important; height: 4px !important; margin-bottom: 1rem !important; margin-left: 0 !important; margin-right: auto !important; }
-                    .mobile-hero-para { font-size: 20px !important; line-height: 36px !important; text-align: justify !important; }
-                }
-
-                @media (max-width: 767px) {
-                    .hero-section .desktop-services-button {
-                        display: none !important;
-                    }
-                }
-
-                @media (min-width: 768px) {
-                    .hero-section > div[style*="padding-top: 120px"] {
-                        padding-top: 90px !important;
-                    }
-
-                    .hero-section .hero-badge {
-                        margin-top: 32px !important;
-                    }
-
-                    .hero-section .hero-desktop-nowrap {
-                        white-space: nowrap !important;
-                        display: inline-block !important;
-                    }
-
-                    .hero-section .hero-mobile-linebreak {
-                        display: none !important;
-                    }
-
-                    .hero-section .hero-title {
-                        margin-top: 16px !important;
-                    }
-
-                    .hero-section .hero-buttons {
-                        margin-top: 16px !important;
-                        transform: translateY(0) !important;
-                    }
+                    .mobile-hero-block { background: rgba(255,255,255,0.98); padding: 1rem; border-radius: 0.75rem; }
+                    .mobile-hero-title { font-size: 1.5rem !important; line-height: 1.15 !important; margin-bottom: 0.5rem !important; }
+                    .mobile-hero-decor { width: 4.5rem !important; height: 4px !important; margin-bottom: 1rem !important; }
+                    .mobile-hero-para { font-size: 1rem !important; line-height: 1.6 !important; }
                 }
             </style>
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1553,20 +1344,13 @@
                             Études d'impact environnemental et social, audits, gestion durable des ressources naturelles
                         </p>
                         <!-- Button -->
-                            <a href="/services#environnement" class="inline-flex items-center gap-2 text-green-600 font-semibold hover:text-green-700 transition-colors md:hidden" style="font-size: 16px; font-weight: 600; color: rgb(5, 150, 105); background-color: rgba(0, 0, 0, 0); display: inline-flex; align-items: center; gap: 8px; text-decoration: none;">
-                                <span>En savoir plus</span>
+                            <button class="inline-flex items-center gap-2 text-green-600 font-semibold hover:text-green-700 transition-colors" style="font-size: 16px; font-weight: 600; color: rgb(5, 150, 105); background-color: rgba(0, 0, 0, 0); display: inline-flex; align-items: center; gap: 8px;">
+                            <span>En savoir plus</span>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
-                                    <path d="M5 12h14"></path>
-                                    <path d="m12 5 7 7-7 7"></path>
-                                </svg>
-                            </a>
-                            <button class="inline-flex items-center gap-2 text-green-600 font-semibold hover:text-green-700 transition-colors hidden md:inline-flex" style="font-size: 16px; font-weight: 600; color: rgb(5, 150, 105); background-color: rgba(0, 0, 0, 0); align-items: center; gap: 8px;">
-                                <span>En savoir plus</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
-                                    <path d="M5 12h14"></path>
-                                    <path d="m12 5 7 7-7 7"></path>
-                                </svg>
-                            </button>
+                                <path d="M5 12h14"></path>
+                                <path d="m12 5 7 7-7 7"></path>
+                            </svg>
+                        </button>
                         </div>
                     </div>
                     
@@ -1590,20 +1374,13 @@
                             Exploration géologique, cartographie numérique, évaluation économique de projets miniers
                         </p>
                         <!-- Button -->
-                            <a href="/services#recherche" class="inline-flex items-center gap-2 text-green-600 font-semibold hover:text-green-700 transition-colors md:hidden" style="font-size: 16px; font-weight: 600; color: rgb(5, 150, 105); background-color: rgba(0, 0, 0, 0); display: inline-flex; align-items: center; gap: 8px; text-decoration: none;">
-                                <span>En savoir plus</span>
+                            <button class="inline-flex items-center gap-2 text-green-600 font-semibold hover:text-green-700 transition-colors" style="font-size: 16px; font-weight: 600; color: rgb(5, 150, 105); background-color: rgba(0, 0, 0, 0); display: inline-flex; align-items: center; gap: 8px;">
+                            <span>En savoir plus</span>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
-                                    <path d="M5 12h14"></path>
-                                    <path d="m12 5 7 7-7 7"></path>
-                                </svg>
-                            </a>
-                            <button class="inline-flex items-center gap-2 text-green-600 font-semibold hover:text-green-700 transition-colors hidden md:inline-flex" style="font-size: 16px; font-weight: 600; color: rgb(5, 150, 105); background-color: rgba(0, 0, 0, 0); align-items: center; gap: 8px;">
-                                <span>En savoir plus</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
-                                    <path d="M5 12h14"></path>
-                                    <path d="m12 5 7 7-7 7"></path>
-                                </svg>
-                            </button>
+                                <path d="M5 12h14"></path>
+                                <path d="m12 5 7 7-7 7"></path>
+                            </svg>
+                        </button>
                         </div>
                     </div>
                     
@@ -1630,20 +1407,13 @@
                             SIG, études hydrogéologiques et géotechniques, modélisation cartographique
                         </p>
                         <!-- Button -->
-                            <a href="/services#geo-ingenierie" class="inline-flex items-center gap-2 text-green-600 font-semibold hover:text-green-700 transition-colors md:hidden" style="font-size: 16px; font-weight: 600; color: rgb(5, 150, 105); background-color: rgba(0, 0, 0, 0); display: inline-flex; align-items: center; gap: 8px; text-decoration: none;">
-                                <span>En savoir plus</span>
+                            <button class="inline-flex items-center gap-2 text-green-600 font-semibold hover:text-green-700 transition-colors" style="font-size: 16px; font-weight: 600; color: rgb(5, 150, 105); background-color: rgba(0, 0, 0, 0); display: inline-flex; align-items: center; gap: 8px;">
+                            <span>En savoir plus</span>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
-                                    <path d="M5 12h14"></path>
-                                    <path d="m12 5 7 7-7 7"></path>
-                                </svg>
-                            </a>
-                            <button class="inline-flex items-center gap-2 text-green-600 font-semibold hover:text-green-700 transition-colors hidden md:inline-flex" style="font-size: 16px; font-weight: 600; color: rgb(5, 150, 105); background-color: rgba(0, 0, 0, 0); align-items: center; gap: 8px;">
-                                <span>En savoir plus</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
-                                    <path d="M5 12h14"></path>
-                                    <path d="m12 5 7 7-7 7"></path>
-                                </svg>
-                            </button>
+                                <path d="M5 12h14"></path>
+                                <path d="m12 5 7 7-7 7"></path>
+                            </svg>
+                        </button>
                         </div>
                     </div>
                     
@@ -1668,20 +1438,13 @@
                             Conseil aux investisseurs, représentation d'entreprises, négociation commerciale
                         </p>
                         <!-- Button -->
-                            <a href="/services#negoce" class="inline-flex items-center gap-2 text-green-600 font-semibold hover:text-green-700 transition-colors md:hidden" style="font-size: 16px; font-weight: 600; color: rgb(5, 150, 105); background-color: rgba(0, 0, 0, 0); display: inline-flex; align-items: center; gap: 8px; text-decoration: none;">
-                                <span>En savoir plus</span>
+                            <button class="inline-flex items-center gap-2 text-green-600 font-semibold hover:text-green-700 transition-colors" style="font-size: 16px; font-weight: 600; color: rgb(5, 150, 105); background-color: rgba(0, 0, 0, 0); display: inline-flex; align-items: center; gap: 8px;">
+                            <span>En savoir plus</span>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
-                                    <path d="M5 12h14"></path>
-                                    <path d="m12 5 7 7-7 7"></path>
-                                </svg>
-                            </a>
-                            <button class="inline-flex items-center gap-2 text-green-600 font-semibold hover:text-green-700 transition-colors hidden md:inline-flex" style="font-size: 16px; font-weight: 600; color: rgb(5, 150, 105); background-color: rgba(0, 0, 0, 0); align-items: center; gap: 8px;">
-                                <span>En savoir plus</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
-                                    <path d="M5 12h14"></path>
-                                    <path d="m12 5 7 7-7 7"></path>
-                                </svg>
-                            </button>
+                                <path d="M5 12h14"></path>
+                                <path d="m12 5 7 7-7 7"></path>
+                            </svg>
+                        </button>
                         </div>
                     </div>
                 </div>
@@ -1829,24 +1592,20 @@
                         <div class="relative overflow-hidden" style="position: relative; overflow: hidden;">
                             <img src="{{ asset('Image/Complexe Immobilier.jpg') }}" alt="Complexe Immobilier BDEAC" class="w-full h-48 object-cover transition-transform duration-300 hover:scale-110" style="width: 100%; height: 200px; object-fit: cover; transition: transform 0.3s ease;">
                             <div class="absolute top-4 right-4 bg-white text-gray-800 px-4 py-1.5 rounded-full text-sm font-semibold shadow-lg" style="position: absolute; top: 16px; right: 16px; background-color: rgb(255, 255, 255); color: rgb(31, 41, 55); padding: 6px 16px; border-radius: 9999px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);">
-                                <span class="md:hidden">2025</span>
-                                <span class="hidden md:inline">2021</span>
+                                2021
                             </div>
                         </div>
                         <div class="p-6" style="padding: 24px;">
                             <div class="mb-4" style="margin-bottom: 16px;">
                                 <span class="bg-green-100 text-green-700 px-3 py-1.5 rounded-full text-sm font-semibold" style="background-color: rgb(220, 252, 231); color: rgb(5, 150, 105); padding: 6px 12px; border-radius: 9999px; font-size: 14px; font-weight: 600; display: inline-block;">
-                                    <span class="md:hidden">Conservation</span>
-                                    <span class="hidden md:inline">environnement</span>
+                                    environnement
                                 </span>
                             </div>
                             <h3 class="text-xl font-bold mb-3" style="font-size: 22px; font-weight: 800; color: rgb(17, 24, 39); margin-bottom: 12px; line-height: 30px; letter-spacing: -0.3px;">
-                                <span class="md:hidden">CGES &amp; PGES - Aire de Conservation de Chinko</span>
-                                <span class="hidden md:inline">Complexe Immobilier BDEAC</span>
+                                Complexe Immobilier BDEAC
                             </h3>
                             <p class="text-gray-600" style="font-size: 16px; color: rgb(75, 85, 99); line-height: 26px;">
-                                <span class="md:hidden">African Parks Network / USAID<br><br>Chinko, RCA<br>Élaboration du Cadre de Gestion Environnementale et Sociale et du PGES pour l'Aire de Conservation de Chinko.<br><br>CGES<br>PGES<br>Conservation<br>Financement : USAID</span>
-                                <span class="hidden md:inline">EIES pour construction d'un complexe administratif et résidentiel au centre-ville de Bangui</span>
+                                EIES pour construction d'un complexe administratif et résidentiel au centre-ville de Bangui
                             </p>
                         </div>
                     </a>
@@ -1856,24 +1615,20 @@
                         <div class="relative overflow-hidden" style="position: relative; overflow: hidden; height: 240px; background-color: #f3f4f6;">
                             <img src="{{ asset('Image/City Apartment Bangui..jpg') }}" alt="City Apartment Bangui" class="w-full h-full object-cover transition-transform duration-300 hover:scale-110" style="width: 100%; height: 100%; min-height: 240px; object-fit: cover; object-position: center; transition: transform 0.3s ease; display: block;">
                             <div class="absolute top-4 right-4 bg-white text-gray-800 px-4 py-1.5 rounded-full text-sm font-semibold shadow-lg" style="position: absolute; top: 16px; right: 16px; background-color: rgb(255, 255, 255); color: rgb(31, 41, 55); padding: 6px 16px; border-radius: 9999px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);">
-                                <span class="md:hidden">2024</span>
-                                <span class="hidden md:inline">2020</span>
+                                2020
                             </div>
                         </div>
                         <div class="p-6" style="padding: 24px;">
                             <div class="mb-4" style="margin-bottom: 16px;">
                                 <span class="bg-green-100 text-green-700 px-3 py-1.5 rounded-full text-sm font-semibold" style="background-color: rgb(220, 252, 231); color: rgb(5, 150, 105); padding: 6px 12px; border-radius: 9999px; font-size: 14px; font-weight: 600; display: inline-block;">
-                                    <span class="md:hidden">Conservation</span>
-                                    <span class="hidden md:inline">environnement</span>
+                                    environnement
                                 </span>
                             </div>
                             <h3 class="text-xl font-bold mb-3" style="font-size: 22px; font-weight: 800; color: rgb(17, 24, 39); margin-bottom: 12px; line-height: 30px; letter-spacing: -0.3px;">
-                                <span class="md:hidden">CGES &amp; PGES - Aire de Conservation de Chinko</span>
-                                <span class="hidden md:inline">City Apartment Bangui</span>
+                                City Apartment Bangui
                             </h3>
                             <p class="text-gray-600" style="font-size: 16px; color: rgb(75, 85, 99); line-height: 26px;">
-                                <span class="md:hidden">African Parks Network / USAID<br><br>Chinko, RCA<br>Élaboration du Cadre de Gestion Environnementale et Sociale et du PGES pour l'Aire de Conservation de Chinko.<br><br>CGES<br>PGES<br>Conservation<br>Financement : USAID</span>
-                                <span class="hidden md:inline">Étude d'impact pour un complexe immobilier à usage administratif et d'appartement</span>
+                                Étude d'impact pour un complexe immobilier à usage administratif et d'appartement
                             </p>
                         </div>
                     </a>
@@ -1883,24 +1638,20 @@
                         <div class="relative overflow-hidden" style="position: relative; overflow: hidden;">
                             <img src="{{ asset('Image/Exploitation Rivière Sangha.jpg') }}" alt="Exploitation Rivière Sangha" class="w-full h-48 object-cover transition-transform duration-300 hover:scale-110" style="width: 100%; height: 200px; object-fit: cover; transition: transform 0.3s ease;">
                             <div class="absolute top-4 right-4 bg-white text-gray-800 px-4 py-1.5 rounded-full text-sm font-semibold shadow-lg" style="position: absolute; top: 16px; right: 16px; background-color: rgb(255, 255, 255); color: rgb(31, 41, 55); padding: 6px 16px; border-radius: 9999px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);">
-                                <span class="md:hidden">2022</span>
-                                <span class="hidden md:inline">2019</span>
+                                2019
                             </div>
                         </div>
                         <div class="p-6" style="padding: 24px;">
                             <div class="mb-4" style="margin-bottom: 16px;">
                                 <span class="bg-orange-100 text-orange-700 px-3 py-1.5 rounded-full text-sm font-semibold" style="background-color: rgb(255, 237, 213); color: rgb(249, 115, 22); padding: 6px 12px; border-radius: 9999px; font-size: 14px; font-weight: 600; display: inline-block;">
-                                    <span class="md:hidden">Changement climatique</span>
-                                    <span class="hidden md:inline">mines</span>
+                                    mines
                                 </span>
                             </div>
                             <h3 class="text-xl font-bold mb-3" style="font-size: 22px; font-weight: 800; color: rgb(17, 24, 39); margin-bottom: 12px; line-height: 30px; letter-spacing: -0.3px;">
-                                <span class="md:hidden">EIES - Projet de Réduction de la Vulnérabilité Climatique</span>
-                                <span class="hidden md:inline">Exploitation Rivière Sangha</span>
+                                Exploitation Rivière Sangha
                             </h3>
                             <p class="text-gray-600" style="font-size: 16px; color: rgb(75, 85, 99); line-height: 26px;">
-                                <span class="md:hidden">Ministère de l'Énergie / BAD<br><br>République Centrafricaine<br>EIES du Projet de Réduction de la Vulnérabilité face aux changements climatiques (PCRVP-FCAE).<br><br>EIES<br>Changement climatique<br>Financement : BAD</span>
-                                <span class="hidden md:inline">EIES pour exploitation semi-mécanisée d'or et diamant sur la rivière Sangha</span>
+                                EIES pour exploitation semi-mécanisée d'or et diamant sur la rivière Sangha
                             </p>
                         </div>
                     </a>
@@ -2018,13 +1769,13 @@
                     naturelles de la Centrafrique
                 </p>
                 <div class="flex justify-center" style="display: flex; justify-content: center;">
-                    <a href="{{ route('contact') }}" class="inline-flex items-center gap-2 px-8 py-3 bg-white text-black rounded-xl font-semibold shadow-lg" style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 32px; background-color: rgb(255, 255, 255); color: rgb(0, 0, 0); border-radius: 12px; font-size: 16px; font-weight: 600; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); text-decoration: none;">
+                    <span class="inline-flex items-center gap-2 px-8 py-3 bg-white text-black rounded-xl font-semibold shadow-lg" style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 32px; background-color: rgb(255, 255, 255); color: rgb(0, 0, 0); border-radius: 12px; font-size: 16px; font-weight: 600; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); cursor: default; pointer-events: none;">
                         <span>Contactez-nous</span>
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
                             <path d="M5 12h14"></path>
                             <path d="m12 5 7 7-7 7"></path>
                         </svg>
-                    </a>
+                    </span>
                 </div>
             </div>
         </section>
@@ -2040,7 +1791,7 @@
                     <div>
                         <!-- Logo and Company Name -->
                         <div class="flex items-center gap-3 mb-6" style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
-                            <img src="{{ asset('Image/CEGME Logo.png') }}" alt="CEGME Logo" class="block h-12 w-auto" style="height: 48px; width: auto; object-fit: contain;">
+                            <img src="{{ asset('Image/CEGME Logo.JPG') }}" alt="CEGME Logo" class="block h-12 w-auto" style="height: 48px; width: auto; object-fit: contain;">
                             <div class="flex flex-col" style="display: flex; flex-direction: column;">
                                 <span class="text-2xl font-bold" style="font-size: 22px; font-weight: 800; background: linear-gradient(135deg, #34d399 0%, #10b981 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2;">CEGME</span>
                                 <span class="text-xs text-gray-200" style="font-size: 11px; color: rgb(229, 231, 235); line-height: 1.2; margin-top: 2px;">Géosciences • Mines • Environnement</span>
@@ -2167,7 +1918,7 @@
                                     </div>
                                     <div>
                                         <span class="text-white font-semibold block mb-1" style="color: rgb(255, 255, 255); font-weight: 600; font-size: 14px; display: block; margin-bottom: 4px;">Email</span>
-                                        <a href="mailto:cabinet.rca@cegme.net" class="text-gray-200 text-sm hover:text-green-300 transition-colors" style="color: rgb(229, 231, 235); font-size: 14px; text-decoration: none; transition: color 0.2s ease;">cabinet.rca@cegme.net / cegme.sarl@gmail.com</a>
+                                        <a href="mailto:contact@cegme.net" class="text-gray-200 text-sm hover:text-green-300 transition-colors" style="color: rgb(229, 231, 235); font-size: 14px; text-decoration: none; transition: color 0.2s ease;">contact@cegme.net</a>
                                     </div>
                                 </div>
                             </li>

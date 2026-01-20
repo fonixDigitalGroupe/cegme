@@ -19,7 +19,6 @@ class ScrapingController extends Controller
         'DGMarket' => 'app:scrape-dgmarket',
         'BDEAC' => 'app:scrape-bdeac',
         'IFAD' => 'app:scrape-ifad',
-        'DG Market (TED)' => 'app:scrape-ted',
     ];
 
     /**

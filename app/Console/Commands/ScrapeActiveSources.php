@@ -27,7 +27,6 @@ class ScrapeActiveSources extends Command
         'DGMarket' => 'app:scrape-dgmarket',
         'BDEAC' => 'app:scrape-bdeac',
         'IFAD' => 'app:scrape-ifad',
-        'DG Market (TED)' => 'app:scrape-ted',
     ];
 
     public function handle()

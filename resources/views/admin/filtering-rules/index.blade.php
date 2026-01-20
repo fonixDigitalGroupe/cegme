@@ -76,12 +76,25 @@
                         @endif
                     </td>
                     <td style="padding: 0.75rem 1rem; font-size: 0.875rem;">
-                        <div style="display: flex; gap: 0.5rem;">
-                            <a href="{{ route('admin.filtering-rules.edit', $rule) }}" style="color: #3b82f6; text-decoration: none;">Modifier</a>
-                            <form method="POST" action="{{ route('admin.filtering-rules.destroy', $rule) }}" style="display: inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette règle ?');">
+                        <div style="display: flex; align-items: center; justify-content: flex-start; gap: 0.375rem;">
+                            <a href="{{ route('admin.filtering-rules.edit', $rule) }}" style="display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; color: #2563eb; text-decoration: none; border-radius: 5px; background-color: transparent; transition: all 0.2s ease; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;" onmouseover="this.style.backgroundColor='#eff6ff'; this.style.color='#1d4ed8';" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#2563eb';" title="Modifier">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
+                            </a>
+                            <form method="POST" action="{{ route('admin.filtering-rules.destroy', $rule) }}" style="display: inline; margin: 0;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette règle ?');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" style="color: #ef4444; background: none; border: none; cursor: pointer; padding: 0;">Supprimer</button>
+                                <button type="submit" style="display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; padding: 0; border: none; background-color: transparent; cursor: pointer; color: #dc2626; border-radius: 5px; transition: all 0.2s ease; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;" onmouseover="this.style.backgroundColor='#fef2f2'; this.style.color='#b91c1c';" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#dc2626';" title="Supprimer">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M3 6h14"></path>
+                                        <path d="M8 6V4a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v2"></path>
+                                        <path d="M5 6v12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V6"></path>
+                                        <path d="M8 10v6"></path>
+                                        <path d="M12 10v6"></path>
+                                    </svg>
+                                </button>
                             </form>
                         </div>
                     </td>
