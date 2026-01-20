@@ -21,6 +21,12 @@ class WorldBankScraperService
     private const MAX_PAGES = 200;
 
     /**
+     * Cache local pour les détails de projets durant une session de scraping
+     * @var array
+     */
+    private $projectCache = [];
+
+    /**
      * Scrape les appels d'offres depuis l'API de la Banque Mondiale
      *
      * @return array ['count' => int, 'stats' => array] Nombre d'appels d'offres récupérés et statistiques
@@ -29,7 +35,7 @@ class WorldBankScraperService
     {
         // Note: Le vidage de la table est géré par la commande principale (app:scrape-active-sources)
         // Ici on scrappe uniquement les offres World Bank
-        
+
         $totalCount = 0;
         $totalNoticesFound = 0;
         $totalExcluded = 0;
@@ -42,24 +48,24 @@ class WorldBankScraperService
             $maxPages = max(1, min((int) env('WORLD_BANK_MAX_PAGES', 5), self::MAX_PAGES));
             while ($page < $maxPages && $start < 10000) { // Limite de sécurité (10,000 résultats max)
                 Log::debug("World Bank Scraper: Fetching page {$page} (start={$start})");
-                
+
                 $result = $this->fetchApiPage($start, $rows);
                 $count = $result['count'];
                 $hasMore = $result['has_more'];
                 $noticesFound = $result['notices_found'] ?? 0;
                 $excluded = $result['excluded'] ?? 0;
-                
+
                 $totalCount += $count;
                 $totalNoticesFound += $noticesFound;
                 $totalExcluded += $excluded;
-                
+
                 // Enregistrer les stats de cette page
                 $pagesStats[$page] = [
                     'kept' => $count,
                     'found' => $noticesFound,
                     'excluded' => $excluded,
                 ];
-                
+
                 // Log seulement toutes les 10 pages pour réduire la charge
                 if ($page % 10 === 0 || $count > 0) {
                     Log::info("World Bank Scraper: Page {$page} traitée", [
@@ -72,15 +78,16 @@ class WorldBankScraperService
                 }
 
 
-    
 
+
+                $updates = $result['updates'] ?? [];
                 // Appliquer les mises à jour (pays/date) sur les offres existantes
                 if (!empty($updates)) {
                     foreach ($updates as $u) {
                         try {
                             Offre::where('id', $u['id'])->update([
-                                'pays' => $u['pays'],
-                                'date_limite_soumission' => $u['date_limite_soumission'],
+                                'pays' => $u['pays'] ?? null,
+                                'date_limite_soumission' => $u['date_limite_soumission'] ?? null,
                                 'updated_at' => now(),
                             ]);
                         } catch (\Exception $e) {
@@ -88,13 +95,13 @@ class WorldBankScraperService
                         }
                     }
                 }
-                
+
                 // Arrêter si aucune offre trouvée ou pas de suite
                 if ($count === 0 || !$hasMore) {
                     Log::info("World Bank Scraper: Page {$page} a retourné 0 offres ou fin de pagination, arrêt.");
                     break;
                 }
-                
+
                 $start += $rows;
                 $page++;
                 usleep(100000); // Réduit à 0.1 seconde entre les pages
@@ -114,7 +121,7 @@ class WorldBankScraperService
             'total_notices_excluded' => $totalExcluded,
             'offres_par_page' => $pagesStats,
         ];
-        
+
         Log::info('World Bank Scraper: Résumé du scraping avec filtrage', $stats);
 
         return ['count' => $totalCount, 'stats' => $stats];
@@ -130,7 +137,7 @@ class WorldBankScraperService
     private function fetchApiPage(int $start, int $rows): array
     {
         $inserted = 0;
-        
+
         try {
             $params = [
                 'format' => 'json',
@@ -142,15 +149,15 @@ class WorldBankScraperService
                 'os' => $start, // Offset
                 'rows' => $rows, // Nombre de résultats
             ];
-            
+
             // Note: L'API peut être instable, on essaie sans certains paramètres si nécessaire
-            
+
             // Note: On ne peut pas filtrer par notice_type dans l'API, donc on filtre après récupération
-            
+
             $url = self::API_BASE_URL . '?' . http_build_query($params);
-            
+
             Log::debug("World Bank Scraper: Fetching API", ['url' => $url]);
-            
+
             $response = Http::withoutVerifying()
                 ->timeout(30)
                 ->withHeaders([
@@ -168,7 +175,7 @@ class WorldBankScraperService
             }
 
             $data = $response->json();
-            
+
             // L'API retourne 'procnotices' au lieu de 'documents'
             if (!isset($data['procnotices']) || !is_array($data['procnotices'])) {
                 Log::warning('World Bank Scraper: Invalid API response structure', ['data_keys' => array_keys($data ?? [])]);
@@ -176,9 +183,9 @@ class WorldBankScraperService
             }
 
             $documents = $data['procnotices'];
-            $totalFound = (int)($data['total'] ?? 0);
+            $totalFound = (int) ($data['total'] ?? 0);
             $hasMore = ($start + count($documents)) < $totalFound;
-            
+
             $totalNotices = count($documents);
             $excludedCount = 0;
             $exclusionReasons = [];
@@ -186,12 +193,11 @@ class WorldBankScraperService
             $passedFilterCount = 0;
 
             // Traiter chaque document et collecter les offres valides
-            $validOffres = [];
             foreach ($documents as $doc) {
                 try {
                     // Vérifier d'abord si le type de notice est valide
                     $filterResult = $this->shouldKeepNotice($doc);
-                    
+
                     if (!$filterResult['keep']) {
                         $excludedCount++;
                         $reason = $filterResult['reason'] ?? 'Unknown';
@@ -201,20 +207,47 @@ class WorldBankScraperService
                         $exclusionReasons[$reason]++;
                         continue;
                     }
-                    
+
                     $passedFilterCount++;
-                    
-                    $offre = $this->extractOffreFromApiDocument($doc);
-                    
-                    if ($offre && !empty($offre['titre']) && !empty($offre['lien_source'])) {
-                        $validOffres[] = $offre;
+
+                    $offreData = $this->extractOffreFromApiDocument($doc);
+
+                    if ($offreData && !empty($offreData['titre']) && !empty($offreData['lien_source'])) {
                         $keptCount++;
+
+                        // Sauvegarder ou mettre à jour immédiatement pour un feedback en temps réel
+                        try {
+                            $existing = Offre::where('source', 'World Bank')
+                                ->where(function ($q) use ($offreData) {
+                                    $q->where('lien_source', $offreData['lien_source'])
+                                        ->orWhere('titre', $offreData['titre']);
+                                })
+                                ->first();
+
+                            if ($existing) {
+                                $existing->update([
+                                    'pays' => $offreData['pays'] ?? $existing->pays,
+                                    'date_limite_soumission' => $offreData['date_limite_soumission'] ?? $existing->date_limite_soumission,
+                                    'updated_at' => now(),
+                                ]);
+                            } else {
+                                $offreData['created_at'] = now();
+                                $offreData['updated_at'] = now();
+                                Offre::create($offreData);
+                                $inserted++;
+                            }
+                        } catch (\Exception $dbEx) {
+                            Log::error('World Bank Scraper: Database error for notice ' . ($doc['id'] ?? 'unknown'), [
+                                'error' => $dbEx->getMessage(),
+                                'doc' => $doc['id'] ?? null
+                            ]);
+                        }
                     } else {
                         // Log pour debug si l'offre n'est pas valide
                         Log::info('World Bank Scraper: Offre invalide', [
-                            'has_offre' => !is_null($offre),
-                            'has_titre' => !empty($offre['titre'] ?? null),
-                            'has_lien' => !empty($offre['lien_source'] ?? null),
+                            'has_offre' => !is_null($offreData),
+                            'has_titre' => !empty($offreData['titre'] ?? null),
+                            'has_lien' => !empty($offreData['lien_source'] ?? null),
                             'project_name' => $doc['project_name'] ?? 'N/A',
                             'project_id' => $doc['project_id'] ?? 'N/A',
                             'notice_type' => $doc['notice_type'] ?? 'N/A',
@@ -228,71 +261,8 @@ class WorldBankScraperService
                     continue;
                 }
             }
-            
-            // Vérifier les offres existantes en batch (optimisation)
-            if (!empty($validOffres)) {
-                $liensSources = array_column($validOffres, 'lien_source');
-                $titres = array_column($validOffres, 'titre');
 
-                // Récupérer en une seule requête les lignes existantes pour éviter deux trips DB
-                $existingRows = Offre::where('source', 'World Bank')
-                    ->where(function ($q) use ($liensSources, $titres) {
-                        if (!empty($liensSources)) {
-                            $q->whereIn('lien_source', $liensSources);
-                        }
-                        if (!empty($titres)) {
-                            $q->orWhereIn('titre', $titres);
-                        }
-                    })
-                    ->get(['id','lien_source', 'titre']);
 
-                $existingLiens = $existingRows->pluck('lien_source','id')->filter();
-                $existingTitres = $existingRows->pluck('titre','id')->filter();
-
-                // Filtrer les offres qui n'existent pas déjà
-                $newOffres = [];
-                $updates = [];
-                foreach ($validOffres as $offre) {
-                    $matchId = null;
-                    // Essayer de matcher par lien_source
-                    $matchId = $existingLiens->search($offre['lien_source']);
-                    if ($matchId === false) {
-                        // Essayer par titre
-                        $matchId = $existingTitres->search($offre['titre']);
-                    }
-
-                    if ($matchId === false || $matchId === null) {
-                        // Nouvel enregistrement à insérer
-                        $newOffres[] = $offre;
-                    } else {
-                        // Mettre à jour l'offre existante avec les nouvelles infos WB (pays/région et date)
-                        $updates[] = [
-                            'id' => $matchId,
-                            'pays' => $offre['pays'] ?? null,
-                            'date_limite_soumission' => $offre['date_limite_soumission'] ?? null,
-                        ];
-                    }
-                }
-                
-                // Insérer en batch (optimisation majeure)
-                if (!empty($newOffres)) {
-                    // Ajouter les timestamps pour l'insertion en batch
-                    $now = now();
-                    foreach ($newOffres as &$offre) {
-                        $offre['created_at'] = $now;
-                        $offre['updated_at'] = $now;
-                    }
-                    unset($offre);
-                    
-                    // Insérer par chunks pour éviter les problèmes de mémoire
-                    $chunks = array_chunk($newOffres, 50);
-                    foreach ($chunks as $chunk) {
-                        Offre::insert($chunk);
-                        $inserted += count($chunk);
-                    }
-                }
-            }
-            
             // Log seulement si des offres ont été trouvées ou si c'est la première page
             if ($inserted > 0 || ($start / $rows) === 0) {
                 Log::info("World Bank Scraper: Filtering results for page", [
@@ -319,6 +289,7 @@ class WorldBankScraperService
             'has_more' => $hasMore ?? false,
             'notices_found' => $totalNotices ?? 0,
             'excluded' => $excludedCount ?? 0,
+            'updates' => $updates ?? [],
         ];
     }
 
@@ -332,7 +303,7 @@ class WorldBankScraperService
     {
         $noticeType = $doc['notice_type'] ?? '';
         $noticeTypeLower = strtolower($noticeType);
-        
+
         // Types de notices à GARDER (Appels d'Offres réels)
         $keepPatterns = [
             'request for proposal',
@@ -351,7 +322,7 @@ class WorldBankScraperService
             'individual consulting',
             'invitation for prequalification', // Prequalification est un appel d'offres
         ];
-        
+
         // Types de notices à EXCLURE
         $excludePatterns = [
             'general procurement notice',
@@ -364,7 +335,7 @@ class WorldBankScraperService
             'archived notice',
             'archive',
         ];
-        
+
         // Vérifier d'abord les patterns d'exclusion
         foreach ($excludePatterns as $pattern) {
             if (stripos($noticeTypeLower, $pattern) !== false) {
@@ -374,7 +345,7 @@ class WorldBankScraperService
                 ];
             }
         }
-        
+
         // Vérifier les patterns à garder
         foreach ($keepPatterns as $pattern) {
             if (stripos($noticeTypeLower, $pattern) !== false) {
@@ -384,7 +355,7 @@ class WorldBankScraperService
                 ];
             }
         }
-        
+
         // Cas spécial: "Request for Expression of Interest" seul (sans consultant) doit être exclu
         if (stripos($noticeTypeLower, 'expression of interest') !== false) {
             // Vérifier s'il y a des mots-clés de consultant dans le titre du projet
@@ -397,7 +368,7 @@ class WorldBankScraperService
                     break;
                 }
             }
-            
+
             if (!$hasConsultantKeyword) {
                 return [
                     'keep' => false,
@@ -405,7 +376,7 @@ class WorldBankScraperService
                 ];
             }
         }
-        
+
         // Si aucun pattern ne correspond, exclure par défaut (principe de sécurité)
         return [
             'keep' => false,
@@ -424,26 +395,29 @@ class WorldBankScraperService
         try {
             // Titre: utiliser project_name ou notice_type
             $titre = $doc['project_name'] ?? $doc['notice_type'] ?? null;
-            
+
             if (!$titre || strlen(trim($titre)) < 10) {
                 return null;
             }
-            
+
             // STRATÉGIE DE LIEN WORLD BANK
             // Priorité affichage et extraction date: notice_url (page détail de l'offre)
             // Sinon, fallback: page projet ou page de recherche (affichage uniquement)
-            
+
             $projectId = $doc['project_id'] ?? null;
             $noticeUrl = $doc['notice_url'] ?? null;
             $lien = null;
             $linkType = null;
-            
+
             if (empty($noticeUrl)) {
                 // Résoudre notice_url via la page de recherche Procurement
                 try {
                     $apiCountry = null;
-                    if (isset($doc['project_ctry_name']) && is_string($doc['project_ctry_name'])) { $apiCountry = $doc['project_ctry_name']; }
-                    elseif (isset($doc['project_ctry_name']) && is_array($doc['project_ctry_name']) && !empty($doc['project_ctry_name'][0])) { $apiCountry = $doc['project_ctry_name'][0]; }
+                    if (isset($doc['project_ctry_name']) && is_string($doc['project_ctry_name'])) {
+                        $apiCountry = $doc['project_ctry_name'];
+                    } elseif (isset($doc['project_ctry_name']) && is_array($doc['project_ctry_name']) && !empty($doc['project_ctry_name'][0])) {
+                        $apiCountry = $doc['project_ctry_name'][0];
+                    }
                     $resolved = $this->resolveNoticeUrlFromSearch($titre, $apiCountry, $doc['notice_type'] ?? null, $doc['id'] ?? null);
                     if (!empty($resolved)) {
                         $noticeUrl = $resolved;
@@ -468,7 +442,9 @@ class WorldBankScraperService
                 $params['searchTerm'] = $titre;
                 if (isset($doc['project_ctry_name']) && !empty($doc['project_ctry_name'])) {
                     $countries = is_array($doc['project_ctry_name']) ? $doc['project_ctry_name'] : [$doc['project_ctry_name']];
-                    if (!empty($countries[0])) { $params['country'] = $countries[0]; }
+                    if (!empty($countries[0])) {
+                        $params['country'] = $countries[0];
+                    }
                 }
                 if (isset($doc['notice_type']) && !empty($doc['notice_type'])) {
                     $nt = strtolower(trim($doc['notice_type']));
@@ -485,11 +461,11 @@ class WorldBankScraperService
                 $lien = $baseUrl . '?' . http_build_query($params);
                 $linkType = 'search_context';
             }
-            
+
             if (!$lien) {
                 return null;
             }
-            
+
             // Récupération de la date limite - PRIORITÉ À LA "CLOSING DATE" DE LA PAGE DU PROJET
             // La "Closing Date" sur la page project-detail est la vraie date limite de soumission
             // Structure trouvée: <label>Closing Date</label><p class="document-info">December 31, 2027</p>
@@ -498,12 +474,11 @@ class WorldBankScraperService
             $submissionRaw = null;
             $apiDate = null;
             $projectClosingDate = null;
-            
+
             // 1. PRIORITÉ: Récupérer la "Closing Date" depuis la page de détail du projet
-            // OPTIMISATION: Désactivable via variable d'environnement WORLD_BANK_FETCH_CLOSING_DATE=false
-            // pour améliorer la vitesse (Browsershot prend ~20-30 secondes par projet)
+            // C'est cette date qui est considérée comme la date limite par l'utilisateur
             $fetchClosingDate = env('WORLD_BANK_FETCH_CLOSING_DATE', true);
-            
+
             if ($fetchClosingDate && !empty($projectId)) {
                 try {
                     $projectDetail = $this->fetchProjectDetailFields($projectId);
@@ -511,8 +486,8 @@ class WorldBankScraperService
                         $projectClosingDate = $projectDetail['closing_date'];
                         $submissionDate = $projectClosingDate;
                         $submissionRaw = $projectDetail['closing_raw'] ?? $projectClosingDate;
-                        Log::info('World Bank Scraper: ✅ Date récupérée depuis la page de détail du projet (Closing Date)', [
-                            'source' => 'Page Project Detail (Closing Date) - PRIORITÉ',
+                        Log::info('World Bank Scraper: ✅ Date récupérée depuis la page de détail du projet (Closing Date) - PRIORITÉ', [
+                            'source' => 'Page Project Detail (Closing Date)',
                             'project_id' => $projectId,
                             'raw_value' => $submissionRaw,
                             'normalized' => $submissionDate,
@@ -525,13 +500,9 @@ class WorldBankScraperService
                         'error' => $e->getMessage(),
                     ]);
                 }
-            } elseif (!$fetchClosingDate && !empty($projectId)) {
-                Log::debug('World Bank Scraper: Récupération de Closing Date désactivée (WORLD_BANK_FETCH_CLOSING_DATE=false)', [
-                    'project_id' => $projectId,
-                ]);
             }
-            
-            // 2. FALLBACK: Si la "Closing Date" n'est pas trouvée sur la page du projet, utiliser l'API
+
+            // 2. FALLBACK 1: Utiliser la date de soumission fournie par l'API
             if (empty($submissionDate) && isset($doc['submission_deadline_date']) && !empty($doc['submission_deadline_date'])) {
                 try {
                     $apiDateValue = $doc['submission_deadline_date'];
@@ -566,11 +537,11 @@ class WorldBankScraperService
                             }
                         }
                     }
-                    
+
                     if ($apiDate) {
                         $submissionDate = $apiDate;
-                        Log::info('World Bank Scraper: ✅ Date récupérée depuis l\'API (fallback)', [
-                            'source' => 'API (submission_deadline_date) - FALLBACK',
+                        Log::info('World Bank Scraper: ✅ Date récupérée depuis l\'API (FALLBACK)', [
+                            'source' => 'API (submission_deadline_date)',
                             'raw_value' => $submissionRaw,
                             'normalized' => $submissionDate,
                             'project_id' => $doc['project_id'] ?? null,
@@ -585,15 +556,15 @@ class WorldBankScraperService
                     ]);
                 }
             }
-            
-            // 3. DERNIER FALLBACK: Si toujours pas de date, essayer depuis la page notice
+
+            // 3. FALLBACK 2: Essayer depuis la page de la notice spécifique
             if (empty($submissionDate) && !empty($noticeUrl)) {
                 try {
                     [$noticeDate, $noticeRaw] = $this->fetchSubmissionDeadlineFromNotice($noticeUrl);
                     if ($noticeDate) {
                         $submissionDate = $noticeDate;
                         $submissionRaw = $noticeRaw;
-                        Log::info('World Bank Scraper: ✅ Date récupérée depuis la page notice (dernier fallback)', [
+                        Log::info('World Bank Scraper: ✅ Date récupérée depuis la page notice (DERNIER FALLBACK)', [
                             'source' => 'Page Notice HTML',
                             'notice_url' => $noticeUrl,
                             'raw_value' => $noticeRaw,
@@ -626,10 +597,10 @@ class WorldBankScraperService
 
             // Pays: prendre depuis l'API (liste côté notices)
             $pays = $apiPays ?: null;
-            
+
             // Acheteur
             $acheteur = "World Bank";
-            
+
             $noticeType = $doc['notice_type'] ?? null;
 
             // Logs qualité + TRAÇABILITÉ (Submission Deadline) - RÉSUMÉ FINAL
@@ -643,7 +614,7 @@ class WorldBankScraperService
                     $sourceType = 'Page HTML (notice) - DERNIER FALLBACK';
                 }
             }
-            
+
             Log::info('[WB] RÉSUMÉ | Date limite de soumission', [
                 'titre' => $titre,
                 'notice_url' => $noticeUrl,
@@ -686,7 +657,9 @@ class WorldBankScraperService
     {
         $baseUrl = 'https://projects.worldbank.org/en/projects-operations/procurement';
         $params = ['searchTerm' => $title];
-        if (!empty($country)) { $params['country'] = $country; }
+        if (!empty($country)) {
+            $params['country'] = $country;
+        }
         if (!empty($noticeType)) {
             $nt = strtolower(trim($noticeType));
             if (str_contains($nt, 'invitation for bid') || str_contains($nt, 'invitation to bid')) {
@@ -724,7 +697,8 @@ class WorldBankScraperService
             if ($nodes) {
                 foreach ($nodes as $a) {
                     $href = $a->getAttribute('href');
-                    if (!$href) continue;
+                    if (!$href)
+                        continue;
                     if (strpos($href, 'http') !== 0) {
                         if ($href[0] === '/') {
                             $href = 'https://projects.worldbank.org' . $href;
@@ -742,10 +716,12 @@ class WorldBankScraperService
                     }
                 }
             }
-            if (empty($candidates)) return null;
+            if (empty($candidates))
+                return null;
             if (!empty($opId)) {
                 foreach ($candidates as $c) {
-                    if (stripos($c, $opId) !== false) return $c;
+                    if (stripos($c, $opId) !== false)
+                        return $c;
                 }
             }
             return $candidates[0];
@@ -792,12 +768,12 @@ class WorldBankScraperService
         // Chercher "Closing Date" ou "Date de clôture" puis une date
         // Extraire un voisinage de texte après l'étiquette
         $pattern = '/(Closing\s*Date|Date\s*de\s*clôture)[^\n\r\<\>]{0,160}?('
-            .'\d{1,2}\s+[A-Za-zÀ-ÖØ-öø-ÿ]+\s+\d{4}' // 31 décembre 2028
-            .'|[A-Za-zÀ-ÖØ-öø-ÿ]+\s+\d{1,2},\s*\d{4}' // December 31, 2028
-            .'|\d{1,2}-[A-Za-z]{3}-\d{4}' // 31-Dec-2028
-            .'|\d{1,2}\/\d{1,2}\/\d{4}' // 12/31/2028
-            .'|\d{4}-\d{2}-\d{2}' // 2028-12-31
-        .')/iu';
+            . '\d{1,2}\s+[A-Za-zÀ-ÖØ-öø-ÿ]+\s+\d{4}' // 31 décembre 2028
+            . '|[A-Za-zÀ-ÖØ-öø-ÿ]+\s+\d{1,2},\s*\d{4}' // December 31, 2028
+            . '|\d{1,2}-[A-Za-z]{3}-\d{4}' // 31-Dec-2028
+            . '|\d{1,2}\/\d{1,2}\/\d{4}' // 12/31/2028
+            . '|\d{4}-\d{2}-\d{2}' // 2028-12-31
+            . ')/iu';
         if (preg_match($pattern, $html, $m)) {
             $rawDate = trim($m[2]);
             $normalized = $this->normalizeDateString($rawDate);
@@ -812,9 +788,15 @@ class WorldBankScraperService
      */
     private function fetchProjectDetailFields(string $projectId): array
     {
+        // 1. Vérifier le cache local pour cette session
+        if (isset($this->projectCache[$projectId])) {
+            Log::debug('World Bank Scraper: Using cached project detail', ['project_id' => $projectId]);
+            return $this->projectCache[$projectId];
+        }
+
         $url = 'https://projects.worldbank.org/en/projects-operations/project-detail/' . $projectId;
         $html = '';
-        
+
         // IMPORTANT: La page World Bank utilise Angular qui charge le contenu dynamiquement
         // Utiliser Browsershot (navigateur headless) pour exécuter JavaScript et récupérer le contenu rendu
         try {
@@ -822,25 +804,24 @@ class WorldBankScraperService
                 'project_id' => $projectId,
                 'url' => $url,
             ]);
-            
+
             $html = \Spatie\Browsershot\Browsershot::url($url)
                 ->waitUntilNetworkIdle() // Attendre que le réseau soit inactif (JS chargé)
-                ->delay(2000) // Attendre 2 secondes pour le chargement Angular
-                ->timeout(60) // Timeout de 60 secondes
+                ->delay(1000) // Réduit de 2000ms à 1000ms pour plus de rapidité
+                ->timeout(45) // Réduit de 60s à 45s
                 ->setOption('args', [
                     '--no-sandbox',
                     '--disable-setuid-sandbox',
                     '--disable-dev-shm-usage',
                     '--disable-blink-features=AutomationControlled',
                     '--disable-features=IsolateOrigins,site-per-process',
+                    '--disable-gpu', // Ajouté pour la performance
+                    '--disable-software-rasterizer',
                 ])
                 ->dismissDialogs()
                 ->userAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
-                ->setExtraHttpHeaders([
-                    'Accept-Language' => 'en-US,en;q=0.9,fr;q=0.8',
-                ])
                 ->bodyHtml(); // Récupérer le HTML après exécution du JavaScript
-            
+
             if (empty($html)) {
                 Log::warning('World Bank Scraper: Browsershot returned empty HTML, trying HTTP fallback', [
                     'project_id' => $projectId,
@@ -848,19 +829,19 @@ class WorldBankScraperService
                 ]);
                 throw new \Exception('Empty HTML from Browsershot');
             }
-            
+
             Log::debug('World Bank Scraper: Successfully fetched project detail page with Browsershot', [
                 'project_id' => $projectId,
                 'html_length' => strlen($html),
             ]);
-            
+
         } catch (\Exception $e) {
             Log::debug('World Bank Scraper: Browsershot failed, using HTTP fallback', [
                 'project_id' => $projectId,
                 'url' => $url,
                 'error' => $e->getMessage(),
             ]);
-            
+
             // Fallback vers HTTP simple si Browsershot échoue
             try {
                 $response = Http::withoutVerifying()
@@ -886,7 +867,7 @@ class WorldBankScraperService
                 return [];
             }
         }
-        
+
         // Sauvegarder le HTML pour debug si nécessaire
         if (config('app.debug')) {
             try {
@@ -903,7 +884,7 @@ class WorldBankScraperService
         // IMPORTANT: La page World Bank utilise Angular qui charge le contenu dynamiquement
         // Le HTML brut ne contient pas le contenu rendu. Il faut chercher dans le JSON embarqué
         // ou utiliser une approche regex pour extraire les données depuis le HTML brut
-        
+
         // Stratégie 1: Chercher "Closing Date" dans le HTML brut avec regex (pour les données pré-rendues)
         $closingRaw = null;
         if (preg_match('/Closing\s+Date[^<]*<[^>]*>([^<]+(?:December|January|February|March|April|May|June|July|August|September|October|November)\s+\d{1,2},?\s+\d{4})/i', $html, $matches)) {
@@ -921,28 +902,31 @@ class WorldBankScraperService
         libxml_clear_errors();
         $xpath = new DOMXPath($dom);
 
-        $findByLabels = function(array $labels) use ($xpath): ?string {
+        $findByLabels = function (array $labels) use ($xpath): ?string {
             foreach ($labels as $label) {
                 // Exact label in table (th->td)
                 $q = "//th[normalize-space()='{$label}' or starts-with(normalize-space(), '{$label}:')]/following-sibling::td[1]";
                 $nodes = $xpath->query($q);
                 if ($nodes && $nodes->length > 0) {
                     $val = trim(preg_replace('/\s+/', ' ', $nodes->item(0)->textContent));
-                    if ($val !== '') return $val;
+                    if ($val !== '')
+                        return $val;
                 }
                 // Exact label in definition list (dt->dd)
                 $q = "//dt[normalize-space()='{$label}' or starts-with(normalize-space(), '{$label}:')]/following-sibling::dd[1]";
                 $nodes = $xpath->query($q);
                 if ($nodes && $nodes->length > 0) {
                     $val = trim(preg_replace('/\s+/', ' ', $nodes->item(0)->textContent));
-                    if ($val !== '') return $val;
+                    if ($val !== '')
+                        return $val;
                 }
                 // Label inside span/div then sibling
                 $q = "//*[self::span or self::div][normalize-space()='{$label}' or starts-with(normalize-space(), '{$label}:')]/following-sibling::*[1]";
                 $nodes = $xpath->query($q);
                 if ($nodes && $nodes->length > 0) {
                     $val = trim(preg_replace('/\s+/', ' ', $nodes->item(0)->textContent));
-                    if ($val !== '') return $val;
+                    if ($val !== '')
+                        return $val;
                 }
                 // Partial/contains match (case-insensitive using translate)
                 $lower = mb_strtolower($label, 'UTF-8');
@@ -950,7 +934,8 @@ class WorldBankScraperService
                 $nodes = $xpath->query($q);
                 if ($nodes && $nodes->length > 0) {
                     $val = trim(preg_replace('/\s+/', ' ', $nodes->item(0)->textContent));
-                    if ($val !== '') return $val;
+                    if ($val !== '')
+                        return $val;
                 }
                 // Robust fallback: find the label node, then take nearest following non-empty text within a short distance
                 $labelNodes = $xpath->query("//*[self::th or self::dt or self::span or self::div][contains(translate(normalize-space(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZÀÂÄÇÉÈÊËÎÏÔŒÙÛÜŸ', 'abcdefghijklmnopqrstuvwxyzàâäçéèêëîïôœùûüÿ'), '{$lower}')]");
@@ -1000,7 +985,7 @@ class WorldBankScraperService
         // 1) PRIORITÉ: Chercher la "Closing Date" dans la structure spécifique World Bank
         // Structure trouvée: <label>Closing Date</label><p class="document-info">December 31, 2027</p>
         // Cette structure se trouve dans la section "Key Details" > "Project Details"
-        
+
         // Méthode 1: Chercher directement le pattern label + p avec class="document-info"
         foreach ($closingLabels as $lbl) {
             // Chercher <label>Closing Date</label> suivi de <p class="document-info">
@@ -1012,7 +997,7 @@ class WorldBankScraperService
                     break;
                 }
             }
-            
+
             // Chercher aussi dans un <li> contenant <label>Closing Date</label> puis <p>
             $query = "//li[.//label[normalize-space()='{$lbl}' or contains(translate(normalize-space(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '" . strtolower($lbl) . "')]]//p[@class='document-info' or contains(@class, 'document-info')][1]";
             $nodes = $xpath->query($query);
@@ -1023,51 +1008,54 @@ class WorldBankScraperService
                 }
             }
         }
-        
+
         // 2) Si pas trouvé, chercher dans la section "Key Details" > "Project Details"
         if ($closingRaw === null) {
             $sectionNodes = $xpath->query(
                 "//section[.//h2[contains(translate(normalize-space(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'key details')]
                 | //*[contains(translate(normalize-space(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'key details')]"
             );
-            
+
             if ($sectionNodes && $sectionNodes->length > 0) {
                 foreach ($sectionNodes as $section) {
                     $sx = new \DOMXPath($dom);
-                    
+
                     // Chercher dans "Project Details" à l'intérieur de "Key Details"
                     $projectDetailsNodes = $sx->query(".//h3[contains(translate(normalize-space(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'project details')]/following-sibling::*[1]", $section);
                     if ($projectDetailsNodes && $projectDetailsNodes->length > 0) {
                         $projectDetails = $projectDetailsNodes->item(0);
-                        
+
                         // Chercher la Closing Date dans cette section
                         foreach ($closingLabels as $lbl) {
                             // Chercher <label>Closing Date</label> suivi de <p>
                             $n = $sx->query(".//label[normalize-space()='{$lbl}' or contains(translate(normalize-space(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '" . strtolower($lbl) . "')]/following-sibling::p[1]", $projectDetails);
-                            if ($n && $n->length > 0) { 
-                                $closingRaw = trim(preg_replace('/\s+/', ' ', $n->item(0)->textContent)); 
-                                if (!empty($closingRaw)) break 2; 
+                            if ($n && $n->length > 0) {
+                                $closingRaw = trim(preg_replace('/\s+/', ' ', $n->item(0)->textContent));
+                                if (!empty($closingRaw))
+                                    break 2;
                             }
-                            
+
                             // Chercher dans les tableaux (th/td)
                             $n = $sx->query(".//th[normalize-space()='{$lbl}' or starts-with(normalize-space(), '{$lbl}:') or contains(translate(normalize-space(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '" . strtolower($lbl) . "')]/following-sibling::td[1]", $projectDetails);
-                            if ($n && $n->length > 0) { 
-                                $closingRaw = trim(preg_replace('/\s+/', ' ', $n->item(0)->textContent)); 
-                                if (!empty($closingRaw)) break 2; 
+                            if ($n && $n->length > 0) {
+                                $closingRaw = trim(preg_replace('/\s+/', ' ', $n->item(0)->textContent));
+                                if (!empty($closingRaw))
+                                    break 2;
                             }
-                            
+
                             // Chercher dans les listes de définition (dt/dd)
                             $n = $sx->query(".//dt[normalize-space()='{$lbl}' or starts-with(normalize-space(), '{$lbl}:') or contains(translate(normalize-space(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '" . strtolower($lbl) . "')]/following-sibling::dd[1]", $projectDetails);
-                            if ($n && $n->length > 0) { 
-                                $closingRaw = trim(preg_replace('/\s+/', ' ', $n->item(0)->textContent)); 
-                                if (!empty($closingRaw)) break 2; 
+                            if ($n && $n->length > 0) {
+                                $closingRaw = trim(preg_replace('/\s+/', ' ', $n->item(0)->textContent));
+                                if (!empty($closingRaw))
+                                    break 2;
                             }
                         }
                     }
                 }
             }
         }
-        
+
         // 2) Essayer aussi dans la section "Key Details" (ou FR)
         if ($closingRaw === null) {
             $sectionNodes = $xpath->query(
@@ -1081,23 +1069,41 @@ class WorldBankScraperService
                 // Country
                 foreach ($countryLabels as $lbl) {
                     $n = $sx->query(".//th[normalize-space()='{$lbl}' or starts-with(normalize-space(), '{$lbl}:')]/following-sibling::td[1]", $keyDetails);
-                    if ($n && $n->length > 0) { $country = trim(preg_replace('/\s+/', ' ', $n->item(0)->textContent)); break; }
+                    if ($n && $n->length > 0) {
+                        $country = trim(preg_replace('/\s+/', ' ', $n->item(0)->textContent));
+                        break;
+                    }
                     $n = $sx->query(".//dt[normalize-space()='{$lbl}' or starts-with(normalize-space(), '{$lbl}:')]/following-sibling::dd[1]", $keyDetails);
-                    if ($n && $n->length > 0) { $country = trim(preg_replace('/\s+/', ' ', $n->item(0)->textContent)); break; }
+                    if ($n && $n->length > 0) {
+                        $country = trim(preg_replace('/\s+/', ' ', $n->item(0)->textContent));
+                        break;
+                    }
                 }
                 // Region
                 foreach ($regionLabels as $lbl) {
                     $n = $sx->query(".//th[normalize-space()='{$lbl}' or starts-with(normalize-space(), '{$lbl}:')]/following-sibling::td[1]", $keyDetails);
-                    if ($n && $n->length > 0) { $region = trim(preg_replace('/\s+/', ' ', $n->item(0)->textContent)); break; }
+                    if ($n && $n->length > 0) {
+                        $region = trim(preg_replace('/\s+/', ' ', $n->item(0)->textContent));
+                        break;
+                    }
                     $n = $sx->query(".//dt[normalize-space()='{$lbl}' or starts-with(normalize-space(), '{$lbl}:')]/following-sibling::dd[1]", $keyDetails);
-                    if ($n && $n->length > 0) { $region = trim(preg_replace('/\s+/', ' ', $n->item(0)->textContent)); break; }
+                    if ($n && $n->length > 0) {
+                        $region = trim(preg_replace('/\s+/', ' ', $n->item(0)->textContent));
+                        break;
+                    }
                 }
                 // Closing Date
                 foreach ($closingLabels as $lbl) {
                     $n = $sx->query(".//th[normalize-space()='{$lbl}' or starts-with(normalize-space(), '{$lbl}:')]/following-sibling::td[1]", $keyDetails);
-                    if ($n && $n->length > 0) { $closingRaw = trim(preg_replace('/\s+/', ' ', $n->item(0)->textContent)); break; }
+                    if ($n && $n->length > 0) {
+                        $closingRaw = trim(preg_replace('/\s+/', ' ', $n->item(0)->textContent));
+                        break;
+                    }
                     $n = $sx->query(".//dt[normalize-space()='{$lbl}' or starts-with(normalize-space(), '{$lbl}:')]/following-sibling::dd[1]", $keyDetails);
-                    if ($n && $n->length > 0) { $closingRaw = trim(preg_replace('/\s+/', ' ', $n->item(0)->textContent)); break; }
+                    if ($n && $n->length > 0) {
+                        $closingRaw = trim(preg_replace('/\s+/', ' ', $n->item(0)->textContent));
+                        break;
+                    }
                 }
             }
         }
@@ -1111,32 +1117,38 @@ class WorldBankScraperService
                     $sx = new \DOMXPath($dom);
                     foreach ($closingLabels as $lbl) {
                         $n = $sx->query(".//th[normalize-space()='{$lbl}' or starts-with(normalize-space(), '{$lbl}:')]/following-sibling::td[1]", $section);
-                        if ($n && $n->length > 0) { 
-                            $closingRaw = trim(preg_replace('/\s+/', ' ', $n->item(0)->textContent)); 
-                            break 2; 
+                        if ($n && $n->length > 0) {
+                            $closingRaw = trim(preg_replace('/\s+/', ' ', $n->item(0)->textContent));
+                            break 2;
                         }
                         $n = $sx->query(".//dt[normalize-space()='{$lbl}' or starts-with(normalize-space(), '{$lbl}:')]/following-sibling::dd[1]", $section);
-                        if ($n && $n->length > 0) { 
-                            $closingRaw = trim(preg_replace('/\s+/', ' ', $n->item(0)->textContent)); 
-                            break 2; 
+                        if ($n && $n->length > 0) {
+                            $closingRaw = trim(preg_replace('/\s+/', ' ', $n->item(0)->textContent));
+                            break 2;
                         }
                         // Chercher aussi dans les div/span
                         $n = $sx->query(".//*[self::div or self::span][contains(translate(normalize-space(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '" . strtolower($lbl) . "')]/following-sibling::*[1]", $section);
-                        if ($n && $n->length > 0) { 
-                            $closingRaw = trim(preg_replace('/\s+/', ' ', $n->item(0)->textContent)); 
+                        if ($n && $n->length > 0) {
+                            $closingRaw = trim(preg_replace('/\s+/', ' ', $n->item(0)->textContent));
                             if (!empty($closingRaw) && !preg_match('/^[A-Za-z\s]+$/', $closingRaw)) { // Vérifier que ce n'est pas juste du texte
-                                break 2; 
+                                break 2;
                             }
                         }
                     }
                 }
             }
         }
-        
+
         // 3) Sinon, chercher globalement dans la page
-        if ($country === null) { $country = $findByLabels($countryLabels); }
-        if ($region === null) { $region = $findByLabels($regionLabels); }
-        if ($closingRaw === null) { $closingRaw = $findByLabels($closingLabels); }
+        if ($country === null) {
+            $country = $findByLabels($countryLabels);
+        }
+        if ($region === null) {
+            $region = $findByLabels($regionLabels);
+        }
+        if ($closingRaw === null) {
+            $closingRaw = $findByLabels($closingLabels);
+        }
 
         // Fallback regex pour Closing Date si non trouvé par DOM
         $closing = null;
@@ -1145,12 +1157,12 @@ class WorldBankScraperService
         }
         if (!$closing) {
             $pattern = '/(Closing\s*Date|Date\s*de\s*clôture)[^\n\r\<\>]{0,200}?('
-                .'\d{1,2}\s+[A-Za-zÀ-ÖØ-öø-ÿ]+\s+\d{4}'
-                .'|[A-Za-zÀ-ÖØ-öø-ÿ]+\s+\d{1,2},\s*\d{4}'
-                .'|\d{1,2}-[A-Za-z]{3}-\d{4}'
-                .'|\d{1,2}\/\d{1,2}\/\d{4}'
-                .'|\d{4}-\d{2}-\d{2}'
-            .')/iu';
+                . '\d{1,2}\s+[A-Za-zÀ-ÖØ-öø-ÿ]+\s+\d{4}'
+                . '|[A-Za-zÀ-ÖØ-öø-ÿ]+\s+\d{1,2},\s*\d{4}'
+                . '|\d{1,2}-[A-Za-z]{3}-\d{4}'
+                . '|\d{1,2}\/\d{1,2}\/\d{4}'
+                . '|\d{4}-\d{2}-\d{2}'
+                . ')/iu';
             if (preg_match($pattern, $html, $m)) {
                 $closingRaw = $closingRaw ?: trim($m[2]);
                 $closing = $this->normalizeDateString(trim($m[2]));
@@ -1175,25 +1187,25 @@ class WorldBankScraperService
 
         // Plain-text fallback (strip tags) for all three fields
         $plain = trim(preg_replace('/\s+/', ' ', strip_tags($html))); // collapse whitespace
-        
+
         // Recherche améliorée de "Closing Date" dans le HTML brut (y compris dans "Project Details")
         if (!$closing && $html !== '') {
             // Chercher "Closing Date" suivi d'une date dans un contexte plus large (500 caractères)
             $patterns = [
                 // Pattern 1: "Closing Date" suivi d'une date dans les 200 caractères suivants
                 '/(Closing\s*Date|Date\s*de\s*clôture)[^<]{0,200}?('
-                    .'\d{1,2}\s+[A-Za-zÀ-ÖØ-öø-ÿ]+\s+\d{4}'
-                    .'|[A-Za-zÀ-ÖØ-öø-ÿ]+\s+\d{1,2},\s*\d{4}'
-                    .'|\d{1,2}-[A-Za-z]{3}-\d{4}'
-                    .'|\d{1,2}\/\d{1,2}\/\d{4}'
-                    .'|\d{4}-\d{2}-\d{2}'
-                .')/iu',
+                . '\d{1,2}\s+[A-Za-zÀ-ÖØ-öø-ÿ]+\s+\d{4}'
+                . '|[A-Za-zÀ-ÖØ-öø-ÿ]+\s+\d{1,2},\s*\d{4}'
+                . '|\d{1,2}-[A-Za-z]{3}-\d{4}'
+                . '|\d{1,2}\/\d{1,2}\/\d{4}'
+                . '|\d{4}-\d{2}-\d{2}'
+                . ')/iu',
                 // Pattern 2: Dans une table avec "Closing Date" dans th/td
                 '/<th[^>]*>.*?Closing\s*Date.*?<\/th>\s*<td[^>]*>(.*?)<\/td>/is',
                 // Pattern 3: Dans un div avec "Closing Date" comme label
                 '/<div[^>]*>.*?Closing\s*Date[^<]*<\/div>\s*<div[^>]*>([^<]{5,50})<\/div>/is',
             ];
-            
+
             foreach ($patterns as $pattern) {
                 if (preg_match($pattern, $html, $m)) {
                     $dateStr = isset($m[2]) ? trim(strip_tags($m[2])) : (isset($m[1]) ? trim(strip_tags($m[1])) : '');
@@ -1213,15 +1225,17 @@ class WorldBankScraperService
                 }
             }
         }
-        
+
         if (!$closing && $plain !== '') {
-            if (preg_match('/\b(Closing\s*Date|Date\s*de\s*clôture)\b\s*[:\-]?\s*('
-                .'\d{1,2}\s+[A-Za-zÀ-ÖØ-öø-ÿ]+\s+\d{4}'
-                .'|[A-Za-zÀ-ÖØ-öø-ÿ]+\s+\d{1,2},\s*\d{4}'
-                .'|\d{1,2}-[A-Za-z]{3}-\d{4}'
-                .'|\d{1,2}\/\d{1,2}\/\d{4}'
-                .'|\d{4}-\d{2}-\d{2}'
-            .')/iu', $plain, $m)) {
+            if (
+                preg_match('/\b(Closing\s*Date|Date\s*de\s*clôture)\b\s*[:\-]?\s*('
+                    . '\d{1,2}\s+[A-Za-zÀ-ÖØ-öø-ÿ]+\s+\d{4}'
+                    . '|[A-Za-zÀ-ÖØ-öø-ÿ]+\s+\d{1,2},\s*\d{4}'
+                    . '|\d{1,2}-[A-Za-z]{3}-\d{4}'
+                    . '|\d{1,2}\/\d{1,2}\/\d{4}'
+                    . '|\d{4}-\d{2}-\d{2}'
+                    . ')/iu', $plain, $m)
+            ) {
                 $closingRaw = $closingRaw ?: $m[2];
                 $closing = $this->normalizeDateString($m[2]);
             }
@@ -1245,12 +1259,17 @@ class WorldBankScraperService
             'closing_norm' => $closing,
         ]);
 
-        return [
+        $result = [
             'country' => $country ?: null,
             'region' => $region ?: null,
             'closing_date' => $closing ?: null,
             'closing_raw' => $closingRaw ?: null,
         ];
+
+        // Mettre en cache pour les futurs appels durant cette session
+        $this->projectCache[$projectId] = $result;
+
+        return $result;
     }
 
     /**
@@ -1267,17 +1286,40 @@ class WorldBankScraperService
         // dd month yyyy (FR/EN)
         $months = [
             // FR
-            'janvier' => 1, 'février' => 2, 'fevrier' => 2, 'mars' => 3, 'avril' => 4, 'mai' => 5, 'juin' => 6,
-            'juillet' => 7, 'août' => 8, 'aout' => 8, 'septembre' => 9, 'octobre' => 10, 'novembre' => 11, 'décembre' => 12, 'decembre' => 12,
+            'janvier' => 1,
+            'février' => 2,
+            'fevrier' => 2,
+            'mars' => 3,
+            'avril' => 4,
+            'mai' => 5,
+            'juin' => 6,
+            'juillet' => 7,
+            'août' => 8,
+            'aout' => 8,
+            'septembre' => 9,
+            'octobre' => 10,
+            'novembre' => 11,
+            'décembre' => 12,
+            'decembre' => 12,
             // EN
-            'january' => 1, 'february' => 2, 'march' => 3, 'april' => 4, 'may' => 5, 'june' => 6, 'july' => 7,
-            'august' => 8, 'september' => 9, 'october' => 10, 'november' => 11, 'december' => 12,
+            'january' => 1,
+            'february' => 2,
+            'march' => 3,
+            'april' => 4,
+            'may' => 5,
+            'june' => 6,
+            'july' => 7,
+            'august' => 8,
+            'september' => 9,
+            'october' => 10,
+            'november' => 11,
+            'december' => 12,
         ];
 
         if (preg_match('/^(\d{1,2})\s+([A-Za-zÀ-ÖØ-öø-ÿ]+)\s+(\d{4})$/u', mb_strtolower($dateStr, 'UTF-8'), $m)) {
-            $d = (int)$m[1];
+            $d = (int) $m[1];
             $monName = $m[2];
-            $y = (int)$m[3];
+            $y = (int) $m[3];
             $mon = $months[$monName] ?? null;
             if ($mon && $d >= 1 && $d <= 31) {
                 return sprintf('%04d-%02d-%02d', $y, $mon, $d);
@@ -1287,8 +1329,8 @@ class WorldBankScraperService
         // Month dd, yyyy (EN) e.g., December 31, 2028
         if (preg_match('/^([A-Za-zÀ-ÖØ-öø-ÿ]+)\s+(\d{1,2}),\s*(\d{4})$/u', mb_strtolower($dateStr, 'UTF-8'), $m)) {
             $monName = $m[1];
-            $d = (int)$m[2];
-            $y = (int)$m[3];
+            $d = (int) $m[2];
+            $y = (int) $m[3];
             $mon = $months[$monName] ?? null;
             if ($mon && $d >= 1 && $d <= 31) {
                 return sprintf('%04d-%02d-%02d', $y, $mon, $d);
@@ -1297,20 +1339,20 @@ class WorldBankScraperService
 
         // dd-MMM-yyyy e.g., 31-Dec-2028
         if (preg_match('/^(\d{1,2})-([A-Za-z]{3})-(\d{4})$/', $dateStr, $m)) {
-            $d = (int)$m[1];
+            $d = (int) $m[1];
             $monAbbr = strtolower($m[2]);
-            $map = ['jan'=>1,'feb'=>2,'mar'=>3,'apr'=>4,'may'=>5,'jun'=>6,'jul'=>7,'aug'=>8,'sep'=>9,'oct'=>10,'nov'=>11,'dec'=>12];
+            $map = ['jan' => 1, 'feb' => 2, 'mar' => 3, 'apr' => 4, 'may' => 5, 'jun' => 6, 'jul' => 7, 'aug' => 8, 'sep' => 9, 'oct' => 10, 'nov' => 11, 'dec' => 12];
             $mon = $map[$monAbbr] ?? null;
             if ($mon && $d >= 1 && $d <= 31) {
-                return sprintf('%04d-%02d-%02d', (int)$m[3], $mon, $d);
+                return sprintf('%04d-%02d-%02d', (int) $m[3], $mon, $d);
             }
         }
 
         // MM/DD/YYYY or M/D/YYYY
         if (preg_match('/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/', $dateStr, $m)) {
-            $mon = (int)$m[1];
-            $d = (int)$m[2];
-            $y = (int)$m[3];
+            $mon = (int) $m[1];
+            $d = (int) $m[2];
+            $y = (int) $m[3];
             if ($mon >= 1 && $mon <= 12 && $d >= 1 && $d <= 31) {
                 return sprintf('%04d-%02d-%02d', $y, $mon, $d);
             }
@@ -1352,7 +1394,7 @@ class WorldBankScraperService
             }
 
             $html = $response->body();
-            
+
             // Sauvegarder pour debug si nécessaire
             if (config('app.debug')) {
                 try {
@@ -1438,7 +1480,7 @@ class WorldBankScraperService
                 if ($pos !== false) {
                     // Extraire un contexte autour du mot-clé
                     $context = substr($html, max(0, $pos - 100), 400);
-                    
+
                     // Patterns de date
                     $datePatterns = [
                         // Format complet: "January 15, 2025"
@@ -1464,7 +1506,7 @@ class WorldBankScraperService
                                 $extrait = substr($html, $contextStart, $contextEnd - $contextStart);
                                 $extrait = strip_tags($extrait);
                                 $extrait = preg_replace('/\s+/', ' ', $extrait);
-                                
+
                                 Log::info('World Bank Scraper: ✅ Date récupérée depuis la page HTML (mot-clé)', [
                                     'source' => 'Page HTML - Recherche par mot-clé',
                                     'url' => $noticeUrl,
@@ -1518,10 +1560,10 @@ class WorldBankScraperService
 
             // Si plusieurs dates trouvées, prendre la plus récente (probablement la deadline)
             if (!empty($allDates)) {
-                usort($allDates, function($a, $b) {
+                usort($allDates, function ($a, $b) {
                     return $a['date']->gt($b['date']) ? -1 : 1;
                 });
-                
+
                 $bestDate = $allDates[0];
                 Log::info('World Bank Scraper: ✅ Date récupérée depuis la page HTML (plus récente)', [
                     'source' => 'Page HTML - Date la plus récente trouvée',
@@ -1577,7 +1619,10 @@ class WorldBankScraperService
 
             $html = $resp->body();
             if (config('app.debug')) {
-                try { \Storage::disk('local')->put('debug/wb_notice_'.md5($noticeUrl).'.html', $html); } catch (\Exception $e) {}
+                try {
+                    \Storage::disk('local')->put('debug/wb_notice_' . md5($noticeUrl) . '.html', $html);
+                } catch (\Exception $e) {
+                }
             }
 
             // 1) Chercher un lien direct vers project-detail/Pxxxxxx
@@ -1619,7 +1664,7 @@ class WorldBankScraperService
         $inserted = 0;
         $html = '';
         $url = $this->buildPageUrl($page);
-        
+
         try {
             // Récupérer la page HTML
             $response = Http::withoutVerifying()
@@ -1641,7 +1686,7 @@ class WorldBankScraperService
             }
 
             $html = $response->body();
-            
+
             // Sauvegarder le HTML pour debug
             if (config('app.debug')) {
                 \Storage::disk('local')->put("debug/worldbank_page_{$page}.html", $html);
@@ -1650,7 +1695,7 @@ class WorldBankScraperService
                     'html_length' => strlen($html),
                 ]);
             }
-            
+
             // Parser le HTML
             $dom = new DOMDocument();
             libxml_use_internal_errors(true);
@@ -1661,29 +1706,29 @@ class WorldBankScraperService
             // Extraire les appels d'offres
             // La structure HTML de World Bank peut varier, utiliser plusieurs stratégies
             $items = [];
-            
+
             // Stratégie 1: Chercher tous les liens (plus permissif)
             // Le site World Bank peut utiliser différents patterns pour les liens
             $allLinks = $xpath->query("//a[@href]");
-            
+
             $validLinks = [];
             $excludedTexts = ['view all', 'see more', 'next', 'previous', 'page', 'home', 'search', 'back to', 'menu', 'skip'];
-            
+
             foreach ($allLinks as $link) {
                 $href = $link->getAttribute('href');
                 $text = trim($link->textContent);
                 $textLower = strtolower($text);
-                
+
                 // Ignorer les liens de navigation/liste
                 if (stripos($href, '/procurement?') !== false || stripos($href, '/procurement#') !== false) {
                     continue;
                 }
-                
+
                 // Ignorer les liens vers des pages générales
                 if (in_array($href, ['/', '/en/home', '/fr/home', '/es/home'])) {
                     continue;
                 }
-                
+
                 // Ignorer les liens avec des textes de navigation
                 $isNavigation = false;
                 foreach ($excludedTexts as $excluded) {
@@ -1692,17 +1737,19 @@ class WorldBankScraperService
                         break;
                     }
                 }
-                
+
                 // Garder les liens qui semblent être des appels d'offres/projets
                 // Soit ils contiennent 'procurement' ou 'project' dans l'URL, soit ils ont un texte long
                 $isValid = false;
-                
+
                 // Lien vers procurement ou project
-                if (stripos($href, '/procurement/') !== false || stripos($href, '/project/') !== false || 
-                    stripos($href, 'procurement') !== false || stripos($href, 'project') !== false) {
+                if (
+                    stripos($href, '/procurement/') !== false || stripos($href, '/project/') !== false ||
+                    stripos($href, 'procurement') !== false || stripos($href, 'project') !== false
+                ) {
                     $isValid = true;
                 }
-                
+
                 // Ou texte long qui pourrait être un titre d'appel d'offres
                 if (!$isValid && strlen($text) > 40 && !$isNavigation) {
                     // Si le texte contient des mots-clés pertinents
@@ -1714,24 +1761,25 @@ class WorldBankScraperService
                         }
                     }
                 }
-                
+
                 if ($isValid && !$isNavigation) {
                     $validLinks[] = $link;
                 }
             }
-            
+
             Log::info('World Bank Scraper: Valid links found', ['page' => $page, 'count' => count($validLinks)]);
-            
+
             // Traiter chaque lien pour trouver le conteneur parent
             foreach ($validLinks as $link) {
                 $href = $link->getAttribute('href');
-                
+
                 // Récupérer le conteneur parent
                 $parent = $link;
                 for ($i = 0; $i < 10; $i++) {
                     $parent = $parent->parentNode;
-                    if (!$parent || $parent->nodeName === 'body' || $parent->nodeName === 'html') break;
-                    
+                    if (!$parent || $parent->nodeName === 'body' || $parent->nodeName === 'html')
+                        break;
+
                     $parentText = $parent->textContent;
                     if (strlen(trim($parentText)) > 80) {
                         // Vérifier doublon par href
@@ -1750,7 +1798,7 @@ class WorldBankScraperService
                     }
                 }
             }
-            
+
             // Stratégie 2: Chercher par structure de liste/carte/tableau (plus permissif)
             $fallbackSelectors = [
                 "//article",
@@ -1778,16 +1826,18 @@ class WorldBankScraperService
                         if ($itemLinks->length > 0) {
                             foreach ($itemLinks as $itemLink) {
                                 $itemHref = $itemLink->getAttribute('href');
-                                
+
                                 // Ignorer les liens de navigation
                                 if (stripos($itemHref, '?') !== false && (stripos($itemHref, 'page=') !== false || stripos($itemHref, 'offset=') !== false)) {
                                     continue;
                                 }
-                                
+
                                 // Si le lien semble valide
-                                if (stripos($itemHref, '/procurement/') !== false || stripos($itemHref, '/project/') !== false ||
-                                    stripos($itemHref, 'procurement') !== false || stripos($itemHref, 'project') !== false) {
-                                    
+                                if (
+                                    stripos($itemHref, '/procurement/') !== false || stripos($itemHref, '/project/') !== false ||
+                                    stripos($itemHref, 'procurement') !== false || stripos($itemHref, 'project') !== false
+                                ) {
+
                                     // Vérifier que ce n'est pas déjà dans $items
                                     $found = false;
                                     foreach ($items as $existing) {
@@ -1809,7 +1859,7 @@ class WorldBankScraperService
                     continue;
                 }
             }
-            
+
             Log::info('World Bank Scraper: Items found after all strategies', ['page' => $page, 'count' => count($items)]);
 
             // Si $items est un DOMNodeList, convertir en array
@@ -1820,19 +1870,19 @@ class WorldBankScraperService
                 }
                 $items = $itemsArray;
             }
-            
+
             // Traiter chaque item et collecter les offres valides
             $validOffres = [];
             foreach ($items as $item) {
                 try {
                     $offre = $this->extractOffreData($item, $xpath);
-                    
+
                     if ($offre && !empty($offre['titre']) && !empty($offre['lien_source'])) {
                         // Normaliser le pays si présent
                         if (isset($offre['pays']) && is_string($offre['pays'])) {
                             $offre['pays'] = trim($offre['pays']);
                         }
-                        
+
                         // Double vérification: ignorer les offres avec des titres suspects
                         $titreLower = strtolower($offre['titre']);
                         $excludedPatterns = ['subscribe', 'email alert', 'sign up', 'newsletter', 'register', 'login'];
@@ -1843,7 +1893,7 @@ class WorldBankScraperService
                                 break;
                             }
                         }
-                        
+
                         if (!$isExcluded) {
                             $validOffres[] = $offre;
                         }
@@ -1852,12 +1902,12 @@ class WorldBankScraperService
                     continue;
                 }
             }
-            
+
             // Vérifier les offres existantes en batch (optimisation)
             if (!empty($validOffres)) {
                 $liensSources = array_column($validOffres, 'lien_source');
                 $titres = array_column($validOffres, 'titre');
-                
+
                 // Récupérer en une seule requête les lignes existantes pour éviter deux trips DB
                 $existingRows = Offre::where('source', 'World Bank')
                     ->where(function ($q) use ($liensSources, $titres) {
@@ -1877,13 +1927,13 @@ class WorldBankScraperService
                 $newOffres = [];
                 foreach ($validOffres as $offre) {
                     $exists = in_array($offre['lien_source'], $existingLiens)
-                           || in_array($offre['titre'], $existingTitres);
+                        || in_array($offre['titre'], $existingTitres);
 
                     if (!$exists) {
                         $newOffres[] = $offre;
                     }
                 }
-                
+
                 // Insérer en batch (optimisation majeure)
                 if (!empty($newOffres)) {
                     // Ajouter les timestamps pour l'insertion en batch
@@ -1893,7 +1943,7 @@ class WorldBankScraperService
                         $offre['updated_at'] = $now;
                     }
                     unset($offre);
-                    
+
                     // Insérer par chunks pour éviter les problèmes de mémoire
                     $chunks = array_chunk($newOffres, 50);
                     foreach ($chunks as $chunk) {
@@ -1930,7 +1980,7 @@ class WorldBankScraperService
             if ($titreNodes->length > 0) {
                 $titre = trim($titreNodes->item(0)->textContent);
             }
-            
+
             // Si pas de titre dans h*, chercher dans les liens
             if (!$titre) {
                 $linkNodes = $xpath->query(".//a[contains(@href, '/procurement/') or contains(@href, '/project/')]", $item);
@@ -1938,7 +1988,7 @@ class WorldBankScraperService
                     $titre = trim($linkNodes->item(0)->textContent);
                 }
             }
-            
+
             // Si toujours pas de titre, chercher tout lien avec du texte
             if (!$titre) {
                 $linkNodes = $xpath->query(".//a[@href]", $item);
@@ -1980,30 +2030,67 @@ class WorldBankScraperService
             if (!$titre || !$lien) {
                 return null;
             }
-            
+
             // Ignorer les titres qui sont clairement de la navigation ou des actions
             $titreLower = strtolower($titre);
             $navigationKeywords = [
-                'view all', 'see more', 'page', 'next', 'previous', 'home', 'search',
-                'subscribe', 'email alert', 'sign up', 'newsletter', 'register', 'login',
-                'contact', 'about', 'help', 'support', 'faq', 'terms', 'privacy',
-                'copyright', 'all rights reserved', 'follow us', 'share', 'print'
+                'view all',
+                'see more',
+                'page',
+                'next',
+                'previous',
+                'home',
+                'search',
+                'subscribe',
+                'email alert',
+                'sign up',
+                'newsletter',
+                'register',
+                'login',
+                'contact',
+                'about',
+                'help',
+                'support',
+                'faq',
+                'terms',
+                'privacy',
+                'copyright',
+                'all rights reserved',
+                'follow us',
+                'share',
+                'print'
             ];
             foreach ($navigationKeywords as $keyword) {
                 if (stripos($titreLower, $keyword) !== false) {
                     return null;
                 }
             }
-            
+
             // Ignorer les titres trop courts ou trop longs (probablement navigation)
             if (strlen(trim($titre)) < 10 || strlen(trim($titre)) > 500) {
                 return null;
             }
 
             // Vérifier la présence de mots-clés pertinents (heuristique, pas bloquante)
-            $relevantKeywords = ['procurement', 'consultant', 'firm', 'service', 'goods', 'works', 
-                                'rfp', 'rfq', 'tender', 'bid', 'call', 'request', 'project', 
-                                'assignment', 'services', 'consulting', 'advisory'];
+            $relevantKeywords = [
+                'procurement',
+                'consultant',
+                'firm',
+                'service',
+                'goods',
+                'works',
+                'rfp',
+                'rfq',
+                'tender',
+                'bid',
+                'call',
+                'request',
+                'project',
+                'assignment',
+                'services',
+                'consulting',
+                'advisory'
+            ];
             $hasRelevantKeyword = false;
             foreach ($relevantKeywords as $keyword) {
                 if (stripos($titreLower, $keyword) !== false) {
@@ -2042,53 +2129,235 @@ class WorldBankScraperService
         // Liste complète des pays (selon la Banque Mondiale)
         $countries = [
             // Afrique
-            'Afghanistan', 'Albania', 'Algeria', 'Angola', 'Argentina', 'Armenia', 'Australia', 'Austria', 'Azerbaijan',
-            'Bangladesh', 'Belarus', 'Belgium', 'Belize', 'Benin', 'Bhutan', 'Bolivia', 'Bosnia and Herzegovina', 'Botswana', 'Brazil', 'Brunei Darussalam', 'Bulgaria', 'Burkina Faso', 'Burundi',
-            'Cambodia', 'Cameroon', 'Canada', 'Cape Verde', 'Central African Republic', 'Chad', 'Chile', 'China', 'Colombia', 'Comoros', 'Congo', 'Congo, Democratic Republic', 'Costa Rica', 'Côte d\'Ivoire', 'Croatia', 'Cuba', 'Cyprus', 'Czech Republic',
-            'Denmark', 'Djibouti', 'Dominica', 'Dominican Republic',
-            'Ecuador', 'Egypt', 'El Salvador', 'Equatorial Guinea', 'Eritrea', 'Estonia', 'Eswatini', 'Ethiopia',
-            'Fiji', 'Finland', 'France',
-            'Gabon', 'Gambia', 'Georgia', 'Germany', 'Ghana', 'Greece', 'Grenada', 'Guatemala', 'Guinea', 'Guinea-Bissau', 'Guyana',
-            'Haiti', 'Honduras', 'Hungary',
-            'Iceland', 'India', 'Indonesia', 'Iran', 'Iraq', 'Ireland', 'Israel', 'Italy',
-            'Jamaica', 'Japan', 'Jordan',
-            'Kazakhstan', 'Kenya', 'Kiribati', 'Korea', 'Kosovo', 'Kuwait', 'Kyrgyz Republic',
-            'Lao PDR', 'Latvia', 'Lebanon', 'Lesotho', 'Liberia', 'Libya', 'Lithuania', 'Luxembourg',
-            'Madagascar', 'Malawi', 'Malaysia', 'Maldives', 'Mali', 'Malta', 'Marshall Islands', 'Mauritania', 'Mauritius', 'Mexico', 'Micronesia', 'Moldova', 'Mongolia', 'Montenegro', 'Morocco', 'Mozambique', 'Myanmar',
-            'Namibia', 'Nepal', 'Netherlands', 'New Zealand', 'Nicaragua', 'Niger', 'Nigeria', 'North Macedonia', 'Norway',
+            'Afghanistan',
+            'Albania',
+            'Algeria',
+            'Angola',
+            'Argentina',
+            'Armenia',
+            'Australia',
+            'Austria',
+            'Azerbaijan',
+            'Bangladesh',
+            'Belarus',
+            'Belgium',
+            'Belize',
+            'Benin',
+            'Bhutan',
+            'Bolivia',
+            'Bosnia and Herzegovina',
+            'Botswana',
+            'Brazil',
+            'Brunei Darussalam',
+            'Bulgaria',
+            'Burkina Faso',
+            'Burundi',
+            'Cambodia',
+            'Cameroon',
+            'Canada',
+            'Cape Verde',
+            'Central African Republic',
+            'Chad',
+            'Chile',
+            'China',
+            'Colombia',
+            'Comoros',
+            'Congo',
+            'Congo, Democratic Republic',
+            'Costa Rica',
+            'Côte d\'Ivoire',
+            'Croatia',
+            'Cuba',
+            'Cyprus',
+            'Czech Republic',
+            'Denmark',
+            'Djibouti',
+            'Dominica',
+            'Dominican Republic',
+            'Ecuador',
+            'Egypt',
+            'El Salvador',
+            'Equatorial Guinea',
+            'Eritrea',
+            'Estonia',
+            'Eswatini',
+            'Ethiopia',
+            'Fiji',
+            'Finland',
+            'France',
+            'Gabon',
+            'Gambia',
+            'Georgia',
+            'Germany',
+            'Ghana',
+            'Greece',
+            'Grenada',
+            'Guatemala',
+            'Guinea',
+            'Guinea-Bissau',
+            'Guyana',
+            'Haiti',
+            'Honduras',
+            'Hungary',
+            'Iceland',
+            'India',
+            'Indonesia',
+            'Iran',
+            'Iraq',
+            'Ireland',
+            'Israel',
+            'Italy',
+            'Jamaica',
+            'Japan',
+            'Jordan',
+            'Kazakhstan',
+            'Kenya',
+            'Kiribati',
+            'Korea',
+            'Kosovo',
+            'Kuwait',
+            'Kyrgyz Republic',
+            'Lao PDR',
+            'Latvia',
+            'Lebanon',
+            'Lesotho',
+            'Liberia',
+            'Libya',
+            'Lithuania',
+            'Luxembourg',
+            'Madagascar',
+            'Malawi',
+            'Malaysia',
+            'Maldives',
+            'Mali',
+            'Malta',
+            'Marshall Islands',
+            'Mauritania',
+            'Mauritius',
+            'Mexico',
+            'Micronesia',
+            'Moldova',
+            'Mongolia',
+            'Montenegro',
+            'Morocco',
+            'Mozambique',
+            'Myanmar',
+            'Namibia',
+            'Nepal',
+            'Netherlands',
+            'New Zealand',
+            'Nicaragua',
+            'Niger',
+            'Nigeria',
+            'North Macedonia',
+            'Norway',
             'Oman',
-            'Pakistan', 'Palau', 'Panama', 'Papua New Guinea', 'Paraguay', 'Peru', 'Philippines', 'Poland', 'Portugal',
+            'Pakistan',
+            'Palau',
+            'Panama',
+            'Papua New Guinea',
+            'Paraguay',
+            'Peru',
+            'Philippines',
+            'Poland',
+            'Portugal',
             'Qatar',
-            'Romania', 'Russian Federation', 'Rwanda',
-            'Samoa', 'São Tomé and Príncipe', 'Saudi Arabia', 'Senegal', 'Serbia', 'Seychelles', 'Sierra Leone', 'Singapore', 'Slovak Republic', 'Slovenia', 'Solomon Islands', 'Somalia', 'South Africa', 'South Sudan', 'Spain', 'Sri Lanka', 'St. Kitts and Nevis', 'St. Lucia', 'St. Vincent and the Grenadines', 'Sudan', 'Suriname', 'Sweden', 'Switzerland', 'Syrian Arab Republic',
-            'Tajikistan', 'Tanzania', 'Thailand', 'Timor-Leste', 'Togo', 'Tonga', 'Trinidad and Tobago', 'Tunisia', 'Turkey', 'Turkmenistan', 'Tuvalu',
-            'Uganda', 'Ukraine', 'United Arab Emirates', 'United Kingdom', 'United States', 'Uruguay', 'Uzbekistan',
-            'Vanuatu', 'Venezuela', 'Vietnam',
+            'Romania',
+            'Russian Federation',
+            'Rwanda',
+            'Samoa',
+            'São Tomé and Príncipe',
+            'Saudi Arabia',
+            'Senegal',
+            'Serbia',
+            'Seychelles',
+            'Sierra Leone',
+            'Singapore',
+            'Slovak Republic',
+            'Slovenia',
+            'Solomon Islands',
+            'Somalia',
+            'South Africa',
+            'South Sudan',
+            'Spain',
+            'Sri Lanka',
+            'St. Kitts and Nevis',
+            'St. Lucia',
+            'St. Vincent and the Grenadines',
+            'Sudan',
+            'Suriname',
+            'Sweden',
+            'Switzerland',
+            'Syrian Arab Republic',
+            'Tajikistan',
+            'Tanzania',
+            'Thailand',
+            'Timor-Leste',
+            'Togo',
+            'Tonga',
+            'Trinidad and Tobago',
+            'Tunisia',
+            'Turkey',
+            'Turkmenistan',
+            'Tuvalu',
+            'Uganda',
+            'Ukraine',
+            'United Arab Emirates',
+            'United Kingdom',
+            'United States',
+            'Uruguay',
+            'Uzbekistan',
+            'Vanuatu',
+            'Venezuela',
+            'Vietnam',
             'Yemen',
-            'Zambia', 'Zimbabwe',
+            'Zambia',
+            'Zimbabwe',
         ];
 
         // Zones géographiques
         $zones = [
-            'Africa', 'Sub-Saharan Africa', 'North Africa', 'West Africa', 'East Africa', 'Southern Africa', 'Central Africa',
-            'East Asia', 'East Asia and Pacific', 'Southeast Asia', 'South Asia', 'Central Asia',
-            'Latin America', 'Latin America and Caribbean', 'Caribbean', 'Central America', 'South America',
-            'Middle East', 'Middle East and North Africa', 'MENA',
-            'Europe', 'Europe and Central Asia', 'Western Europe', 'Eastern Europe',
-            'Pacific', 'Oceania',
-            'Global', 'Worldwide', 'International',
+            'Africa',
+            'Sub-Saharan Africa',
+            'North Africa',
+            'West Africa',
+            'East Africa',
+            'Southern Africa',
+            'Central Africa',
+            'East Asia',
+            'East Asia and Pacific',
+            'Southeast Asia',
+            'South Asia',
+            'Central Asia',
+            'Latin America',
+            'Latin America and Caribbean',
+            'Caribbean',
+            'Central America',
+            'South America',
+            'Middle East',
+            'Middle East and North Africa',
+            'MENA',
+            'Europe',
+            'Europe and Central Asia',
+            'Western Europe',
+            'Eastern Europe',
+            'Pacific',
+            'Oceania',
+            'Global',
+            'Worldwide',
+            'International',
         ];
 
         $text = $item->textContent;
         $foundItems = [];
-        
+
         // Rechercher TOUS les pays mentionnés
         foreach ($countries as $country) {
             if (stripos($text, $country) !== false) {
                 $foundItems[] = $country;
             }
         }
-        
+
         // Rechercher TOUTES les zones géographiques mentionnées
         foreach ($zones as $zone) {
             if (stripos($text, $zone) !== false) {
@@ -2105,7 +2374,7 @@ class WorldBankScraperService
                 }
             }
         }
-        
+
         if (!empty($foundItems)) {
             return implode(', ', array_unique($foundItems));
         }
@@ -2119,7 +2388,7 @@ class WorldBankScraperService
     private function extractDeadline(\DOMElement $item, DOMXPath $xpath): ?string
     {
         $text = $item->textContent;
-        
+
         // Patterns de date en anglais
         $patterns = [
             // Format: "January 15, 2025", "Jan 15, 2025"
@@ -2133,9 +2402,29 @@ class WorldBankScraperService
         ];
 
         $months = [
-            'january' => 1, 'february' => 2, 'march' => 3, 'april' => 4, 'may' => 5, 'june' => 6,
-            'july' => 7, 'august' => 8, 'september' => 9, 'october' => 10, 'november' => 11, 'december' => 12,
-            'jan' => 1, 'feb' => 2, 'mar' => 3, 'apr' => 4, 'jun' => 6, 'jul' => 7, 'aug' => 8, 'sep' => 9, 'oct' => 10, 'nov' => 11, 'dec' => 12,
+            'january' => 1,
+            'february' => 2,
+            'march' => 3,
+            'april' => 4,
+            'may' => 5,
+            'june' => 6,
+            'july' => 7,
+            'august' => 8,
+            'september' => 9,
+            'october' => 10,
+            'november' => 11,
+            'december' => 12,
+            'jan' => 1,
+            'feb' => 2,
+            'mar' => 3,
+            'apr' => 4,
+            'jun' => 6,
+            'jul' => 7,
+            'aug' => 8,
+            'sep' => 9,
+            'oct' => 10,
+            'nov' => 11,
+            'dec' => 12,
         ];
 
         foreach ($patterns as $pattern) {
@@ -2156,8 +2445,8 @@ class WorldBankScraperService
                     // Convertir en format date
                     if (preg_match('/(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\.?\s+(\d{1,2}),\s+(\d{4})/i', $dateStr, $dateMatches)) {
                         $monthName = strtolower(trim($dateMatches[1], '.'));
-                        $day = (int)$dateMatches[2];
-                        $year = (int)$dateMatches[3];
+                        $day = (int) $dateMatches[2];
+                        $year = (int) $dateMatches[3];
                         if (isset($months[$monthName])) {
                             return sprintf('%04d-%02d-%02d', $year, $months[$monthName], $day);
                         }

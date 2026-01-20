@@ -37,10 +37,11 @@ class ScrapeActiveSources extends Command
         // Récupérer les sources actives et leurs règles
         $activeSources = ScraperHelper::getActiveSources();
 
+        // Si aucune règle active, scraper TOUTES les sources par défaut
         if (empty($activeSources)) {
             $this->warn('⚠ Aucune règle de filtrage active trouvée.');
-            $this->info('💡 Activez au moins une règle de filtrage dans l\'admin avant de lancer le scraping.');
-            return Command::FAILURE;
+            $this->info('💡 Scraping de TOUTES les sources par défaut...');
+            $activeSources = array_keys($this->sourceCommands);
         }
 
         // Afficher les filtres si demandé
@@ -53,7 +54,7 @@ class ScrapeActiveSources extends Command
         if (!$this->option('no-truncate')) {
             $this->info('Vidage de la table offres...');
             $countBefore = DB::table('offres')->count();
-            
+
             // Vider dans toutes les connexions possibles
             try {
                 DB::statement('DELETE FROM offres');
@@ -61,7 +62,7 @@ class ScrapeActiveSources extends Command
             } catch (\Exception $e) {
                 $this->warn('⚠ Erreur lors du vidage: ' . $e->getMessage());
             }
-            
+
             // Si SQLite, réinitialiser le compteur auto
             $driver = DB::connection()->getDriverName();
             if ($driver === 'sqlite') {
@@ -71,14 +72,14 @@ class ScrapeActiveSources extends Command
                     // Ignorer si la table n'existe pas
                 }
             }
-            
+
             // Vider aussi dans MySQL si disponible
             try {
                 DB::connection('mysql')->statement('TRUNCATE TABLE offres');
             } catch (\Exception $e) {
                 // MySQL non disponible ou déjà vidé, ignorer
             }
-            
+
             $this->newLine();
         } else {
             $this->info('⚠ Mode --no-truncate : la table ne sera pas vidée');
@@ -105,7 +106,7 @@ class ScrapeActiveSources extends Command
             try {
                 // Utiliser --force car on a déjà vérifié que la source est active
                 $exitCode = Artisan::call($command, ['--force' => true]);
-                
+
                 if ($exitCode === 0) {
                     $this->info("✓ Scraping de {$source} terminé avec succès");
                     $successCount++;
@@ -127,7 +128,7 @@ class ScrapeActiveSources extends Command
         if ($failCount > 0) {
             $this->warn("Sources en erreur: {$failCount}");
         }
-        
+
         $totalOffres = DB::table('offres')->count();
         $this->info("Total d'offres scrapées: {$totalOffres}");
         $this->newLine();
@@ -165,22 +166,22 @@ class ScrapeActiveSources extends Command
             }
 
             $this->line("📋 <fg=cyan>{$source}</>");
-            
+
             foreach ($rules as $rule) {
                 $this->line("   Règle: <fg=yellow>{$rule->name}</>");
-                
+
                 // Type de marché
                 if (!empty($rule->market_type)) {
                     $marketTypeLabel = $rule->market_type === 'bureau_d_etude' ? 'Bureau d\'études' : 'Consultant individuel';
                     $this->line("   • Type de marché: <fg=green>{$marketTypeLabel}</>");
                 }
-                
+
                 // Pays
                 if ($rule->countries->isNotEmpty()) {
                     $countries = $rule->countries->pluck('country')->toArray();
                     $this->line("   • Pays autorisés: <fg=green>" . implode(', ', $countries) . "</>");
                 }
-                
+
                 // Mots-clés des pôles d'activité
                 if ($rule->activityPoles->isNotEmpty()) {
                     $keywords = [];
@@ -192,13 +193,13 @@ class ScrapeActiveSources extends Command
                         $this->line("   • Mots-clés requis: <fg=green>" . implode(', ', array_unique($keywords)) . "</>");
                     }
                 }
-                
+
                 // Si aucun filtre spécifique
                 if (empty($rule->market_type) && $rule->countries->isEmpty() && $rule->activityPoles->isEmpty()) {
                     $this->line("   • <fg=yellow>Aucun filtre spécifique (toutes les offres acceptées)</>");
                 }
             }
-            
+
             $this->newLine();
         }
     }
@@ -209,29 +210,29 @@ class ScrapeActiveSources extends Command
     private function applyFiltering(): void
     {
         $filteringService = app(OfferFilteringService::class);
-        
+
         $this->info('Récupération de toutes les offres...');
         $allOffres = \App\Models\Offre::all();
         $countBefore = $allOffres->count();
         $this->info("Total d'offres avant filtrage: {$countBefore}");
-        
+
         $this->info('Application des filtres...');
         $filteredOffres = $filteringService->filterOffers($allOffres);
         $countAfter = $filteredOffres->count();
         $countRejected = $countBefore - $countAfter;
-        
+
         $this->info("Offres conformes aux filtres: {$countAfter}");
         $this->info("Offres rejetées: {$countRejected}");
-        
+
         if ($countRejected > 0) {
             $this->info('Suppression des offres non conformes...');
-            
+
             // Récupérer les IDs des offres à garder
             $keepIds = $filteredOffres->pluck('id')->toArray();
-            
+
             // Supprimer les offres qui ne sont pas dans la liste à garder
             $deleted = \App\Models\Offre::whereNotIn('id', $keepIds)->delete();
-            
+
             $this->info("✓ {$deleted} offres non conformes supprimées");
         } else {
             $this->info('✓ Toutes les offres sont conformes aux filtres');

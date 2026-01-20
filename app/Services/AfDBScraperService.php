@@ -30,7 +30,7 @@ class AfDBScraperService
     {
         // Note: Le vidage de la table est géré par la commande principale (app:scrape-active-sources)
         // Ici on scrappe uniquement les offres African Development Bank
-        
+
         $totalCount = 0;
         $page = 0;
         $pagesStats = [];
@@ -39,29 +39,29 @@ class AfDBScraperService
             $maxPages = max(1, min((int) env('AFDB_MAX_PAGES', 5), self::MAX_PAGES));
             while ($page < $maxPages) {
                 Log::debug("AfDB Scraper: Fetching page {$page}");
-                
+
                 $result = $this->scrapePage($page);
                 $count = $result['count'];
                 $totalCount += $count;
-                
+
                 $pagesStats[$page] = $count;
-                
+
                 if ($page % 10 === 0 || $count > 0) {
                     Log::info("AfDB Scraper: Page {$page} traitée", [
                         'offres_trouvees' => $count,
                         'total_accumule' => $totalCount,
                     ]);
                 }
-                
+
                 // Arrêter seulement si aucune offre trouvée ET qu'on a déjà essayé plusieurs pages
                 // (pour éviter d'arrêter trop tôt si la première page est vide)
                 if ($count === 0 && $page > 0) {
                     Log::info("AfDB Scraper: Page {$page} a retourné 0 offres, arrêt.");
                     break;
                 }
-                
+
                 // Continuer même si count = 0 sur la première page (peut être une page vide temporairement)
-                
+
                 $page++;
                 usleep(200000); // 0.2 seconde entre les pages
             }
@@ -78,7 +78,7 @@ class AfDBScraperService
             'total_notices_kept' => $totalCount,
             'offres_par_page' => $pagesStats,
         ];
-        
+
         Log::info('AfDB Scraper: Résumé du scraping', $stats);
 
         return ['count' => $totalCount, 'stats' => $stats];
@@ -94,7 +94,7 @@ class AfDBScraperService
     {
         $count = 0;
         $html = '';
-        
+
         try {
             // Construire l'URL avec pagination
             $url = self::BASE_URL;
@@ -102,43 +102,44 @@ class AfDBScraperService
                 // Essayer différents formats de pagination
                 $url .= '?page=' . ($page + 1); // Page 1, 2, 3...
             }
-            
+
             Log::debug("AfDB Scraper: Fetching page", ['page' => $page, 'url' => $url]);
-            
+
             // Utiliser Browsershot (navigateur headless) pour contourner la protection anti-bot
             // Browsershot utilise Chrome headless qui ressemble à un vrai navigateur
             try {
                 Log::debug('AfDB Scraper: Using Browsershot to fetch page', ['url' => $url]);
-                
+
                 $html = Browsershot::url($url)
-                    ->waitUntilNetworkIdle() // Attendre que le réseau soit inactif (JS chargé)
-                    ->timeout(120) // Timeout de 2 minutes
+                    ->waitUntilNetworkIdle()
+                    ->timeout(90) // Réduit de 120s à 90s pour plus de réactivité
                     ->setOption('args', [
                         '--no-sandbox',
                         '--disable-setuid-sandbox',
                         '--disable-dev-shm-usage',
                         '--disable-accelerated-2d-canvas',
                         '--disable-gpu',
+                        '--disable-blink-features=AutomationControlled',
                     ])
                     ->userAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
-                    ->bodyHtml(); // Récupérer le HTML après exécution du JavaScript
-                
+                    ->bodyHtml();
+
                 if (empty($html)) {
                     Log::warning('AfDB Scraper: Browsershot returned empty HTML', ['url' => $url]);
                     return ['count' => 0, 'html' => ''];
                 }
-                
+
                 Log::debug('AfDB Scraper: Successfully fetched page with Browsershot', [
                     'url' => $url,
                     'html_length' => strlen($html),
                 ]);
-                
+
             } catch (\Exception $e) {
                 Log::error('AfDB Scraper: Browsershot failed, falling back to HTTP', [
                     'error' => $e->getMessage(),
                     'url' => $url,
                 ]);
-                
+
                 // Fallback vers HTTP simple si Browsershot échoue
                 $response = Http::withoutVerifying()
                     ->timeout(60)
@@ -162,7 +163,7 @@ class AfDBScraperService
 
                 $html = $response->body();
             }
-            
+
             // Parser le HTML
             $dom = new DOMDocument();
             libxml_use_internal_errors(true);
@@ -172,13 +173,13 @@ class AfDBScraperService
 
             // Extraire les notices de procurement
             $items = $this->extractProcurementItems($xpath, $dom);
-            
+
             Log::info('AfDB Scraper: Items found', ['page' => $page, 'count' => count($items)]);
-            
+
             // Si aucun item trouvé, essayer une extraction plus large
             if (count($items) === 0) {
                 Log::info('AfDB Scraper: No items with standard selectors, trying broader extraction');
-                
+
                 // Chercher tous les éléments qui pourraient contenir des appels d'offres
                 $allDivs = $xpath->query("//div[contains(@class, 'content') or contains(@class, 'item') or contains(@class, 'card') or contains(@class, 'article')]");
                 foreach ($allDivs as $div) {
@@ -195,15 +196,15 @@ class AfDBScraperService
             // Traiter chaque item et collecter les offres valides avec validation stricte
             $validOffres = [];
             $titresVus = []; // Pour détecter les doublons
-            
+
             foreach ($items as $item) {
                 try {
                     $offre = $this->extractOffreData($item, $xpath);
-                    
+
                     if (!$offre || empty($offre['titre']) || empty($offre['lien_source'])) {
                         continue;
                     }
-                    
+
                     // VALIDATION: Rejeter seulement les doublons de titres
                     $titreNormalise = $this->normalizeTitle($offre['titre']);
                     if (isset($titresVus[$titreNormalise])) {
@@ -211,14 +212,14 @@ class AfDBScraperService
                         continue;
                     }
                     $titresVus[$titreNormalise] = true;
-                    
+
                     // Si le titre et le lien existent, l'offre est valide
                     // (le lien est déjà validé lors de l'extraction)
                     Log::debug('AfDB Scraper: Offre acceptée', [
                         'titre' => $offre['titre'],
                         'lien' => $offre['lien_source'],
                     ]);
-                    
+
                     $validOffres[] = $offre;
                 } catch (\Exception $e) {
                     Log::debug('AfDB Scraper: Error processing item', [
@@ -227,34 +228,34 @@ class AfDBScraperService
                     continue;
                 }
             }
-            
+
             // Vérifier les offres existantes en batch (optimisation)
             if (!empty($validOffres)) {
                 $liensSources = array_column($validOffres, 'lien_source');
                 $titres = array_column($validOffres, 'titre');
-                
+
                 // Récupérer toutes les offres existantes en une seule requête
                 $existingLiens = Offre::where('source', 'African Development Bank')
                     ->whereIn('lien_source', $liensSources)
                     ->pluck('lien_source')
                     ->toArray();
-                
+
                 $existingTitres = Offre::where('source', 'African Development Bank')
                     ->whereIn('titre', $titres)
                     ->pluck('titre')
                     ->toArray();
-                
+
                 // Filtrer les offres qui n'existent pas déjà
                 $newOffres = [];
                 foreach ($validOffres as $offre) {
-                    $exists = in_array($offre['lien_source'], $existingLiens) 
-                           || in_array($offre['titre'], $existingTitres);
-                    
+                    $exists = in_array($offre['lien_source'], $existingLiens)
+                        || in_array($offre['titre'], $existingTitres);
+
                     if (!$exists) {
                         $newOffres[] = $offre;
                     }
                 }
-                
+
                 // Insérer en batch (optimisation majeure)
                 if (!empty($newOffres)) {
                     // Ajouter les timestamps pour l'insertion en batch
@@ -264,7 +265,7 @@ class AfDBScraperService
                         $offre['updated_at'] = $now;
                     }
                     unset($offre);
-                    
+
                     // Insérer par chunks pour éviter les problèmes de mémoire
                     $chunks = array_chunk($newOffres, 50);
                     foreach ($chunks as $chunk) {
@@ -295,35 +296,37 @@ class AfDBScraperService
     private function extractProcurementItems(DOMXPath $xpath, DOMDocument $dom): array
     {
         $items = [];
-        
+
         // Stratégies multiples pour trouver les notices de procurement
         // AfDB peut utiliser différentes structures HTML
-        
+
         // Stratégie 0: Chercher tous les textes qui ressemblent à des titres d'appels d'offres
         // et trouver leurs conteneurs parents
         $allTextNodes = $xpath->query("//text()[string-length(normalize-space(.)) > 50]");
         $processedContainers = [];
-        
+
         foreach ($allTextNodes as $textNode) {
             $text = trim($textNode->textContent);
             $textLower = strtolower($text);
-            
+
             // Chercher des textes qui ressemblent à des titres d'appels d'offres
             // (contiennent projet, pays, activité spécifique)
-            if (strlen($text) > 40 && strlen($text) < 500 &&
+            if (
+                strlen($text) > 40 && strlen($text) < 500 &&
                 stripos($textLower, 'consultancy services (e-consultant)') === false &&
                 stripos($textLower, 'procurement notice') === false &&
                 stripos($textLower, 'rules and procedures') === false &&
                 (stripos($textLower, 'project') !== false ||
-                 stripos($textLower, 'projet') !== false ||
-                 stripos($textLower, 'program') !== false ||
-                 preg_match('/\b[A-Z]{2,}[A-Z0-9]*\b/', $text))) { // Code de projet
-                
+                    stripos($textLower, 'projet') !== false ||
+                    stripos($textLower, 'program') !== false ||
+                    preg_match('/\b[A-Z]{2,}[A-Z0-9]*\b/', $text))
+            ) { // Code de projet
+
                 // Trouver le conteneur parent
                 $parent = $textNode->parentNode;
                 $maxDepth = 10;
                 $depth = 0;
-                
+
                 while ($parent && $depth < $maxDepth) {
                     if ($parent->nodeType === XML_ELEMENT_NODE) {
                         $parentId = spl_object_hash($parent);
@@ -341,7 +344,7 @@ class AfDBScraperService
                 }
             }
         }
-        
+
         // Stratégie 0.5: Chercher par structure de conteneur (plus fiable)
         // Chercher les éléments qui contiennent à la fois un titre spécifique et un lien
         $containerSelectors = [
@@ -354,7 +357,7 @@ class AfDBScraperService
             "//div[contains(@class, 'card')]",
             "//div[contains(@class, 'row')]//div[contains(@class, 'col')]",
         ];
-        
+
         foreach ($containerSelectors as $selector) {
             try {
                 $containers = $xpath->query($selector);
@@ -363,7 +366,7 @@ class AfDBScraperService
                     if (isset($processedContainers[$containerId])) {
                         continue; // Déjà traité
                     }
-                    
+
                     $text = trim($container->textContent);
                     // Si le conteneur a du texte substantiel et contient un lien
                     if (strlen($text) > 50) {
@@ -378,7 +381,7 @@ class AfDBScraperService
                 continue;
             }
         }
-        
+
         // Stratégie 1: Chercher les liens vers les pages de procurement
         // Essayer plusieurs patterns de liens possibles
         $linkPatterns = [
@@ -390,7 +393,7 @@ class AfDBScraperService
             "//a[contains(@href, '/en/projects-and-operations/')]", // Plus large
             "//a[contains(@href, '.pdf')]", // PDFs de procurement
         ];
-        
+
         $allLinks = [];
         foreach ($linkPatterns as $pattern) {
             $links = $xpath->query($pattern);
@@ -398,28 +401,30 @@ class AfDBScraperService
                 $allLinks[] = $link;
             }
         }
-        
+
         foreach ($allLinks as $link) {
             $href = $link->getAttribute('href');
             $text = trim($link->textContent);
-            
+
             // Ignorer les liens de navigation
-            if (stripos($text, 'view all') !== false || 
+            if (
+                stripos($text, 'view all') !== false ||
                 stripos($text, 'see more') !== false ||
                 stripos($text, 'next') !== false ||
                 stripos($text, 'previous') !== false ||
-                strlen($text) < 20) {
+                strlen($text) < 20
+            ) {
                 continue;
             }
-            
+
             // Normaliser l'URL
             $href = $this->normalizeUrl($href);
-            
+
             // Trouver le conteneur parent qui contient les informations complètes
             $parent = $link->parentNode;
             $maxDepth = 5;
             $depth = 0;
-            
+
             while ($parent && $depth < $maxDepth) {
                 $parentText = trim($parent->textContent);
                 if (strlen($parentText) > 50) {
@@ -441,7 +446,7 @@ class AfDBScraperService
                 $depth++;
             }
         }
-        
+
         // Stratégie 2: Chercher par structure de liste/carte
         $selectors = [
             "//article[contains(@class, 'procurement')]",
@@ -451,7 +456,7 @@ class AfDBScraperService
             "//li[contains(@class, 'procurement')]",
             "//tr[contains(@class, 'procurement')]",
         ];
-        
+
         foreach ($selectors as $selector) {
             try {
                 $nodes = $xpath->query($selector);
@@ -460,8 +465,10 @@ class AfDBScraperService
                     $nodeLinks = $xpath->query(".//a[@href]", $node);
                     if ($nodeLinks->length > 0) {
                         $nodeHref = $nodeLinks->item(0)->getAttribute('href');
-                        if (stripos($nodeHref, 'procurement') !== false || 
-                            stripos($nodeHref, '/en/projects-and-operations/') !== false) {
+                        if (
+                            stripos($nodeHref, 'procurement') !== false ||
+                            stripos($nodeHref, '/en/projects-and-operations/') !== false
+                        ) {
                             // Vérifier doublon
                             $found = false;
                             foreach ($items as $existing) {
@@ -481,7 +488,7 @@ class AfDBScraperService
                 continue;
             }
         }
-        
+
         return $items;
     }
 
@@ -500,84 +507,88 @@ class AfDBScraperService
             // Chaque notice a un lien <a> dont le texte est le titre et le href est l'URL de détail
             $lien = null;
             $titre = null;
-            
+
             // Chercher tous les liens dans l'élément
             $linkNodes = $xpath->query(".//a[@href]", $item);
-            
+
             foreach ($linkNodes as $link) {
                 $href = $link->getAttribute('href');
                 $linkText = trim($link->textContent);
-                
+
                 // Ignorer les liens de navigation évidents
-                if (stripos($href, 'javascript:') !== false ||
+                if (
+                    stripos($href, 'javascript:') !== false ||
                     stripos($href, '#') === 0 ||
                     stripos($href, 'mailto:') !== false ||
                     stripos($linkText, 'view all') !== false ||
                     stripos($linkText, 'see more') !== false ||
                     stripos($linkText, 'next') !== false ||
                     stripos($linkText, 'previous') !== false ||
-                    strlen($linkText) < 20) {
+                    strlen($linkText) < 20
+                ) {
                     continue;
                 }
-                
+
                 // Ignorer les fichiers XML/RSS
                 if (preg_match('/\.(xml|rss|atom)$/i', $href)) {
                     continue;
                 }
-                
+
                 // Ignorer les liens vers la plateforme E-Consultant (mais pas les liens depuis afdb.org)
                 if (stripos($href, 'econsultant.afdb.org') !== false) {
                     continue;
                 }
-                
+
                 // Ignorer les liens de pagination (avec paramètres page=)
                 if (preg_match('/[?&]page=/i', $href)) {
                     continue;
                 }
-                
+
                 // Si le lien a un texte substantiel (titre de notice), c'est notre notice
                 // Le texte du lien EST le titre, le href EST l'URL de détail
                 if (strlen($linkText) > 20 && strlen($linkText) < 500) {
                     // Normaliser l'URL mais garder le href exact
                     $hrefNormalized = $this->normalizeUrl($href);
-                    
+
                     // Vérifier que ce n'est pas une page de liste générique
                     // (mais accepter les liens vers des pages spécifiques même si elles contiennent /procurement)
-                    if (stripos($hrefNormalized, '/procurement?') === false &&
+                    if (
+                        stripos($hrefNormalized, '/procurement?') === false &&
                         stripos($hrefNormalized, '/procurement#') === false &&
-                        stripos($hrefNormalized, 'econsultant.afdb.org') === false) {
+                        stripos($hrefNormalized, 'econsultant.afdb.org') === false
+                    ) {
                         $titre = $linkText;
                         $lien = $hrefNormalized; // Utiliser EXACTEMENT le href fourni (normalisé)
                         break; // Prendre le premier lien valide trouvé
                     }
                 }
             }
-            
+
             // Si aucun lien titre trouvé, rejeter l'item
             if (!$titre || !$lien) {
                 return null;
             }
-            
+
             // Les titres de navigation ont déjà été filtrés lors de l'extraction du lien
             // Pas besoin de vérifier à nouveau ici
-            
+
             // Extraire le pays/zone géographique
             $pays = $this->extractCountry($item, $xpath);
-            
+
             // Extraire la date de publication
             $datePublication = $this->extractPublicationDate($item, $xpath);
-            
+
             // Date limite - extraire depuis la page de détail pour avoir la vraie date
             $dateLimite = $this->extractDeadlineFromDetailPage($lien);
-            
+
             // Si pas trouvée dans la page de détail, utiliser la date de publication
             if (empty($dateLimite)) {
                 $dateLimite = $datePublication;
             }
-            
+
             // Acheteur
             $acheteur = "African Development Bank";
-            
+
             return [
                 'titre' => $titre,
                 'acheteur' => $acheteur,
@@ -603,44 +614,92 @@ class AfDBScraperService
     private function extractCountry(\DOMElement $item, DOMXPath $xpath): ?string
     {
         $text = $item->textContent;
-        
+
         // Liste des pays africains et zones géographiques
         $countries = [
-            'Algeria', 'Angola', 'Benin', 'Botswana', 'Burkina Faso', 'Burundi',
-            'Cameroon', 'Cape Verde', 'Central African Republic', 'Chad', 'Comoros',
-            'Congo', 'Côte d\'Ivoire', 'Djibouti', 'Egypt', 'Equatorial Guinea',
-            'Eritrea', 'Eswatini', 'Ethiopia', 'Gabon', 'Gambia', 'Ghana', 'Guinea',
-            'Guinea-Bissau', 'Kenya', 'Lesotho', 'Liberia', 'Libya', 'Madagascar',
-            'Malawi', 'Mali', 'Mauritania', 'Mauritius', 'Morocco', 'Mozambique',
-            'Namibia', 'Niger', 'Nigeria', 'Rwanda', 'São Tomé and Príncipe',
-            'Senegal', 'Seychelles', 'Sierra Leone', 'Somalia', 'South Africa',
-            'South Sudan', 'Sudan', 'Tanzania', 'Togo', 'Tunisia', 'Uganda',
-            'Zambia', 'Zimbabwe',
+            'Algeria',
+            'Angola',
+            'Benin',
+            'Botswana',
+            'Burkina Faso',
+            'Burundi',
+            'Cameroon',
+            'Cape Verde',
+            'Central African Republic',
+            'Chad',
+            'Comoros',
+            'Congo',
+            'Côte d\'Ivoire',
+            'Djibouti',
+            'Egypt',
+            'Equatorial Guinea',
+            'Eritrea',
+            'Eswatini',
+            'Ethiopia',
+            'Gabon',
+            'Gambia',
+            'Ghana',
+            'Guinea',
+            'Guinea-Bissau',
+            'Kenya',
+            'Lesotho',
+            'Liberia',
+            'Libya',
+            'Madagascar',
+            'Malawi',
+            'Mali',
+            'Mauritania',
+            'Mauritius',
+            'Morocco',
+            'Mozambique',
+            'Namibia',
+            'Niger',
+            'Nigeria',
+            'Rwanda',
+            'São Tomé and Príncipe',
+            'Senegal',
+            'Seychelles',
+            'Sierra Leone',
+            'Somalia',
+            'South Africa',
+            'South Sudan',
+            'Sudan',
+            'Tanzania',
+            'Togo',
+            'Tunisia',
+            'Uganda',
+            'Zambia',
+            'Zimbabwe',
         ];
-        
+
         $zones = [
-            'West Africa', 'East Africa', 'Southern Africa', 'Central Africa',
-            'North Africa', 'Sub-Saharan Africa', 'Africa',
+            'West Africa',
+            'East Africa',
+            'Southern Africa',
+            'Central Africa',
+            'North Africa',
+            'Sub-Saharan Africa',
+            'Africa',
         ];
-        
+
         $foundItems = [];
-        
+
         foreach ($countries as $country) {
             if (stripos($text, $country) !== false) {
                 $foundItems[] = $country;
             }
         }
-        
+
         foreach ($zones as $zone) {
             if (stripos($text, $zone) !== false) {
                 $foundItems[] = $zone;
             }
         }
-        
+
         if (!empty($foundItems)) {
             return implode(', ', array_unique($foundItems));
         }
-        
+
         return null;
     }
 
@@ -651,7 +710,7 @@ class AfDBScraperService
     {
         $text = $item->textContent;
         $html = $item->ownerDocument->saveHTML($item);
-        
+
         // Patterns de date plus complets (ajouter plus de variations)
         $patterns = [
             // Formats américains
@@ -666,7 +725,7 @@ class AfDBScraperService
             '/(deadline|closing|due|submission)[\s:]+(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{1,2}),?\s+(\d{4})/i',
             '/(deadline|closing|due|submission)[\s:]+(\d{1,2})\/(\d{1,2})\/(\d{4})/i',
         ];
-        
+
         // Chercher dans le texte brut
         foreach ($patterns as $pattern) {
             if (preg_match($pattern, $text, $matches)) {
@@ -685,7 +744,7 @@ class AfDBScraperService
                 }
             }
         }
-        
+
         // Chercher aussi dans les attributs HTML (data-date, datetime, etc.)
         $dateAttributes = ['data-date', 'datetime', 'data-deadline', 'data-closing'];
         foreach ($dateAttributes as $attr) {
@@ -704,7 +763,7 @@ class AfDBScraperService
                 }
             }
         }
-        
+
         // Si aucune date trouvée, retourner null (sera géré plus haut)
         return null;
     }
@@ -740,7 +799,7 @@ class AfDBScraperService
     private function isValidTitle(string $titre): bool
     {
         $titreLower = strtolower(trim($titre));
-        
+
         // Titres génériques à REJETER absolument
         $forbiddenTitles = [
             'consultancy services (e-consultant)',
@@ -755,45 +814,78 @@ class AfDBScraperService
             'procurement plan',
             'contract award',
         ];
-        
+
         // Vérifier si le titre correspond exactement à un titre interdit
         foreach ($forbiddenTitles as $forbidden) {
             if ($titreLower === strtolower($forbidden)) {
                 return false;
             }
         }
-        
+
         // Rejeter les titres qui commencent par ces patterns sans objet précis
         $genericPatterns = [
             'consultancy services',
             'procurement notice',
             'expression of interest',
         ];
-        
+
         foreach ($genericPatterns as $pattern) {
             if (stripos($titreLower, $pattern) === 0 && strlen($titre) < 50) {
                 // Si le titre commence par un pattern générique et est court, rejeter
                 return false;
             }
         }
-        
+
         // Le titre doit contenir des informations spécifiques (projet, pays, activité)
         // Un vrai appel d'offres a généralement plus de 40 caractères et contient des détails
         if (strlen($titre) < 40) {
             return false;
         }
-        
+
         // Le titre doit contenir au moins un mot-clé indiquant un objet spécifique
         $specificKeywords = [
-            'project', 'program', 'programme', 'study', 'consultant', 'service', 'supply', 'works',
-            'construction', 'rehabilitation', 'development', 'management', 'training',
-            'assessment', 'evaluation', 'design', 'implementation', 'supervision',
-            'projet', 'programme', 'étude', 'consultant', 'service', 'fourniture', 'travaux',
-            'construction', 'réhabilitation', 'développement', 'gestion', 'formation',
-            'évaluation', 'conception', 'mise en œuvre', 'supervision',
-            'renforcement', 'résilience', 'risque', 'climatique', 'agricole', 'secteur',
+            'project',
+            'program',
+            'programme',
+            'study',
+            'consultant',
+            'service',
+            'supply',
+            'works',
+            'construction',
+            'rehabilitation',
+            'development',
+            'management',
+            'training',
+            'assessment',
+            'evaluation',
+            'design',
+            'implementation',
+            'supervision',
+            'projet',
+            'programme',
+            'étude',
+            'consultant',
+            'service',
+            'fourniture',
+            'travaux',
+            'construction',
+            'réhabilitation',
+            'développement',
+            'gestion',
+            'formation',
+            'évaluation',
+            'conception',
+            'mise en œuvre',
+            'supervision',
+            'renforcement',
+            'résilience',
+            'risque',
+            'climatique',
+            'agricole',
+            'secteur',
         ];
-        
+
         $hasSpecificKeyword = false;
         foreach ($specificKeywords as $keyword) {
             if (stripos($titreLower, $keyword) !== false) {
@@ -801,7 +893,7 @@ class AfDBScraperService
                 break;
             }
         }
-        
+
         // Si le titre contient un code de projet (ex: PreRAB, AGPM) ou un pays, c'est probablement valide
         if (!$hasSpecificKeyword) {
             // Vérifier si le titre contient un code de projet (majuscules/lettres-chiffres)
@@ -809,7 +901,7 @@ class AfDBScraperService
                 $hasSpecificKeyword = true;
             }
         }
-        
+
         return $hasSpecificKeyword;
     }
 
@@ -822,14 +914,14 @@ class AfDBScraperService
     private function isValidLink(string $url): bool
     {
         $urlLower = strtolower($url);
-        
+
         // LIENS INTERDITS - Plateformes et listes
         $forbiddenPatterns = [
             'econsultant.afdb.org',
             '/en/projects-and-operations/procurement', // Page de liste (sans ID)
             '/en/documents', // Page de documents générique
         ];
-        
+
         foreach ($forbiddenPatterns as $pattern) {
             if (stripos($urlLower, $pattern) !== false) {
                 // Vérifier si c'est vraiment une page de liste (sans identifiant)
@@ -842,17 +934,17 @@ class AfDBScraperService
                 return false;
             }
         }
-        
+
         // Rejeter les URLs avec paramètres de recherche/liste
         if (stripos($urlLower, '/procurement?') !== false || stripos($urlLower, '/procurement#') !== false) {
             return false;
         }
-        
+
         // Rejeter les fichiers XML/RSS (flux de données, pas des avis)
         if (preg_match('/\.(xml|rss|atom)$/i', $urlLower)) {
             return false;
         }
-        
+
         // LIENS ACCEPTÉS - Doivent contenir un identifiant ou être un document
         $validPatterns = [
             '/procurement/', // Avec chemin spécifique
@@ -862,7 +954,7 @@ class AfDBScraperService
             '.docx',
             '/en/projects-and-operations/procurement/', // Avec chemin après
         ];
-        
+
         $hasValidPattern = false;
         foreach ($validPatterns as $pattern) {
             if (stripos($urlLower, $pattern) !== false) {
@@ -870,7 +962,7 @@ class AfDBScraperService
                 break;
             }
         }
-        
+
         // Si c'est un lien vers afdb.org mais pas vers une plateforme, accepter
         if (stripos($urlLower, 'afdb.org') !== false && !$hasValidPattern) {
             // Vérifier qu'il y a un chemin spécifique (pas juste le domaine)
@@ -879,7 +971,7 @@ class AfDBScraperService
                 $hasValidPattern = true; // Lien spécifique vers autre page
             }
         }
-        
+
         return $hasValidPattern;
     }
 
@@ -917,16 +1009,16 @@ class AfDBScraperService
                     ],
                 ])
                 ->head($url); // Utiliser HEAD pour être plus rapide
-            
+
             $status = $response->status();
             $finalUrl = $response->effectiveUri() ?? $url;
-            
+
             // Accepter 200 OK
             if ($status === 200) {
                 // Vérifier que l'URL finale n'est pas une plateforme/liste
                 return $this->isValidLink($finalUrl);
             }
-            
+
             // Accepter 301/302 seulement si la redirection mène à un lien valide
             if (in_array($status, [301, 302, 303, 307, 308])) {
                 $location = $response->header('Location');
@@ -936,14 +1028,14 @@ class AfDBScraperService
                 // Si pas de Location header, vérifier l'URL finale
                 return $this->isValidLink($finalUrl);
             }
-            
+
             // Rejeter tous les autres codes
             Log::debug('AfDB Scraper: URL returned invalid status', [
                 'url' => $url,
                 'status' => $status,
             ]);
             return false;
-            
+
         } catch (\Exception $e) {
             Log::debug('AfDB Scraper: URL validation failed', [
                 'url' => $url,
@@ -963,12 +1055,12 @@ class AfDBScraperService
     private function determineLinkType(string $url): string
     {
         $urlLower = strtolower($url);
-        
+
         // Si c'est un document (PDF, DOC, etc.)
         if (preg_match('/\.(pdf|doc|docx)$/i', $urlLower)) {
             return 'document';
         }
-        
+
         // Sinon c'est une page de détail
         return 'detail';
     }
@@ -984,13 +1076,13 @@ class AfDBScraperService
         try {
             // Petit délai pour ne pas surcharger le serveur
             usleep(100000); // 0.1 seconde
-            
+
             $html = '';
-            
+
             // Essayer d'abord avec Browsershot pour les pages JavaScript
             try {
                 Log::debug('AfDB Scraper: Using Browsershot to fetch detail page for deadline', ['url' => $url]);
-                
+
                 $html = Browsershot::url($url)
                     ->waitUntilNetworkIdle()
                     ->timeout(30)
@@ -1003,7 +1095,7 @@ class AfDBScraperService
                     ])
                     ->userAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
                     ->bodyHtml();
-                
+
                 if (empty($html)) {
                     Log::debug('AfDB Scraper: Browsershot returned empty HTML, trying HTTP fallback', ['url' => $url]);
                     throw new \Exception('Empty HTML from Browsershot');
@@ -1011,7 +1103,7 @@ class AfDBScraperService
             } catch (\Exception $e) {
                 // Fallback vers HTTP simple
                 Log::debug('AfDB Scraper: Browsershot failed, using HTTP fallback', ['url' => $url, 'error' => $e->getMessage()]);
-                
+
                 $response = Http::withoutVerifying()
                     ->timeout(15)
                     ->retry(1, 500)
@@ -1041,7 +1133,7 @@ class AfDBScraperService
             $xpath = new DOMXPath($dom);
 
             // Chercher la date limite avec plusieurs stratégies
-            
+
             // Stratégie 1: Chercher dans les éléments avec icônes de calendrier ou attributs de date
             $dateSelectors = [
                 "//*[contains(@class, 'date')]",
@@ -1114,7 +1206,7 @@ class AfDBScraperService
                     // Extraire 300 caractères autour du mot-clé (plus large pour capturer la date)
                     $context = substr($text, max(0, $keywordPos - 100), 400);
                     $contextLower = strtolower($context);
-                    
+
                     // Chercher une date dans ce contexte
                     foreach ($datePatterns as $pattern) {
                         if (preg_match($pattern, $context, $matches)) {
@@ -1123,7 +1215,7 @@ class AfDBScraperService
                                 // Nettoyer la chaîne de date
                                 $dateStr = preg_replace('/^(deadline|closing|due|submission)[\s:]+/i', '', $dateStr);
                                 $dateStr = trim($dateStr);
-                                
+
                                 $date = \Carbon\Carbon::parse($dateStr);
                                 // Vérifier que la date est dans le futur ou pas trop ancienne (max 2 ans)
                                 if ($date->isFuture() || $date->gt(now()->subYears(2))) {
@@ -1168,10 +1260,10 @@ class AfDBScraperService
 
             // Si plusieurs dates trouvées, prendre la plus récente (probablement la deadline)
             if (!empty($allDates)) {
-                usort($allDates, function($a, $b) {
+                usort($allDates, function ($a, $b) {
                     return $a['date']->gt($b['date']) ? -1 : 1;
                 });
-                
+
                 $bestDate = $allDates[0]['date'];
                 Log::debug('AfDB Scraper: Found date in page (most recent)', [
                     'url' => $url,
