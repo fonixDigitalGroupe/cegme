@@ -48,6 +48,7 @@
 
         <!-- Styles / Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @include('partials.site-styles')
     </head>
     <body class="bg-white text-[#1b1b18] min-h-screen" style="background-color: #ffffff !important;">
         <x-site-header />
@@ -755,6 +756,7 @@
                 }
             }
         </style>
+        @include('partials.site-scripts')
     </body>
 </html>
 

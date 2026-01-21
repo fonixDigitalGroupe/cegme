@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    @include('partials.site-styles')
     <style>
         * {
             box-sizing: border-box;
@@ -21,42 +22,7 @@
             background-color: #f8fafc;
         }
 
-        .header {
-            background-color: #ffffff;
-            border-bottom: 1px solid #d1d5db;
-            padding: 1rem 2rem;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
 
-        .header-content {
-            max-width: 1280px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .header-nav {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .header-nav a {
-            color: #374151;
-            text-decoration: none;
-            font-size: 0.875rem;
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            transition: background-color 0.2s;
-        }
-
-        .header-nav a:hover {
-            background-color: #f3f4f6;
-        }
 
         .container {
             max-width: 1280px;
@@ -161,13 +127,7 @@
             max-width: 400px;
         }
 
-        footer.mobile-footer-home {
-            display: none;
-        }
 
-        footer.desktop-footer {
-            display: block;
-        }
 
 
 
@@ -447,29 +407,8 @@
 
     <x-site-footer />
 
-    <script>
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobileMenu');
-            const button = document.getElementById('mobileMenuButton');
-
-            if (menu && button) {
-                menu.classList.toggle('active');
-                button.classList.toggle('active');
-            }
-        }
-
-        document.addEventListener('click', function (event) {
-            const menu = document.getElementById('mobileMenu');
-            const button = document.getElementById('mobileMenuButton');
-
-            if (menu && button && menu.classList.contains('active')) {
-                if (!menu.contains(event.target) && !button.contains(event.target)) {
-                    menu.classList.remove('active');
-                    button.classList.remove('active');
-                }
-            }
-        });
-    </script>
+    <!-- Site Scripts -->
+    @include('partials.site-scripts')
 </body>
 
 </html>

@@ -13,8 +13,8 @@
                     <!-- Logo and Company Name -->
                     <div class="flex items-center gap-3 mb-6"
                         style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
-                        <img src="{{ asset('Image/CEGME Logo.png') }}" alt="CEGME Logo" class="block h-10 w-auto"
-                            style="height: 40px; width: auto; object-fit: contain;">
+                        <img src="{{ asset('Image/CEGME Logo.png') }}" alt="CEGME Logo" class="block h-8 w-auto"
+                            style="height: 32px; width: auto; max-width: 120px; object-fit: contain;">
                         <div class="flex flex-col" style="display: flex; flex-direction: column;">
                             <span class="text-xl font-bold"
                                 style="font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #34d399 0%, #10b981 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2;">CEGME</span>
@@ -218,8 +218,8 @@
                 <div>
                     <div class="flex items-center gap-3 mb-6"
                         style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
-                        <img src="{{ asset('Image/CEGME Logo.png') }}" alt="CEGME Logo" class="block h-10 w-auto"
-                            style="height: 40px; width: auto; object-fit: contain;">
+                        <img src="{{ asset('Image/CEGME Logo.png') }}" alt="CEGME Logo" class="block h-8 w-auto"
+                            style="height: 32px; width: auto; max-width: 120px; object-fit: contain;">
                         <div class="flex flex-col" style="display: flex; flex-direction: column;">
                             <span class="text-xl font-bold"
                                 style="font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #34d399 0%, #10b981 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2;">CEGME</span>

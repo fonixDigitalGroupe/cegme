@@ -92,8 +92,9 @@
         }
 
         header {
-            background-color: rgba(255, 255, 255, 0.95) !important;
-            backdrop-filter: blur(10px) !important;
+            background-color: #ffffff !important;
+            backdrop-filter: none !important;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
         }
 
         /* Masquer le menu desktop sur mobile */
@@ -155,8 +156,9 @@
         }
 
         .mobile-menu a.active {
-            background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%);
-            color: rgb(255, 255, 255);
+            background: transparent;
+            color: rgb(10, 150, 120);
+            font-weight: 700;
         }
 
         /* Header mobile - Style site de référence (Contact) */
@@ -165,13 +167,13 @@
             align-items: center;
             justify-content: space-between;
             width: 100%;
-            padding: 16px 24px !important;
-            min-height: 64px !important;
+            padding: 4px 12px !important;
+            min-height: 48px !important;
             position: relative;
             z-index: 1000;
-            background-color: transparent !important;
-            box-shadow: none !important;
-            border-bottom: none !important;
+            background-color: #ffffff !important;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+            border-bottom: 1px solid #f3f4f6 !important;
         }
 
         /* Bouton hamburger - Style Contact */
@@ -193,17 +195,27 @@
             visibility: visible !important;
             opacity: 1 !important;
             margin-left: 0 !important;
-            /* Reset margin */
         }
 
-        .mobile-menu-button span {
-            width: 24px;
-            height: 3px;
+        .mobile-menu-button span,
+        .mobile-menu-button .hamburger-line {
+            width: 24px !important;
+            height: 3px !important;
+            /* Increased thickness */
             background-color: #000000 !important;
-            border-radius: 0;
+            border-radius: 0 !important;
+            /* Sharp edges for clearer lines */
             transition: all 0.3s ease;
-            display: block;
+            display: block !important;
             position: relative;
+            min-width: 24px !important;
+            /* Force width */
+        }
+
+        .mobile-menu-button span::before,
+        .mobile-menu-button span::after {
+            display: none !important;
+            content: none !important;
         }
 
         .mobile-menu-button:hover,
@@ -318,16 +330,19 @@
 
         /* Badge Hero mobile - Pixel perfect site de référence */
         .hero-section .inline-block {
-            padding: 4px 16px !important;
-            font-size: 13px !important;
+            padding: 8px 12px !important;
+            font-size: 14px !important;
             margin-bottom: 24px !important;
-            margin-top: 30px !important;
+            margin-top: -20px !important;
             background-color: rgba(16, 185, 129, 0.3) !important;
             border: 1px solid rgb(5, 150, 105) !important;
             border-radius: 9999px !important;
             width: auto !important;
-            max-width: 85% !important;
+            max-width: 98% !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
             display: inline-block !important;
+            white-space: nowrap !important;
             visibility: visible !important;
             opacity: 1 !important;
             position: relative !important;
@@ -335,10 +350,10 @@
         }
 
         .hero-section .inline-block p {
-            font-size: 16px !important;
-            line-height: 28px !important;
+            font-size: 14px !important;
+            line-height: normal !important;
             color: rgb(110, 231, 183) !important;
-            font-weight: 500 !important;
+            font-weight: 600 !important;
             padding: 0 !important;
             margin: 0 !important;
             visibility: visible !important;
@@ -437,7 +452,8 @@
             box-sizing: border-box !important;
         }
 
-        .hero-buttons>span {
+        .hero-buttons>span,
+        .hero-buttons>a[href="/contact"] {
             width: 100% !important;
             max-width: 100% !important;
             padding: 24px 32px !important;
@@ -451,7 +467,7 @@
             min-height: 52px !important;
             border-radius: 9999px !important;
             background-color: rgba(255, 255, 255, 0.1) !important;
-            border: 2px solid rgb(255, 255, 255) !important;
+            border: 2px solid rgba(255, 255, 255, 0.3) !important;
             color: rgb(255, 255, 255) !important;
             font-weight: 500 !important;
             gap: 8px !important;
@@ -685,6 +701,19 @@
             align-items: center !important;
             text-align: center !important;
             margin-bottom: 32px !important;
+        }
+
+        .identity-section-container {
+            padding-left: 4px !important;
+            padding-right: 4px !important;
+        }
+
+        .identity-grid-container>div {
+            padding: 48px 16px !important;
+            min-height: 420px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
         }
 
         .stats-grid-container>div:last-child {

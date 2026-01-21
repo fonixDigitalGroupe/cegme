@@ -38,6 +38,7 @@
     <!-- Styles / Scripts -->
     <!-- Styles / Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @include('partials.site-styles')
     <style>
 
     </style>
@@ -262,27 +263,8 @@
     </section>
 
     <x-site-footer />
-    <!-- Mobile Menu JavaScript -->
-    <script>
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobileMenu');
-            const button = document.getElementById('mobileMenuButton');
-            if (!menu || !button) return;
-            menu.classList.toggle('active');
-            button.classList.toggle('active');
-        }
-        document.addEventListener('click', (e) => {
-            const menu = document.getElementById('mobileMenu');
-            const button = document.getElementById('mobileMenuButton');
-            if (!menu || !button) return;
-            const isClickInsideMenu = menu.contains(e.target);
-            const isClickOnButton = button.contains(e.target);
-            if (!isClickInsideMenu && !isClickOnButton && menu.classList.contains('active')) {
-                menu.classList.remove('active');
-                button.classList.remove('active');
-            }
-        });
-    </script>
+    <!-- Site Scripts -->
+    @include('partials.site-scripts')
 </body>
 
 </html>

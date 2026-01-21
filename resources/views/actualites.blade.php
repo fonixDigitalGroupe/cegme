@@ -43,6 +43,7 @@
 
     <!-- Styles / Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @include('partials.site-styles')
 </head>
 
 <body class="bg-white text-[#1b1b18] min-h-screen" style="background-color: #ffffff !important;">
@@ -287,29 +288,6 @@
 
     <x-site-footer />
 
-    <script>
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobileMenu');
-            const button = document.getElementById('mobileMenuButton');
-
-            if (menu && button) {
-                menu.classList.toggle('active');
-                button.classList.toggle('active');
-            }
-        }
-
-        document.addEventListener('click', function (event) {
-            const menu = document.getElementById('mobileMenu');
-            const button = document.getElementById('mobileMenuButton');
-
-            if (menu && button && menu.classList.contains('active')) {
-                if (!menu.contains(event.target) && !button.contains(event.target)) {
-                    menu.classList.remove('active');
-                    button.classList.remove('active');
-                }
-            }
-        });
-    </script>
+    <!-- Site Scripts -->
+    @include('partials.site-scripts')
 </body>
-
-</html>

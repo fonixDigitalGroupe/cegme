@@ -38,329 +38,12 @@
     <!-- Styles / Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @include('partials.site-styles')
-    <style>
-        /* MOBILE ONLY STYLES - Matches a-propos.blade.php */
-        @media (max-width: 768px) {
-            header {
-                background-color: rgba(255, 255, 255, 0.95) !important;
-                backdrop-filter: blur(10px) !important;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-            }
 
-            .mobile-menu a {
-                display: block;
-                padding: 16px 20px !important;
-                color: rgb(55, 65, 81) !important;
-                text-decoration: none !important;
-                font-size: 16px !important;
-                font-weight: 600 !important;
-                border-bottom: 1px solid rgba(229, 231, 235, 0.5) !important;
-                transition: background-color 0.2s ease !important;
-            }
-
-            .mobile-menu a:hover,
-            .mobile-menu a:active {
-                background-color: rgb(249, 250, 251) !important;
-            }
-
-            .mobile-menu a.active {
-                background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%) !important;
-                color: rgb(255, 255, 255) !important;
-            }
-
-            .desktop-menu {
-                display: none !important;
-            }
-
-            .mobile-header {
-                display: flex !important;
-                align-items: center !important;
-                justify-content: space-between !important;
-                width: 100% !important;
-                padding: 16px 24px !important;
-                min-height: 64px !important;
-                position: relative !important;
-                z-index: 1000 !important;
-                background-color: transparent !important;
-                /* Ensure it doesn't have a conflicting background */
-                border-bottom: none !important;
-            }
-
-            .mobile-menu-button {
-                display: flex !important;
-                flex-direction: column !important;
-                justify-content: center !important;
-                align-items: center !important;
-                width: 44px !important;
-                height: 44px !important;
-                background: transparent !important;
-                border: none !important;
-                border-radius: 0 !important;
-                cursor: pointer !important;
-                padding: 0 !important;
-                z-index: 1001 !important;
-                gap: 6px !important;
-                position: relative !important;
-                visibility: visible !important;
-                opacity: 1 !important;
-            }
-
-            .mobile-menu-button span {
-                width: 24px !important;
-                height: 3px !important;
-                background-color: #000000 !important;
-                border-radius: 0 !important;
-                transition: all 0.3s ease !important;
-                display: block !important;
-                position: relative !important;
-            }
-
-            .mobile-menu-button:hover,
-            .mobile-menu-button:active {
-                background: transparent !important;
-                border: none !important;
-            }
-
-            .mobile-menu {
-                display: block !important;
-                position: fixed !important;
-                top: calc(3px + 64px) !important;
-                left: 0 !important;
-                right: 0 !important;
-                background-color: #fff !important;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
-                z-index: 999 !important;
-                max-height: calc(100vh - 67px) !important;
-                overflow-y: auto !important;
-                border-top: 1px solid rgba(229, 231, 235, 0.5) !important;
-                transform: translateY(-100%) !important;
-                opacity: 0 !important;
-                transition: transform .3s ease, opacity .3s ease !important;
-                pointer-events: none !important;
-            }
-
-            .mobile-menu.active {
-                transform: translateY(0) !important;
-                opacity: 1 !important;
-                pointer-events: auto !important;
-            }
-
-            .mobile-logo {
-                flex: 1 !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: flex-start !important;
-                min-width: 0 !important;
-            }
-
-            .mobile-logo a {
-                display: flex !important;
-                align-items: center !important;
-                gap: 8px !important;
-                min-width: 0 !important;
-                flex: 1 !important;
-            }
-
-            .mobile-logo img {
-                height: 64px !important;
-                width: auto !important;
-                flex-shrink: 0 !important;
-            }
-
-            .mobile-logo .flex.flex-col {
-                min-width: 0 !important;
-                flex: 1 !important;
-            }
-
-            .mobile-logo span.font-bold {
-                font-size: 20px !important;
-                line-height: 1.2 !important;
-                font-weight: 800 !important;
-                background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
-                -webkit-background-clip: text !important;
-                -webkit-text-fill-color: transparent !important;
-                background-clip: text !important;
-            }
-
-            .mobile-logo .text-xs,
-            .mobile-logo .text-sm {
-                font-size: 13px !important;
-                line-height: 1.2 !important;
-                margin-top: 2px !important;
-            }
-
-            .desktop-login-button {
-                display: none !important;
-            }
-        }
-
-        @media (min-width: 769px) {
-
-            .mobile-menu-button,
-            .mobile-menu,
-            .mobile-header {
-                display: none !important;
-            }
-
-            .desktop-menu {
-                display: flex !important;
-            }
-        }
-    </style>
 </head>
 
 <body class="bg-white text-[#1b1b18] min-h-screen" style="background-color: #ffffff !important;">
     <!-- Header from Contact/Services/Realisations Page -->
-    <header class="w-full bg-white sticky top-0 z-50"
-        style="position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000; background-color: rgb(255, 255, 255); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
-        <div style="height: 3px; background-color: rgb(101, 64, 48);"></div>
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            @if (Route::has('login'))
-                <!-- Mobile Header -->
-                <div class="mobile-header">
-                    <div class="mobile-logo">
-                        <a href="/" class="flex items-center gap-2 shrink-0" style="text-decoration: none; color: inherit;">
-                            <img src="{{ asset('Image/CEGME Logo.png') }}" alt="CEGME Logo" class="block h-16 w-auto"
-                                style="height: 64px; width: auto; object-fit: contain;">
-                            <div class="flex flex-col" style="display: flex; flex-direction: column !important;">
-                                <span class="font-bold"
-                                    style="font-size: 20px !important; font-weight: 800 !important; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important; background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; background-clip: text !important; line-height: 1.2 !important;">CEGME</span>
-                                <span class="text-sm text-gray-600"
-                                    style="font-size: 13px !important; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important; color: rgb(75, 85, 99) !important; line-height: 1.2 !important; margin-top: 2px !important;">Géosciences
-                                    • Mines • Environnement</span>
-                            </div>
-                        </a>
-                    </div>
-                    <button class="mobile-menu-button" id="mobileMenuButton" onclick="toggleMobileMenu()" aria-label="Menu">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </button>
-                </div>
-
-                <!-- Mobile Menu -->
-                <div class="mobile-menu" id="mobileMenu">
-                    <a href="/" class="{{ request()->is('/') ? 'active' : '' }}">Accueil</a>
-                    <a href="/a-propos"
-                        class="{{ request()->is('a-propos') || request()->is('a-propos/*') ? 'active' : '' }}">À Propos</a>
-                    <a href="/services"
-                        class="{{ request()->is('services') || request()->is('services/*') ? 'active' : '' }}">Services</a>
-                    <a href="/realisations"
-                        class="{{ request()->is('realisations') || request()->is('realisations/*') ? 'active' : '' }}">Réalisations</a>
-                    <a href="/actualites"
-                        class="{{ request()->is('actualites') || request()->is('actualites/*') ? 'active' : '' }}">Actualités</a>
-                    <a href="/blog" class="{{ request()->is('blog') || request()->is('blog/*') ? 'active' : '' }}">Blog</a>
-                    <a href="{{ route('appels-offres.index') }}"
-                        class="{{ request()->is('appels-offres') || request()->is('appels-offres/*') ? 'active' : '' }}">Offres</a>
-                    <a href="/contact"
-                        class="{{ request()->is('contact') || request()->is('contact/*') ? 'active' : '' }}">Contact</a>
-                    @auth
-                        <form method="POST" action="{{ route('logout') }}" style="display: block;">
-                            @csrf
-                            <button type="submit"
-                                style="display: block; width: 100%; text-align: left; padding: 16px 20px; color: rgb(55, 65, 81); font-size: 16px; font-weight: 600; background: none; border: none; border-bottom: 1px solid rgba(229, 231, 235, 0.5); cursor: pointer; color: rgb(10, 150, 120);">
-                                Déconnexion
-                            </button>
-                        </form>
-                    @else
-                        <a href="{{ route('login') }}"
-                            style="background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: #fff; margin: 12px 20px; border-radius: 8px; text-align: center;">Se
-                            connecter</a>
-                    @endauth
-                </div>
-
-                <!-- Desktop Menu -->
-                <nav class="py-4 flex items-center justify-between gap-4 flex-wrap desktop-menu">
-                    <div class="flex items-center gap-4 flex-wrap" style="margin-left: -24px;">
-                        <a href="/" class="flex items-center gap-3 shrink-0" style="text-decoration: none; color: inherit;">
-                            <img src="{{ asset('Image/CEGME Logo.png') }}" alt="CEGME Logo" class="block h-16 w-auto"
-                                style="height: 64px; width: auto; object-fit: contain;">
-                            <div class="flex flex-col" style="display: flex; flex-direction: column;">
-                                <span class="font-bold"
-                                    style="font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #10b981 0%, #059669 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2;">CEGME</span>
-                                <span class="text-sm text-gray-600"
-                                    style="font-size: 13px; color: rgb(75, 85, 99); line-height: 1.2; margin-top: 2px;">Géosciences
-                                    • Mines • Environnement</span>
-                            </div>
-                        </a>
-                    </div>
-
-                    <div class="flex items-center gap-4 flex-wrap desktop-menu" style="margin-right: -32px;">
-                        <a href="/"
-                            class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal transition-colors {{ request()->is('/') ? 'text-white bg-green-600' : 'hover:text-gray-700' }}"
-                            style="font-size: 15px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; {{ request()->is('/') ? 'background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); border-radius: 6px;' : 'color: rgb(55, 65, 81); text-decoration: none;' }}">
-                            Accueil
-                        </a>
-                        <a href="/a-propos"
-                            class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal transition-colors {{ request()->is('a-propos') || request()->is('a-propos/*') ? 'text-white bg-green-600' : 'hover:text-gray-700' }}"
-                            style="font-size: 15px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; {{ request()->is('a-propos') || request()->is('a-propos/*') ? 'background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); border-radius: 6px;' : 'color: rgb(55, 65, 81); text-decoration: none;' }}">
-                            À Propos
-                        </a>
-                        <a href="/services"
-                            class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal transition-colors {{ request()->is('services') || request()->is('services/*') ? 'text-white bg-green-600' : 'hover:text-gray-700' }}"
-                            style="font-size: 15px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; {{ request()->is('services') || request()->is('services/*') ? 'background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); border-radius: 6px;' : 'color: rgb(55, 65, 81); text-decoration: none;' }}">
-                            Services
-                        </a>
-                        <a href="/realisations"
-                            class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal transition-colors {{ request()->is('realisations') || request()->is('realisations/*') ? 'text-white bg-green-600' : 'hover:text-gray-700' }}"
-                            style="font-size: 15px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; {{ request()->is('realisations') || request()->is('realisations/*') ? 'background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); border-radius: 6px;' : 'color: rgb(55, 65, 81); text-decoration: none;' }}">
-                            Réalisations
-                        </a>
-                        <a href="/actualites"
-                            class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal transition-colors {{ request()->is('actualites') || request()->is('actualites/*') ? 'text-white bg-green-600' : 'hover:text-gray-700' }}"
-                            style="font-size: 15px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; {{ request()->is('actualites') || request()->is('actualites/*') ? 'background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); border-radius: 6px;' : 'color: rgb(55, 65, 81); text-decoration: none;' }}">
-                            Actualités
-                        </a>
-                        <a href="/blog"
-                            class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal transition-colors {{ request()->is('blog') || request()->is('blog/*') ? 'text-white bg-green-600' : 'hover:text-gray-700' }}"
-                            style="font-size: 15px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; {{ request()->is('blog') || request()->is('blog/*') ? 'background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); border-radius: 6px;' : 'color: rgb(55, 65, 81); text-decoration: none;' }}">
-                            Blog
-                        </a>
-                        <a href="{{ route('appels-offres.index') }}"
-                            class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal transition-colors {{ request()->is('appels-offres') || request()->is('appels-offres/*') ? 'text-white bg-green-600' : 'hover:text-gray-700' }}"
-                            style="font-size: 15px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; {{ request()->is('appels-offres') || request()->is('appels-offres/*') ? 'background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); border-radius: 6px;' : 'color: rgb(55, 65, 81); text-decoration: none;' }}">
-                            Offres
-                        </a>
-                        <a href="/contact"
-                            class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal transition-colors {{ request()->is('contact') || request()->is('contact/*') ? 'text-white bg-green-600' : 'hover:text-gray-700' }}"
-                            style="font-size: 15px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; {{ request()->is('contact') || request()->is('contact/*') ? 'background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); border-radius: 6px;' : 'color: rgb(55, 65, 81); text-decoration: none;' }}">
-                            Contact
-                        </a>
-                        @auth
-                            <form method="POST" action="{{ route('logout') }}" class="inline-block" style="margin: 0;">
-                                @csrf
-                                <button type="submit"
-                                    class="inline-flex items-center justify-center gap-1.5 px-4 py-2 text-white font-medium transition-all duration-200 hover:opacity-90 rounded-full cursor-pointer"
-                                    style="font-family: inherit; background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); padding: 8px 18px; font-size: 14px; border-radius: 8px; flex-shrink: 0; white-space: nowrap; border: none;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round" style="width: 16px; height: 16px;">
-                                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                                        <polyline points="16 17 21 12 16 7"></polyline>
-                                        <line x1="21" y1="12" x2="9" y2="12"></line>
-                                    </svg>
-                                    <span>Déconnexion</span>
-                                </button>
-                            </form>
-                        @else
-                            <a href="{{ route('login') }}"
-                                class="inline-flex items-center justify-center gap-1.5 px-4 py-2 text-white font-medium transition-all duration-200 hover:opacity-90 rounded-full desktop-login-button"
-                                style="background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); padding: 8px 18px; font-size: 14px; border-radius: 8px; flex-shrink: 0; white-space: nowrap;">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                    style="width: 16px; height: 16px;">
-                                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
-                                    <polyline points="10 17 15 12 10 7"></polyline>
-                                    <line x1="15" y1="12" x2="3" y2="12"></line>
-                                </svg>
-                                <span>Se connecter</span>
-                            </a>
-                        @endauth
-                    </div>
-                </nav>
-            @endif
-        </div>
-    </header>
+    <x-site-header />
     <!-- Hero Section - Exact Reproduction from Site -->
     <section class="hero-section relative w-full flex items-center justify-center overflow-hidden"
         style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; min-height: 100vh; padding: 0;">
@@ -408,21 +91,26 @@
             <!-- Call-to-Action Buttons - Exact from Site -->
             <div class="hero-buttons flex flex-row items-center justify-center" style="gap: 20px; margin-top: 20px;">
                 <!-- Nos Services Button - Exact from Site -->
-                <a href="/services"
+                <!-- Prendre un RDV Button -->
+                <a href="https://calendly.com/cegme" target="_blank" rel="noopener noreferrer"
                     class="inline-flex items-center justify-center gap-2 px-8 py-2 text-white font-medium transition-all duration-200 hover:opacity-90"
                     style="background-color: rgb(5, 150, 105); border-radius: 9999px; padding: 10px 32px; font-size: 18px;">
-                    <span>Nos Services</span>
+                    <span>Prendre un RDV</span>
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                         style="width: 20px; height: 20px; stroke-width: 2.5;">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path>
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
                     </svg>
                 </a>
 
                 <!-- Nous Contacter Button - Exact from Site -->
-                <span class="inline-flex items-center justify-center px-8 py-2 text-white font-medium"
-                    style="background-color: rgba(55, 65, 81, 0.8) !important; border: 2px solid rgb(255, 255, 255) !important; border-radius: 9999px; padding: 10px 32px; font-size: 18px; cursor: default; pointer-events: none;">
+                <a href="/contact"
+                    class="inline-flex items-center justify-center px-8 py-2 text-white font-medium transition-all duration-200 hover:bg-white/10"
+                    style="background-color: rgba(55, 65, 81, 0.8) !important; border: 2px solid rgba(255, 255, 255, 0.3) !important; border-radius: 9999px; padding: 10px 32px; font-size: 18px; text-decoration: none;">
                     <span>Nous Contacter</span>
-                </span>
+                </a>
             </div>
         </div>
     </section>
@@ -434,60 +122,76 @@
             /* Mobile-only styles: emphasize and reorganize hero text without touching desktop */
             @media (max-width: 639px) {
                 .mobile-hero-block {
-                    background: rgba(255, 255, 255, 0.98);
-                    padding: 1rem;
-                    border-radius: 0.75rem;
+                    background: transparent;
+                    padding: 0;
+                    border-radius: 0;
+                    box-shadow: none;
+                    border: none;
+                    max-width: 768px !important;
+                    margin: 0 auto !important;
+                    text-align: center;
                 }
 
                 .mobile-hero-title {
-                    font-size: 1.5rem !important;
-                    line-height: 1.15 !important;
-                    margin-bottom: 0.5rem !important;
+                    font-size: 1.85rem !important;
+                    line-height: 1.2 !important;
+                    margin-bottom: 1.5rem !important;
+                    text-align: center !important;
                 }
 
                 .mobile-hero-decor {
-                    width: 4.5rem !important;
+                    width: 80px !important;
                     height: 4px !important;
-                    margin-bottom: 1rem !important;
+                    margin: 0 auto 2rem auto !important;
                 }
 
                 .mobile-hero-para {
-                    font-size: 1rem !important;
-                    line-height: 1.6 !important;
+                    font-size: 20px !important;
+                    line-height: 36px !important;
+                    text-align: justify !important;
+                    margin-bottom: 24px !important;
+                    color: #374151 !important;
+                }
+
+                .mobile-hero-image-container {
+                    margin-bottom: 2rem !important;
+                    height: 300px !important;
+                    min-height: 300px !important;
                 }
             }
         </style>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center"
-                style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 64px; align-items: stretch;">
-                <!-- Image à gauche -->
-                <div class="relative w-full flex items-stretch"
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-12 items-center"
+                style="display: grid; grid-template-columns: repeat(1, minmax(0, 1fr)); gap: 48px; align-items: stretch;">
+                <!-- Image à gauche (2/5) -->
+                <div class="relative w-full flex items-stretch lg:col-span-2"
                     style="position: relative; width: 100%; display: flex; align-items: stretch;">
                     <!-- Decorative card/glow: hidden on small screens to avoid 'card effect' under image -->
                     <div class="hidden sm:block absolute -inset-4 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl opacity-20 blur-xl"
                         style="position: absolute; top: -16px; right: -16px; bottom: -16px; left: -16px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.3) 0%, rgba(5, 150, 105, 0.3) 100%); border-radius: 16px; opacity: 0.2; filter: blur(20px); z-index: 0;">
                     </div>
-                    <div class="relative overflow-hidden rounded-2xl shadow-2xl w-full"
+                    <div class="relative overflow-hidden rounded-2xl shadow-2xl w-fullmobile-hero-image-container"
                         style="position: relative; overflow: hidden; border-radius: 16px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03); z-index: 1; width: 100%; height: 100%; min-height: 550px;">
                         <img src="{{ asset('Image/Personnel.jpg') }}" alt="Équipe CEGME"
                             class="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
-                            style="width: 100%; height: 100%; min-height: 550px; object-fit: cover; transition: transform 0.7s ease; display: block;">
+                            style="width: 100%; height: 100%; min-height: inherit; object-fit: cover; transition: transform 0.7s ease; display: block;">
                     </div>
                 </div>
 
-                <!-- Texte à droite -->
-                <div class="w-full" style="width: 100%;">
-                    <h2 class="text-4xl font-bold mb-6 leading-tight mobile-hero-title"
-                        style="font-size: 42px; font-weight: 800; color: rgb(17, 24, 39); margin-bottom: 24px; line-height: 1.2; letter-spacing: -0.5px;">
-                        L'Expertise au Service de l'Émergence
-                    </h2>
-
-                    <!-- Ligne décorative -->
-                    <div class="w-20 h-1 bg-gradient-to-r from-green-500 to-green-600 rounded-full mb-8 mobile-hero-decor"
-                        style="width: 80px; height: 4px; background: linear-gradient(90deg, rgb(5, 150, 105) 0%, rgb(16, 185, 129) 100%); border-radius: 9999px; margin-bottom: 32px;">
-                    </div>
-
+                <!-- Texte à droite (3/5) -->
+                <div class="w-full lg:col-span-3" style="width: 100%;">
                     <div class="space-y-6 mobile-hero-block" style="display: flex; flex-direction: column; gap: 24px;">
+                        <!-- Titre et Ligne déplacés ici pour alignement mobile -->
+                        <div>
+                            <h2 class="text-4xl font-bold mb-6 leading-tight mobile-hero-title"
+                                style="font-size: 42px; font-weight: 800; color: rgb(17, 24, 39); margin-bottom: 24px; line-height: 1.2; letter-spacing: -0.5px;">
+                                L'Expertise au Service de l'Émergence
+                            </h2>
+                            <div class="w-20 h-1 bg-gradient-to-r from-green-500 to-green-600 rounded-full mobile-hero-decor"
+                                style="width: 80px; height: 4px; background: linear-gradient(90deg, rgb(5, 150, 105) 0%, rgb(16, 185, 129) 100%); border-radius: 9999px;">
+                            </div>
+                        </div>
+
                         <p class="text-lg text-gray-700 leading-relaxed mobile-hero-para"
                             style="font-size: 17px; color: rgb(55, 65, 81); line-height: 32px; margin: 0; font-weight: 400;">
                             Le <strong style="font-weight: 700; color: rgb(17, 24, 39);">Cabinet d'Études Géologiques,
@@ -640,8 +344,8 @@
     </section>
 
     <!-- Identité et Synergies Scientifiques Section -->
-    <section class="w-full bg-gray-100" style="padding: 60px 0; margin: 0; background-color: #f3f4f6 !important;">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section class="w-full bg-gray-100" style="padding: 100px 0; margin: 0; background-color: #f3f4f6 !important;">
+        <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 identity-section-container">
             <!-- Titre avec ligne décorative -->
             <div class="text-center mb-16" style="text-align: center; margin-bottom: 64px;">
                 <h2 class="text-4xl font-bold mb-4"
@@ -654,10 +358,10 @@
             </div>
 
             <!-- Deux colonnes -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 identity-grid-container">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 identity-grid-container">
                 <!-- Colonne gauche: Une Résilience Entrepreneuriale -->
                 <div class="bg-white rounded-2xl p-10 shadow-xl border border-gray-100 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2"
-                    style="background-color: #ffffff; border-radius: 16px; padding: 40px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); border: 1px solid rgb(243, 244, 246); transition: all 0.3s ease; cursor: default; position: relative; overflow: hidden;">
+                    style="background-color: #ffffff; border-radius: 16px; padding: 32px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); border: 1px solid rgb(243, 244, 246); transition: all 0.3s ease; cursor: default; position: relative; overflow: hidden;">
                     <!-- Effet de fond décoratif -->
                     <div class="absolute top-0 right-0 w-32 h-32 bg-green-50 rounded-full -mr-16 -mt-16 opacity-50"
                         style="position: absolute; top: 0; right: 0; width: 128px; height: 128px; background-color: rgb(240, 253, 250); border-radius: 50%; margin-right: -64px; margin-top: -64px; opacity: 0.5;">
@@ -683,8 +387,8 @@
                                     Une Résilience Entrepreneuriale
                                 </h3>
                                 <p class="text-gray-700 leading-relaxed"
-                                    style="font-size: 17px; color: rgb(55, 65, 81); line-height: 30px; margin: 0;">
-                                    Né en 2014 au coeur d'une période de défis majeurs pour la RCA, le CEGME est passé
+                                    style="font-size: 18px; color: rgb(55, 65, 81); line-height: 32px; margin: 0; text-align: justify;">
+                                    Né en 2014 au cœur d'une période de défis majeurs pour la RCA, le CEGME est passé
                                     d'un collectif d'experts nationaux à une SARL de conseil reconnue à l'échelle
                                     régionale. Le cabinet emploie aujourd'hui une équipe multidisciplinaire
                                     (enseignants-chercheurs, ingénieurs, chargés de mission) capable d'intervenir sur
@@ -697,7 +401,7 @@
 
                 <!-- Colonne droite: Un Socle Académique et International -->
                 <div class="bg-white rounded-2xl p-10 shadow-xl border border-gray-100 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2"
-                    style="background-color: #ffffff; border-radius: 16px; padding: 40px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); border: 1px solid rgb(243, 244, 246); transition: all 0.3s ease; cursor: default; position: relative; overflow: hidden;">
+                    style="background-color: #ffffff; border-radius: 16px; padding: 32px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); border: 1px solid rgb(243, 244, 246); transition: all 0.3s ease; cursor: default; position: relative; overflow: hidden;">
                     <!-- Effet de fond décoratif -->
                     <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full -mr-16 -mt-16 opacity-50"
                         style="position: absolute; top: 0; right: 0; width: 128px; height: 128px; background-color: rgb(239, 246, 255); border-radius: 50%; margin-right: -64px; margin-top: -64px; opacity: 0.5;">
@@ -725,7 +429,7 @@
                                     Un Socle Académique et International
                                 </h3>
                                 <p class="text-gray-700 leading-relaxed mb-6"
-                                    style="font-size: 17px; color: rgb(55, 65, 81); line-height: 30px; margin: 0 0 24px 0;">
+                                    style="font-size: 18px; color: rgb(55, 65, 81); line-height: 32px; margin: 0 0 24px 0; text-align: justify;">
                                     Pour garantir une approche fondée sur l'innovation, le CEGME maintient des
                                     collaborations organiques :
                                 </p>
@@ -1686,9 +1390,9 @@
                 naturelles de la Centrafrique
             </p>
             <div class="flex justify-center" style="display: flex; justify-content: center;">
-                <span
-                    class="inline-flex items-center gap-2 px-8 py-3 bg-white text-black rounded-xl font-semibold shadow-lg"
-                    style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 32px; background-color: rgb(255, 255, 255); color: rgb(0, 0, 0); border-radius: 12px; font-size: 16px; font-weight: 600; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); cursor: default; pointer-events: none;">
+                <a href="/contact"
+                    class="inline-flex items-center gap-2 px-8 py-3 bg-white text-black rounded-xl font-semibold shadow-lg transition-transform hover:scale-105 active:scale-95"
+                    style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 32px; background-color: rgb(255, 255, 255); color: rgb(0, 0, 0); border-radius: 12px; font-size: 16px; font-weight: 600; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); text-decoration: none; cursor: pointer;">
                     <span>Contactez-nous</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -1696,7 +1400,7 @@
                         <path d="M5 12h14"></path>
                         <path d="m12 5 7 7-7 7"></path>
                     </svg>
-                </span>
+                </a>
             </div>
         </div>
     </section>
@@ -1704,31 +1408,7 @@
     <x-site-footer />
 
     @include('partials.site-scripts')
-    <script>
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobileMenu');
-            const button = document.getElementById('mobileMenuButton');
 
-            if (menu && button) {
-                menu.classList.toggle('active');
-                button.classList.toggle('active');
-            }
-        }
-
-        document.addEventListener('click', function (event) {
-            const menu = document.getElementById('mobileMenu');
-            const button = document.getElementById('mobileMenuButton');
-
-            if (menu && button && menu.classList.contains('active')) {
-                if (!menu.contains(event.target) && !button.contains(event.target)) {
-                    menu.classList.remove('active');
-                    button.classList.remove('active');
-                }
-
-
-            }
-        });
-    </script>
 </body>
 
 </html>

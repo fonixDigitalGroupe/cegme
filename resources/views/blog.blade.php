@@ -31,10 +31,6 @@
         }
 
         @media (max-width: 768px) {
-            header {
-                background-color: rgba(255, 255, 255, 0.95) !important;
-                backdrop-filter: blur(10px) !important;
-            }
 
             body {
                 overflow-x: hidden !important;
@@ -91,7 +87,7 @@
 
 
 
-            }
+        }
 
         /* Desktop - masquer le menu mobile */
         @media (min-width: 769px) {
@@ -114,6 +110,7 @@
 
     <!-- Styles / Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @include('partials.site-styles')
 </head>
 
 <body class="bg-white text-[#1b1b18] min-h-screen" x-data="{ activeFilter: 'all', searchQuery: '' }"
@@ -313,8 +310,8 @@
 
     <x-site-footer />
 
-
-
+    <!-- Site Scripts -->
+    @include('partials.site-scripts')
 </body>
 
 </html>
