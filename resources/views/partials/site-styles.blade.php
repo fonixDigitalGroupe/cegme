@@ -55,6 +55,32 @@
     /* MOBILE ONLY STYLES - Ne pas affecter le desktop */
     @media (max-width: 1024px) {
 
+        /* Force mobile footer to display vertically */
+        .mobile-footer-home .grid {
+            grid-template-columns: 1fr !important;
+        }
+
+        /* Reduce mobile footer logo size */
+        .mobile-footer-home img {
+            height: 32px !important;
+            width: auto !important;
+        }
+
+        /* Add left padding to mobile footer content */
+        .mobile-footer-home {
+            padding-left: 20px !important;
+            padding-right: 20px !important;
+        }
+
+        .mobile-footer-home .max-w-7xl {
+            padding-left: 0px !important;
+            padding-right: 0px !important;
+        }
+
+        .mobile-footer-home .grid>div {
+            padding-left: 8px !important;
+        }
+
         /* Empêcher le débordement horizontal */
         body {
             overflow-x: hidden !important;
@@ -505,20 +531,7 @@
             font-size: 16px !important;
         }
 
-        /* Footer mobile */
-        footer {
-            padding: 40px 24px 24px !important;
-        }
 
-        footer .grid {
-            grid-template-columns: 1fr !important;
-            gap: 32px !important;
-        }
-
-        footer h3 {
-            font-size: 18px !important;
-            margin-bottom: 16px !important;
-        }
 
         /* About section mobile - empiler image et texte */
         .grid.grid-cols-1.lg\\:grid-cols-2,
@@ -648,21 +661,7 @@
             gap: 24px !important;
         }
 
-        /* Footer visibility */
-        .desktop-footer {
-            display: none !important;
-        }
 
-        .mobile-footer-home {
-            display: block !important;
-        }
-
-        /* FIX: Force footer logo size */
-        .mobile-footer-home img {
-            height: 40px !important;
-            width: auto !important;
-            max-width: none !important;
-        }
     }
 
     /* FIX: Force vertical stacking up to 1024px (Tablet & Mobile) */
@@ -702,19 +701,7 @@
             display: none !important;
         }
 
-        ```css footer {
-            padding: 40px 24px 24px !important;
-        }
 
-        footer .grid {
-            grid-template-columns: 1fr !important;
-            gap: 32px !important;
-        }
-
-        footer h3 {
-            font-size: 18px !important;
-            margin-bottom: 16px !important;
-        }
 
         /* About section mobile - empiler image et texte */
         .grid.grid-cols-1.lg\:grid-cols-2,
@@ -844,21 +831,7 @@
             gap: 24px !important;
         }
 
-        /* Footer visibility */
-        .desktop-footer {
-            display: none !important;
-        }
 
-        .mobile-footer-home {
-            display: block !important;
-        }
-
-        /* FIX: Force footer logo size */
-        .mobile-footer-home img {
-            height: 40px !important;
-            width: auto !important;
-            max-width: none !important;
-        }
     }
 
     /* FIX: Force vertical stacking up to 1024px (Tablet & Mobile) */
@@ -902,9 +875,7 @@
             display: flex !important;
         }
 
-        .mobile-footer-home {
-            display: none !important;
-        }
+
 
         /* Restored Mobile Logo Styles - Placed correctly inside style block */
         .mobile-logo {
@@ -960,4 +931,3 @@
         max-width: none !important;
     }
 </style>
-```

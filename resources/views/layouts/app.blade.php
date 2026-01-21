@@ -39,7 +39,6 @@
             {{ $slot }}
         </main>
 
-        <x-site-footer />
     </div>
 
     <!-- Site Scripts -->

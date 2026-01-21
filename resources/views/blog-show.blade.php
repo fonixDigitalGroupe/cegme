@@ -36,166 +36,10 @@
                     max-width: 100% !important;
                 }
 
-                .desktop-menu {
-                    display: none !important;
-                }
 
-                .mobile-header {
-                    display: flex !important;
-                }
-
-                .mobile-menu-button {
-                    display: flex !important;
-                    flex-direction: column;
-                    justify-content: center;
-                    align-items: center;
-                    width: 44px;
-                    height: 44px;
-                    background: transparent;
-                    border: none !important;
-                    border-radius: 0;
-                    cursor: pointer;
-                    padding: 0;
-                    z-index: 1001;
-                    position: relative;
-                    visibility: visible !important;
-                    opacity: 1 !important;
-                    gap: 6px;
-                }
-
-                .mobile-menu-button span {
-                    width: 24px;
-                    height: 3px;
-                    background-color: #000000 !important;
-                    border-radius: 0;
-                    transition: all 0.3s ease;
-                    display: block;
-                    position: relative;
-                }
-
-                .mobile-menu-button:hover,
-                .mobile-menu-button:active {
-                    background: transparent !important;
-                    border: none !important;
-                }
-
-                .mobile-menu {
-                    display: block;
-                    position: fixed;
-                    top: calc(3px + 64px);
-                    left: 0;
-                    right: 0;
-                    background-color: rgb(255, 255, 255);
-                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                    z-index: 999;
-                    max-height: calc(100vh - 67px);
-                    overflow-y: auto;
-                    border-top: 1px solid rgba(229, 231, 235, 0.5);
-                    transform: translateY(-100%);
-                    opacity: 0;
-                    transition: transform 0.3s ease, opacity 0.3s ease;
-                    pointer-events: none;
-                }
-
-                .mobile-menu.active {
-                    transform: translateY(0);
-                    opacity: 1;
-                    pointer-events: auto;
-                }
-
-                .mobile-menu a {
-                    display: block;
-                    padding: 16px 20px;
-                    color: rgb(55, 65, 81);
-                    text-decoration: none;
-                    font-size: 16px;
-                    font-weight: 600;
-                    border-bottom: 1px solid rgba(229, 231, 235, 0.5);
-                    transition: background-color 0.2s ease;
-                }
-
-                .mobile-menu a:hover,
-                .mobile-menu a:active {
-                    background-color: rgb(249, 250, 251);
-                }
-
-                .mobile-menu a.active {
-                    background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%);
-                    color: rgb(255, 255, 255);
-                }
-
-                .mobile-header {
-                    display: flex !important;
-                    align-items: center;
-                    justify-content: space-between;
-                    width: 100%;
-                    padding: 16px 24px;
-                    min-height: 64px;
-                    position: relative;
-                    z-index: 1000;
-                }
-
-                .mobile-logo {
-                    flex: 1;
-                    display: flex;
-                    align-items: center;
-                    justify-content: flex-start;
-                    min-width: 0;
-                }
-
-                .mobile-logo a {
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    min-width: 0;
-                    flex: 1;
-                }
-
-                .mobile-logo img {
-                    height: 40px !important;
-                    width: auto !important;
-                    flex-shrink: 0;
-                }
-
-                .mobile-logo .flex.flex-col {
-                    min-width: 0;
-                    flex: 1;
-                }
-
-                .mobile-logo span.font-bold {
-                    font-size: 16px !important;
-                    line-height: 1.2 !important;
-                }
-
-                .mobile-logo .text-xs,
-                .mobile-logo .text-sm {
-                    font-size: 10px !important;
-                    line-height: 1.2 !important;
-                    margin-top: 2px !important;
-                }
-
-                .desktop-login-button {
-                    display: none !important;
-                }
-
-                .blog-footer-grid {
-                    grid-template-columns: 1fr !important;
-                    gap: 32px !important;
-                }
             }
 
-            /* Desktop - masquer le menu mobile */
-            @media (min-width: 769px) {
-                .mobile-menu-button,
-                .mobile-menu,
-                .mobile-header {
-                    display: none !important;
-                }
 
-                .desktop-menu {
-                    display: flex !important;
-                }
-            }
         </style>
 
         <!-- Fonts -->
@@ -206,130 +50,9 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="bg-white text-[#1b1b18] min-h-screen" style="background-color: #ffffff !important;">
-        <header class="w-full bg-white sticky top-0 z-50" style="position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000; background-color: rgb(255, 255, 255); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
-            <div style="height: 3px; background-color: rgb(101, 64, 48);"></div>
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            @if (Route::has('login'))
-                    <div class="mobile-header">
-                        <div class="mobile-logo">
-                            <a href="/" class="flex items-center gap-2 shrink-0" style="text-decoration: none; color: inherit;">
-                                <img src="{{ asset('Image/CEGME Logo.png') }}" alt="CEGME Logo" class="block h-12 w-auto" style="height: 48px; width: auto; object-fit: contain;">
-                                <div class="flex flex-col" style="display: flex; flex-direction: column;">
-                                    <span class="font-bold" style="font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #10b981 0%, #059669 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2;">CEGME</span>
-                                    <span class="text-xs text-gray-600" style="font-size: 11px; color: rgb(75, 85, 99); line-height: 1.2; margin-top: 2px;">Géosciences • Mines • Environnement</span>
-                                </div>
-                            </a>
-                        </div>
-                        <button class="mobile-menu-button" id="mobileMenuButton" onclick="toggleMobileMenu()" aria-label="Menu">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </button>
-                    </div>
+        <x-site-header />
 
-                    <div class="mobile-menu" id="mobileMenu">
-                        <a href="/" class="{{ request()->is('/') ? 'active' : '' }}">Accueil</a>
-                        <a href="/a-propos" class="{{ request()->is('a-propos') || request()->is('a-propos/*') ? 'active' : '' }}">À Propos</a>
-                        <a href="/services" class="{{ request()->is('services') || request()->is('services/*') ? 'active' : '' }}">Services</a>
-                        <a href="/realisations" class="{{ request()->is('realisations') || request()->is('realisations/*') ? 'active' : '' }}">Réalisations</a>
-                        <a href="/actualites" class="{{ request()->is('actualites') || request()->is('actualites/*') ? 'active' : '' }}">Actualités</a>
-                        <a href="/blog" class="{{ request()->is('blog') || request()->is('blog/*') ? 'active' : '' }}">Blog</a>
-                        <a href="{{ route('appels-offres.index') }}" class="{{ request()->is('appels-offres') || request()->is('appels-offres/*') ? 'active' : '' }}">Appels d'Offres</a>
-                        <a href="/contact" class="{{ request()->is('contact') || request()->is('contact/*') ? 'active' : '' }}">Contact</a>
-                        @auth
-                            <a href="{{ url('/dashboard') }}">Dashboard</a>
-                        @else
-                            <a href="{{ route('login') }}" style="background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); margin: 12px 20px; border-radius: 8px; text-align: center;">
-                                Se connecter
-                            </a>
-                        @endauth
-                    </div>
 
-                    <nav class="py-4 flex items-center justify-between gap-4 flex-wrap desktop-menu">
-                        <div class="flex items-center gap-4 flex-wrap" style="margin-left: -24px;">
-                            <a href="/" class="flex items-center gap-3 shrink-0" style="text-decoration: none; color: inherit;">
-                                <img src="{{ asset('Image/CEGME Logo.png') }}" alt="CEGME Logo" class="block h-16 w-auto" style="height: 64px; width: auto; object-fit: contain;">
-                                <div class="flex flex-col" style="display: flex; flex-direction: column;">
-                                    <span class="font-bold" style="font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #10b981 0%, #059669 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2;">CEGME</span>
-                                    <span class="text-sm text-gray-600" style="font-size: 13px; color: rgb(75, 85, 99); line-height: 1.2; margin-top: 2px;">Géosciences • Mines • Environnement</span>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="flex items-center gap-4 flex-wrap" style="margin-right: -32px;">
-                            <a href="/" class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal transition-colors {{ request()->is('/') ? 'text-white bg-green-600' : 'hover:text-gray-700' }}" style="font-size: 15px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; {{ request()->is('/') ? 'background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); border-radius: 6px;' : 'color: rgb(55, 65, 81); text-decoration: none;' }}">
-                                Accueil
-                            </a>
-                            <a href="/a-propos" class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal transition-colors {{ request()->is('a-propos') || request()->is('a-propos/*') ? 'text-white bg-green-600' : 'hover:text-gray-700' }}" style="font-size: 15px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; {{ request()->is('a-propos') || request()->is('a-propos/*') ? 'background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); border-radius: 6px;' : 'color: rgb(55, 65, 81); text-decoration: none;' }}">
-                                À Propos
-                            </a>
-                            <a href="/services" class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal transition-colors {{ request()->is('services') || request()->is('services/*') ? 'text-white bg-green-600' : 'hover:text-gray-700' }}" style="font-size: 15px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; {{ request()->is('services') || request()->is('services/*') ? 'background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); border-radius: 6px;' : 'color: rgb(55, 65, 81); text-decoration: none;' }}">
-                                Services
-                            </a>
-                            <a href="/realisations" class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal transition-colors {{ request()->is('realisations') || request()->is('realisations/*') ? 'text-white bg-green-600' : 'hover:text-gray-700' }}" style="font-size: 15px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; {{ request()->is('realisations') || request()->is('realisations/*') ? 'background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); border-radius: 6px;' : 'color: rgb(55, 65, 81); text-decoration: none;' }}">
-                                Réalisations
-                            </a>
-                            <a href="/actualites" class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal transition-colors {{ request()->is('actualites') || request()->is('actualites/*') ? 'text-white bg-green-600' : 'hover:text-gray-700' }}" style="font-size: 15px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; {{ request()->is('actualites') || request()->is('actualites/*') ? 'background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); border-radius: 6px;' : 'color: rgb(55, 65, 81); text-decoration: none;' }}">
-                                Actualités
-                            </a>
-                            <a href="/blog" class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal transition-colors {{ request()->is('blog') || request()->is('blog/*') ? 'text-white bg-green-600' : 'hover:text-gray-700' }}" style="font-size: 15px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; {{ request()->is('blog') || request()->is('blog/*') ? 'background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); border-radius: 6px;' : 'color: rgb(55, 65, 81); text-decoration: none;' }}">
-                                Blog
-                            </a>
-                            <a href="{{ route('appels-offres.index') }}" class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal transition-colors {{ request()->is('appels-offres') || request()->is('appels-offres/*') ? 'text-white bg-green-600' : 'hover:text-gray-700' }}" style="font-size: 15px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; {{ request()->is('appels-offres') || request()->is('appels-offres/*') ? 'background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); border-radius: 6px;' : 'color: rgb(55, 65, 81); text-decoration: none;' }}">
-                                Offres
-                            </a>
-                            <a href="/contact" class="inline-block px-3 py-1.5 rounded-sm text-base leading-normal transition-colors {{ request()->is('contact') || request()->is('contact/*') ? 'text-white bg-green-600' : 'hover:text-gray-700' }}" style="font-size: 15px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; {{ request()->is('contact') || request()->is('contact/*') ? 'background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); border-radius: 6px;' : 'color: rgb(55, 65, 81); text-decoration: none;' }}">
-                                Contact
-                            </a>
-                    @auth
-                        <a
-                            href="{{ url('/dashboard') }}"
-                            class="inline-block px-5 py-1.5 text-black border border-gray-300 hover:border-gray-400 rounded-sm text-sm leading-normal"
-                        >
-                            Dashboard
-                        </a>
-                    @else
-                        <a
-                            href="{{ route('login') }}"
-                            class="inline-flex items-center justify-center gap-1.5 px-4 py-2 text-white font-medium transition-all duration-200 hover:opacity-90 rounded-full desktop-login-button"
-                            style="background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); padding: 8px 18px; font-size: 14px; border-radius: 8px;"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
-                                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
-                                <polyline points="10 17 15 12 10 7"></polyline>
-                                <line x1="15" y1="12" x2="3" y2="12"></line>
-                            </svg>
-                            <span>Se connecter</span>
-                        </a>
-                    @endauth
-                        </div>
-                </nav>
-            @endif
-            </div>
-        </header>
-
-        <script>
-            function toggleMobileMenu() {
-                const menu = document.getElementById('mobileMenu');
-                const button = document.getElementById('mobileMenuButton');
-                
-                if (menu && button) {
-                    menu.classList.toggle('active');
-                    button.classList.toggle('active');
-                }
-            }
-
-            document.addEventListener('click', function(event) {
-                const menu = document.getElementById('mobileMenu');
-                const button = document.getElementById('mobileMenuButton');
-                
-                if (menu && button && menu.classList.contains('active')) {
-                    if (!menu.contains(event.target) && !button.contains(event.target)) {
-                        menu.classList.remove('active');
-                        button.classList.remove('active');
-                    }
-                }
-            });
-        </script>
 
         <!-- Hero Section - Article Header -->
         <section class="relative w-full flex items-center justify-center overflow-hidden" style="min-height: 75vh; padding-top: 140px; padding-bottom: 120px; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%); position: relative;">
@@ -355,11 +78,11 @@
                     
                     <!-- Catégorie -->
                     @if($post->category)
-                    <div style="margin-bottom: 24px;">
-                        <span style="display: inline-block; padding: 6px 16px; background-color: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.15); color: rgba(255, 255, 255, 0.85); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; border-radius: 4px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-                            {{ $post->category->name }}
-                        </span>
-                    </div>
+                        <div style="margin-bottom: 24px;">
+                            <span style="display: inline-block; padding: 6px 16px; background-color: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.15); color: rgba(255, 255, 255, 0.85); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; border-radius: 4px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                                {{ $post->category->name }}
+                            </span>
+                        </div>
                     @endif
                     
                     <!-- Titre - Design Magazine Premium -->
@@ -461,118 +184,54 @@
 
         <!-- Related Posts -->
         @if($relatedPosts->count() > 0)
-        <section class="w-full bg-white" style="padding: 100px 0; border-top: 1px solid #e5e7eb; background: #ffffff;">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div style="text-align: center; margin-bottom: 64px;">
-                    <h2 style="font-size: 36px; font-weight: 700; color: #1a1a1a; margin-bottom: 16px; letter-spacing: -1px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">Articles similaires</h2>
-                    <p style="font-size: 16px; color: #6b7280; max-width: 600px; margin: 0 auto; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">Découvrez d'autres articles qui pourraient vous intéresser</p>
-                </div>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 40px;">
-                    @foreach($relatedPosts as $relatedPost)
-                        <article style="background-color: #ffffff; border-radius: 0; overflow: hidden; border: 1px solid #e5e7eb; transition: all 0.3s ease;" onmouseover="this.style.borderColor='#d1d5db'; this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='#e5e7eb'; this.style.transform='translateY(0)';">
-                            @if($relatedPost->featured_image)
-                                <a href="{{ route('blog.show', $relatedPost->slug) }}" style="display: block; overflow: hidden;">
-                                    <img src="{{ asset('storage/' . $relatedPost->featured_image) }}" alt="{{ $relatedPost->title }}" style="width: 100%; height: 240px; object-fit: cover; transition: transform 0.3s ease;" onmouseover="this.style.transform='scale(1.03)';" onmouseout="this.style.transform='scale(1)';">
-                                </a>
-                            @endif
-                            <div style="padding: 32px;">
-                                @if($relatedPost->category)
-                                    <span style="display: inline-block; padding: 4px 12px; background-color: #f3f4f6; color: #374151; border-radius: 4px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-                                        {{ $relatedPost->category->name }}
-                                    </span>
-                                @endif
-                                <h3 style="font-size: 24px; font-weight: 700; color: #1a1a1a; margin-bottom: 16px; line-height: 1.3; letter-spacing: -0.5px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-                                    <a href="{{ route('blog.show', $relatedPost->slug) }}" style="color: inherit; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#000000';" onmouseout="this.style.color='#1a1a1a';">
-                                        {{ $relatedPost->title }}
+            <section class="w-full bg-white" style="padding: 100px 0; border-top: 1px solid #e5e7eb; background: #ffffff;">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div style="text-align: center; margin-bottom: 64px;">
+                        <h2 style="font-size: 36px; font-weight: 700; color: #1a1a1a; margin-bottom: 16px; letter-spacing: -1px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">Articles similaires</h2>
+                        <p style="font-size: 16px; color: #6b7280; max-width: 600px; margin: 0 auto; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">Découvrez d'autres articles qui pourraient vous intéresser</p>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 40px;">
+                        @foreach($relatedPosts as $relatedPost)
+                            <article style="background-color: #ffffff; border-radius: 0; overflow: hidden; border: 1px solid #e5e7eb; transition: all 0.3s ease;" onmouseover="this.style.borderColor='#d1d5db'; this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='#e5e7eb'; this.style.transform='translateY(0)';">
+                                @if($relatedPost->featured_image)
+                                    <a href="{{ route('blog.show', $relatedPost->slug) }}" style="display: block; overflow: hidden;">
+                                        <img src="{{ asset('storage/' . $relatedPost->featured_image) }}" alt="{{ $relatedPost->title }}" style="width: 100%; height: 240px; object-fit: cover; transition: transform 0.3s ease;" onmouseover="this.style.transform='scale(1.03)';" onmouseout="this.style.transform='scale(1)';">
                                     </a>
-                                </h3>
-                                @if($relatedPost->excerpt)
-                                    <p style="font-size: 16px; color: #6b7280; line-height: 1.6; margin-bottom: 20px; font-family: 'Georgia', 'Times New Roman', serif;">
-                                        {{ \Illuminate\Support\Str::limit($relatedPost->excerpt, 140) }}
-                                    </p>
                                 @endif
-                                <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #9ca3af; font-weight: 400; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect>
-                                        <line x1="16" y1="2" x2="16" y2="6"></line>
-                                        <line x1="8" y1="2" x2="8" y2="6"></line>
-                                        <line x1="3" y1="10" x2="21" y2="10"></line>
-                                    </svg>
-                                    {{ $relatedPost->published_at ? $relatedPost->published_at->format('d M Y') : $relatedPost->created_at->format('d M Y') }}
+                                <div style="padding: 32px;">
+                                    @if($relatedPost->category)
+                                        <span style="display: inline-block; padding: 4px 12px; background-color: #f3f4f6; color: #374151; border-radius: 4px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                                            {{ $relatedPost->category->name }}
+                                        </span>
+                                    @endif
+                                    <h3 style="font-size: 24px; font-weight: 700; color: #1a1a1a; margin-bottom: 16px; line-height: 1.3; letter-spacing: -0.5px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                                        <a href="{{ route('blog.show', $relatedPost->slug) }}" style="color: inherit; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#000000';" onmouseout="this.style.color='#1a1a1a';">
+                                            {{ $relatedPost->title }}
+                                        </a>
+                                    </h3>
+                                    @if($relatedPost->excerpt)
+                                        <p style="font-size: 16px; color: #6b7280; line-height: 1.6; margin-bottom: 20px; font-family: 'Georgia', 'Times New Roman', serif;">
+                                            {{ \Illuminate\Support\Str::limit($relatedPost->excerpt, 140) }}
+                                        </p>
+                                    @endif
+                                    <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #9ca3af; font-weight: 400; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect>
+                                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                                        </svg>
+                                        {{ $relatedPost->published_at ? $relatedPost->published_at->format('d M Y') : $relatedPost->created_at->format('d M Y') }}
+                                    </div>
                                 </div>
-                            </div>
-                        </article>
-                    @endforeach
+                            </article>
+                        @endforeach
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
         @endif
 
-        <!-- Footer -->
-        <footer class="w-full text-white px-4 sm:px-6 lg:px-8" style="background: linear-gradient(180deg, rgb(15, 64, 62) 0%, rgb(22, 78, 75) 50%, rgb(25, 85, 82) 100%); padding: 64px 0 32px; color: rgb(255, 255, 255);">
-            <div class="max-w-7xl mx-auto" style="padding: 0px;">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-12 blog-footer-grid" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 48px; margin-bottom: 32px; padding: 0px;">
-                    <!-- Company Info -->
-                    <div>
-                        <div class="flex items-center gap-3 mb-4" style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-                            <img src="{{ asset('Image/CEGME Logo.png') }}" alt="CEGME Logo" class="block h-10 w-auto" style="height: 40px; width: auto; object-fit: contain;">
-                            <span class="text-xl font-bold" style="font-size: 20px; font-weight: 700; color: rgb(255, 255, 255);">CEGME</span>
-                        </div>
-                        <p class="text-white mb-4" style="font-size: 16px; color: rgb(255, 255, 255); margin-bottom: 16px; line-height: 26px;">
-                            Cabinet d'Études Géologiques, Minières et Environnementales
-                        </p>
-                        <p class="text-gray-300 text-sm" style="font-size: 14px; color: rgb(209, 213, 219); line-height: 20px;">
-                            Plateforme d'experts nationaux agréée<br>
-                            N° 004/MEDD/DIRCAB_21
-                        </p>
-                    </div>
-                    
-                    <!-- Liens Rapides -->
-                    <div>
-                        <h3 class="text-lg font-bold mb-4" style="font-size: 18px; font-weight: 700; margin-bottom: 16px; color: rgb(255, 255, 255);">
-                            Liens Rapides
-                        </h3>
-                        <ul class="space-y-3" style="list-style: none; padding: 0; margin: 0;">
-                            <li><a href="/" class="text-gray-300 hover:text-white transition-colors" style="color: rgb(209, 213, 219); text-decoration: none; font-size: 14px; display: block; padding: 4px 0;">Accueil</a></li>
-                            <li><a href="/a-propos" class="text-gray-300 hover:text-white transition-colors" style="color: rgb(209, 213, 219); text-decoration: none; font-size: 14px; display: block; padding: 4px 0;">À Propos</a></li>
-                            <li><a href="/services" class="text-gray-300 hover:text-white transition-colors" style="color: rgb(209, 213, 219); text-decoration: none; font-size: 14px; display: block; padding: 4px 0;">Services</a></li>
-                            <li><a href="/realisations" class="text-gray-300 hover:text-white transition-colors" style="color: rgb(209, 213, 219); text-decoration: none; font-size: 14px; display: block; padding: 4px 0;">Réalisations</a></li>
-                            <li><a href="/actualites" class="text-gray-300 hover:text-white transition-colors" style="color: rgb(209, 213, 219); text-decoration: none; font-size: 14px; display: block; padding: 4px 0;">Actualités</a></li>
-                            <li><a href="/blog" class="text-gray-300 hover:text-white transition-colors" style="color: rgb(209, 213, 219); text-decoration: none; font-size: 14px; display: block; padding: 4px 0;">Blog</a></li>
-                            <li><a href="/contact" class="text-gray-300 hover:text-white transition-colors" style="color: rgb(209, 213, 219); text-decoration: none; font-size: 14px; display: block; padding: 4px 0;">Contact</a></li>
-                        </ul>
-                    </div>
-                    
-                    <!-- Contact -->
-                    <div>
-                        <h3 class="text-lg font-bold mb-4" style="font-size: 18px; font-weight: 700; margin-bottom: 16px; color: rgb(255, 255, 255);">
-                            Contact
-                        </h3>
-                        <ul class="space-y-3" style="list-style: none; padding: 0; margin: 0;">
-                            <li style="padding: 4px 0;">
-                                <span class="text-white font-semibold" style="color: rgb(255, 255, 255); font-weight: 600; font-size: 14px; display: block;">Adresse</span>
-                                <p class="text-gray-300 text-sm" style="color: rgb(209, 213, 219); font-size: 14px; margin-top: 4px;">Bangui, République Centrafricaine</p>
-                            </li>
-                            <li style="padding: 4px 0;">
-                                <span class="text-white font-semibold" style="color: rgb(255, 255, 255); font-weight: 600; font-size: 14px; display: block;">Email</span>
-                                <p class="text-gray-300 text-sm" style="color: rgb(209, 213, 219); font-size: 14px; margin-top: 4px;">cabinet.rca@cegme.net / cegme.sarl@gmail.com</p>
-                            </li>
-                            <li style="padding: 4px 0;">
-                                <span class="text-white font-semibold" style="color: rgb(255, 255, 255); font-weight: 600; font-size: 14px; display: block;">Registre</span>
-                                <p class="text-gray-300 text-sm" style="color: rgb(209, 213, 219); font-size: 14px; margin-top: 4px;">CA/BG/2015B514</p>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                
-                <!-- Copyright -->
-                <div class="text-center" style="border-top: 1px solid rgba(255, 255, 255, 0.2); padding-top: 24px; text-align: center; margin-top: 32px;">
-                    <p class="text-gray-400 text-sm" style="color: rgb(156, 163, 175); font-size: 14px;">
-                        © 2025 CEGME SARL. Tous droits réservés.
-                    </p>
-                </div>
-            </div>
-        </footer>
+        <x-site-footer />
 
         <style>
             /* IMPORTANT: Les styles inline de Quill ont TOUJOURS priorité */

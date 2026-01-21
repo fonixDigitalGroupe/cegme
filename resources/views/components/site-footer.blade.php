@@ -1,13 +1,13 @@
-<footer class="w-full text-white px-4 sm:px-6 lg:px-8 desktop-footer"
-    style="background: linear-gradient(to right bottom, rgb(15, 23, 42), rgb(6, 78, 59), rgb(19, 78, 74)); padding: 80px 0 32px; color: rgb(255, 255, 255); position: relative; overflow: hidden;">
+<footer class="w-full text-white px-4 sm:px-6 lg:px-8 desktop-footer hidden lg:block"
+    style="background: linear-gradient(to right bottom, rgb(15, 23, 42), rgb(6, 78, 59), rgb(19, 78, 74)); padding: 80px 0; color: rgb(255, 255, 255); position: relative; overflow: hidden;">
     <!-- Decorative overlay -->
     <div
         style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 20% 50%, rgba(16, 185, 129, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(5, 150, 105, 0.08) 0%, transparent 50%); pointer-events: none;">
     </div>
     <div class="relative z-10" style="position: relative; z-index: 10;">
-        <div class="max-w-7xl mx-auto" style="padding: 0px;">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12"
-                style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 48px; margin-bottom: 48px; padding: 0px;">
+        <div class="max-w-7xl mx-auto" style="padding: 0px 24px;">
+            <div class="grid grid-cols-1 gap-12 mb-12"
+                style="display: grid; grid-template-columns: 1fr; gap: 48px; margin-bottom: 48px; padding: 0px;">
                 <!-- Company Info -->
                 <div>
                     <!-- Logo and Company Name -->
@@ -205,15 +205,15 @@
     </div>
 </footer>
 
-<footer class="w-full text-white px-4 sm:px-6 lg:px-8 mobile-footer-home"
-    style="background: linear-gradient(to right bottom, rgb(15, 23, 42), rgb(6, 78, 59), rgb(19, 78, 74)); padding: 80px 0 32px; color: rgb(255, 255, 255); position: relative; overflow: hidden;">
+<footer class="w-full text-white px-4 sm:px-6 lg:px-8 mobile-footer-home lg:hidden"
+    style="background: linear-gradient(to right bottom, rgb(15, 23, 42), rgb(6, 78, 59), rgb(19, 78, 74)); padding: 80px 0; color: rgb(255, 255, 255); position: relative; overflow: hidden;">
     <div
         style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 20% 50%, rgba(16, 185, 129, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(5, 150, 105, 0.08) 0%, transparent 50%); pointer-events: none;">
     </div>
     <div class="relative z-10" style="position: relative; z-index: 10;">
-        <div class="max-w-7xl mx-auto" style="padding: 0px;">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12"
-                style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 48px; margin-bottom: 48px; padding: 0px;">
+        <div class="max-w-7xl mx-auto" style="padding: 0px 24px;">
+            <div class="grid grid-cols-1 gap-12 mb-12"
+                style="display: grid; grid-template-columns: 1fr; gap: 48px; margin-bottom: 48px; padding: 0px;">
                 <!-- Company Info Mobile -->
                 <div>
                     <div class="flex items-center gap-3 mb-6"

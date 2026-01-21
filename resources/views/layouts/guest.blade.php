@@ -31,7 +31,6 @@
         </div>
     </main>
 
-    <x-site-footer />
 
     <!-- Site Scripts -->
     @include('partials.site-scripts')

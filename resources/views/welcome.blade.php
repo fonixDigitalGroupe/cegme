@@ -380,10 +380,10 @@
         <div class="relative z-10 w-full max-w-[1200px] mx-auto px-4 text-center flex flex-col items-center justify-start"
             style="min-height: 100vh; padding-top: 120px; z-index: 10; position: relative;">
             <!-- Badge - Plateforme d'Experts Nationaux Agréée -->
-            <div class="inline-block px-6 py-2 mb-6 rounded-full"
-                style="background-color: rgba(16, 185, 129, 0.3); border: 1px solid rgb(5, 150, 105) !important; border-radius: 9999px; padding: 8px 24px; margin-bottom: 24px; margin-top: 20px;">
+            <div class="inline-block px-8 py-3 mb-6 rounded-full"
+                style="background-color: rgba(16, 185, 129, 0.3); border: 1px solid rgb(5, 150, 105) !important; border-radius: 9999px; padding: 12px 32px; margin-bottom: 24px; margin-top: 20px;">
                 <p class="text-center"
-                    style="color: rgb(110, 231, 183) !important; font-size: 16px; font-weight: 500; margin: 0;">
+                    style="color: rgb(110, 231, 183) !important; font-size: 18px; font-weight: 600; margin: 0; letter-spacing: 0.5px;">
                     Plateforme d'Experts Nationaux Agréée
                 </p>
             </div>
@@ -1076,9 +1076,9 @@
                             Études d'impact environnemental et social, audits, gestion durable des ressources naturelles
                         </p>
                         <!-- Button -->
-                        <button
+                        <a href="/services#environnement"
                             class="inline-flex items-center gap-2 text-green-600 font-semibold hover:text-green-700 transition-colors"
-                            style="font-size: 16px; font-weight: 600; color: rgb(5, 150, 105); background-color: rgba(0, 0, 0, 0); display: inline-flex; align-items: center; gap: 8px;">
+                            style="font-size: 16px; font-weight: 600; color: rgb(5, 150, 105); background-color: rgba(0, 0, 0, 0); display: inline-flex; align-items: center; gap: 8px; text-decoration: none;">
                             <span>En savoir plus</span>
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
@@ -1086,7 +1086,7 @@
                                 <path d="M5 12h14"></path>
                                 <path d="m12 5 7 7-7 7"></path>
                             </svg>
-                        </button>
+                        </a>
                     </div>
                 </div>
 
@@ -1118,9 +1118,9 @@
                             Exploration géologique, cartographie numérique, évaluation économique de projets miniers
                         </p>
                         <!-- Button -->
-                        <button
+                        <a href="/services#recherche"
                             class="inline-flex items-center gap-2 text-green-600 font-semibold hover:text-green-700 transition-colors"
-                            style="font-size: 16px; font-weight: 600; color: rgb(5, 150, 105); background-color: rgba(0, 0, 0, 0); display: inline-flex; align-items: center; gap: 8px;">
+                            style="font-size: 16px; font-weight: 600; color: rgb(5, 150, 105); background-color: rgba(0, 0, 0, 0); display: inline-flex; align-items: center; gap: 8px; text-decoration: none;">
                             <span>En savoir plus</span>
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
@@ -1128,7 +1128,7 @@
                                 <path d="M5 12h14"></path>
                                 <path d="m12 5 7 7-7 7"></path>
                             </svg>
-                        </button>
+                        </a>
                     </div>
                 </div>
 
@@ -1163,9 +1163,9 @@
                             SIG, études hydrogéologiques et géotechniques, modélisation cartographique
                         </p>
                         <!-- Button -->
-                        <button
+                        <a href="/services#geo-ingenierie"
                             class="inline-flex items-center gap-2 text-green-600 font-semibold hover:text-green-700 transition-colors"
-                            style="font-size: 16px; font-weight: 600; color: rgb(5, 150, 105); background-color: rgba(0, 0, 0, 0); display: inline-flex; align-items: center; gap: 8px;">
+                            style="font-size: 16px; font-weight: 600; color: rgb(5, 150, 105); background-color: rgba(0, 0, 0, 0); display: inline-flex; align-items: center; gap: 8px; text-decoration: none;">
                             <span>En savoir plus</span>
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
@@ -1173,7 +1173,7 @@
                                 <path d="M5 12h14"></path>
                                 <path d="m12 5 7 7-7 7"></path>
                             </svg>
-                        </button>
+                        </a>
                     </div>
                 </div>
 
@@ -1206,9 +1206,9 @@
                             Conseil aux investisseurs, représentation d'entreprises, négociation commerciale
                         </p>
                         <!-- Button -->
-                        <button
+                        <a href="/services#negoce"
                             class="inline-flex items-center gap-2 text-green-600 font-semibold hover:text-green-700 transition-colors"
-                            style="font-size: 16px; font-weight: 600; color: rgb(5, 150, 105); background-color: rgba(0, 0, 0, 0); display: inline-flex; align-items: center; gap: 8px;">
+                            style="font-size: 16px; font-weight: 600; color: rgb(5, 150, 105); background-color: rgba(0, 0, 0, 0); display: inline-flex; align-items: center; gap: 8px; text-decoration: none;">
                             <span>En savoir plus</span>
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
@@ -1216,7 +1216,7 @@
                                 <path d="M5 12h14"></path>
                                 <path d="m12 5 7 7-7 7"></path>
                             </svg>
-                        </button>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -1424,93 +1424,124 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 projects-grid-container"
                 style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px;">
                 <!-- Project 1 -->
-                <a href="/services"
+                <a href="/services#geo-ingenierie"
                     class="block bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-gray-100"
                     style="display: block; background-color: rgb(255, 255, 255); border-radius: 16px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); overflow: hidden; transition: all 0.3s ease; text-decoration: none; color: inherit; cursor: pointer; border: 1px solid rgba(229, 231, 235, 0.8);">
-                    <div class="relative overflow-hidden" style="position: relative; overflow: hidden;">
-                        <img src="{{ asset('Image/Complexe Immobilier.jpg') }}" alt="Complexe Immobilier BDEAC"
-                            class="w-full h-48 object-cover transition-transform duration-300 hover:scale-110"
-                            style="width: 100%; height: 200px; object-fit: cover; transition: transform 0.3s ease;">
+                    <div class="relative overflow-hidden"
+                        style="position: relative; overflow: hidden; height: 260px; background-color: #f3f4f6;">
+                        <img src="{{ asset('Image/Complexe Immobilier.jpg') }}"
+                            alt="Études hydrogéologiques OXFAM & UNICEF"
+                            class="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                            style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; display: block;">
                         <div class="absolute top-4 right-4 bg-white text-gray-800 px-4 py-1.5 rounded-full text-sm font-semibold shadow-lg"
                             style="position: absolute; top: 16px; right: 16px; background-color: rgb(255, 255, 255); color: rgb(31, 41, 55); padding: 6px 16px; border-radius: 9999px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);">
-                            2021
+                            2025
                         </div>
                     </div>
                     <div class="p-6" style="padding: 24px;">
-                        <div class="mb-4" style="margin-bottom: 16px;">
+                        <div class="mb-4" style="margin-bottom: 16px; display: flex; flex-wrap: wrap; gap: 8px;">
+                            <span class="bg-blue-100 text-blue-700 px-3 py-1.5 rounded-full text-sm font-semibold"
+                                style="background-color: rgb(239, 246, 255); color: rgb(29, 78, 216); padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 600; display: inline-block;">
+                                Hydrogéologie
+                            </span>
                             <span class="bg-green-100 text-green-700 px-3 py-1.5 rounded-full text-sm font-semibold"
-                                style="background-color: rgb(220, 252, 231); color: rgb(5, 150, 105); padding: 6px 12px; border-radius: 9999px; font-size: 14px; font-weight: 600; display: inline-block;">
-                                environnement
+                                style="background-color: rgb(220, 252, 231); color: rgb(5, 150, 105); padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 600; display: inline-block;">
+                                OXFAM & UNICEF
                             </span>
                         </div>
                         <h3 class="text-xl font-bold mb-3"
-                            style="font-size: 22px; font-weight: 800; color: rgb(17, 24, 39); margin-bottom: 12px; line-height: 30px; letter-spacing: -0.3px;">
-                            Complexe Immobilier BDEAC
+                            style="font-size: 20px; font-weight: 800; color: rgb(17, 24, 39); margin-bottom: 12px; line-height: 28px; letter-spacing: -0.3px;">
+                            Études hydrogéologiques - Programmes d'urgence
                         </h3>
-                        <p class="text-gray-600" style="font-size: 16px; color: rgb(75, 85, 99); line-height: 26px;">
-                            EIES pour construction d'un complexe administratif et résidentiel au centre-ville de Bangui
+                        <p class="text-gray-600 mb-2"
+                            style="font-size: 14px; font-weight: 600; color: rgb(107, 114, 128);">
+                            Bria / Batangafo
+                        </p>
+                        <p class="text-gray-600" style="font-size: 15px; color: rgb(75, 85, 99); line-height: 24px;">
+                            Mobilisation des eaux souterraines, tarification de l'eau, rentabilité AEP et enquêtes
+                            socio-économiques.
                         </p>
                     </div>
                 </a>
 
                 <!-- Project 2 -->
-                <a href="/services"
+                <a href="/services#environnement"
                     class="block bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-gray-100"
                     style="display: block; background-color: rgb(255, 255, 255); border-radius: 16px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); overflow: hidden; transition: all 0.3s ease; text-decoration: none; color: inherit; cursor: pointer; border: 1px solid rgba(229, 231, 235, 0.8);">
                     <div class="relative overflow-hidden"
-                        style="position: relative; overflow: hidden; height: 240px; background-color: #f3f4f6;">
-                        <img src="{{ asset('Image/City Apartment Bangui..jpg') }}" alt="City Apartment Bangui"
+                        style="position: relative; overflow: hidden; height: 260px; background-color: #f3f4f6;">
+                        <img src="{{ asset('Image/City Apartment Bangui..jpg') }}"
+                            alt="CGES & PGES - Aire de Conservation de Chinko"
                             class="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
-                            style="width: 100%; height: 100%; min-height: 240px; object-fit: cover; object-position: center; transition: transform 0.3s ease; display: block;">
+                            style="width: 100%; height: 100%; object-fit: cover; object-position: center; transition: transform 0.3s ease; display: block;">
                         <div class="absolute top-4 right-4 bg-white text-gray-800 px-4 py-1.5 rounded-full text-sm font-semibold shadow-lg"
                             style="position: absolute; top: 16px; right: 16px; background-color: rgb(255, 255, 255); color: rgb(31, 41, 55); padding: 6px 16px; border-radius: 9999px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);">
-                            2020
+                            2024
                         </div>
                     </div>
                     <div class="p-6" style="padding: 24px;">
-                        <div class="mb-4" style="margin-bottom: 16px;">
+                        <div class="mb-4" style="margin-bottom: 16px; display: flex; flex-wrap: wrap; gap: 8px;">
                             <span class="bg-green-100 text-green-700 px-3 py-1.5 rounded-full text-sm font-semibold"
-                                style="background-color: rgb(220, 252, 231); color: rgb(5, 150, 105); padding: 6px 12px; border-radius: 9999px; font-size: 14px; font-weight: 600; display: inline-block;">
-                                environnement
+                                style="background-color: rgb(220, 252, 231); color: rgb(5, 150, 105); padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 600; display: inline-block;">
+                                Environnement
+                            </span>
+                            <span class="bg-blue-100 text-blue-700 px-3 py-1.5 rounded-full text-sm font-semibold"
+                                style="background-color: rgb(239, 246, 255); color: rgb(29, 78, 216); padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 600; display: inline-block;">
+                                African Parks / USAID
                             </span>
                         </div>
                         <h3 class="text-xl font-bold mb-3"
-                            style="font-size: 22px; font-weight: 800; color: rgb(17, 24, 39); margin-bottom: 12px; line-height: 30px; letter-spacing: -0.3px;">
-                            City Apartment Bangui
+                            style="font-size: 20px; font-weight: 800; color: rgb(17, 24, 39); margin-bottom: 12px; line-height: 28px; letter-spacing: -0.3px;">
+                            CGES & PGES - Aire de Conservation de Chinko
                         </h3>
-                        <p class="text-gray-600" style="font-size: 16px; color: rgb(75, 85, 99); line-height: 26px;">
-                            Étude d'impact pour un complexe immobilier à usage administratif et d'appartement
+                        <p class="text-gray-600 mb-2"
+                            style="font-size: 14px; font-weight: 600; color: rgb(107, 114, 128);">
+                            Chinko, RCA
+                        </p>
+                        <p class="text-gray-600" style="font-size: 15px; color: rgb(75, 85, 99); line-height: 24px;">
+                            Élaboration du Cadre de Gestion Environnementale et Sociale et du PGES pour l'Aire de
+                            Conservation.
                         </p>
                     </div>
                 </a>
 
                 <!-- Project 3 -->
-                <a href="/services"
+                <a href="/services#environnement"
                     class="block bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-gray-100"
                     style="display: block; background-color: rgb(255, 255, 255); border-radius: 16px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); overflow: hidden; transition: all 0.3s ease; text-decoration: none; color: inherit; cursor: pointer; border: 1px solid rgba(229, 231, 235, 0.8);">
-                    <div class="relative overflow-hidden" style="position: relative; overflow: hidden;">
+                    <div class="relative overflow-hidden"
+                        style="position: relative; overflow: hidden; height: 260px; background-color: #f3f4f6;">
                         <img src="{{ asset('Image/Exploitation Rivière Sangha.jpg') }}"
-                            alt="Exploitation Rivière Sangha"
-                            class="w-full h-48 object-cover transition-transform duration-300 hover:scale-110"
-                            style="width: 100%; height: 200px; object-fit: cover; transition: transform 0.3s ease;">
+                            alt="EIES - Projet de Réduction de la Vulnérabilité Climatique"
+                            class="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                            style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; display: block;">
                         <div class="absolute top-4 right-4 bg-white text-gray-800 px-4 py-1.5 rounded-full text-sm font-semibold shadow-lg"
                             style="position: absolute; top: 16px; right: 16px; background-color: rgb(255, 255, 255); color: rgb(31, 41, 55); padding: 6px 16px; border-radius: 9999px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);">
-                            2019
+                            2022
                         </div>
                     </div>
                     <div class="p-6" style="padding: 24px;">
-                        <div class="mb-4" style="margin-bottom: 16px;">
-                            <span class="bg-orange-100 text-orange-700 px-3 py-1.5 rounded-full text-sm font-semibold"
-                                style="background-color: rgb(255, 237, 213); color: rgb(249, 115, 22); padding: 6px 12px; border-radius: 9999px; font-size: 14px; font-weight: 600; display: inline-block;">
-                                mines
+                        <div class="mb-4" style="margin-bottom: 16px; display: flex; flex-wrap: wrap; gap: 8px;">
+                            <span class="bg-green-100 text-green-700 px-3 py-1.5 rounded-full text-sm font-semibold"
+                                style="background-color: rgb(220, 252, 231); color: rgb(5, 150, 105); padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 600; display: inline-block;">
+                                Environnement
+                            </span>
+                            <span class="bg-blue-100 text-blue-700 px-3 py-1.5 rounded-full text-sm font-semibold"
+                                style="background-color: rgb(239, 246, 255); color: rgb(29, 78, 216); padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 600; display: inline-block;">
+                                Ministère de l'Énergie / BAD
                             </span>
                         </div>
                         <h3 class="text-xl font-bold mb-3"
-                            style="font-size: 22px; font-weight: 800; color: rgb(17, 24, 39); margin-bottom: 12px; line-height: 30px; letter-spacing: -0.3px;">
-                            Exploitation Rivière Sangha
+                            style="font-size: 20px; font-weight: 800; color: rgb(17, 24, 39); margin-bottom: 12px; line-height: 28px; letter-spacing: -0.3px;">
+                            EIES - Projet de Réduction de la Vulnérabilité Climatique
                         </h3>
-                        <p class="text-gray-600" style="font-size: 16px; color: rgb(75, 85, 99); line-height: 26px;">
-                            EIES pour exploitation semi-mécanisée d'or et diamant sur la rivière Sangha
+                        <p class="text-gray-600 mb-2"
+                            style="font-size: 14px; font-weight: 600; color: rgb(107, 114, 128);">
+                            République Centrafricaine
+                        </p>
+                        <p class="text-gray-600" style="font-size: 15px; color: rgb(75, 85, 99); line-height: 24px;">
+                            EIES du Projet de Réduction de la Vulnérabilité face aux changements climatiques
+                            (PCRVP-FCAE).
                         </p>
                     </div>
                 </a>
@@ -1670,7 +1701,6 @@
         </div>
     </section>
 
-    <!-- Footer - Enhanced Professional Design -->
     <x-site-footer />
 
     @include('partials.site-scripts')
@@ -1694,8 +1724,10 @@
                     menu.classList.remove('active');
                     button.classList.remove('active');
                 }
+
+
             }
-            });
+        });
     </script>
 </body>
 

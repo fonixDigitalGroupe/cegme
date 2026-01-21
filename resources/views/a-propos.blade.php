@@ -39,6 +39,7 @@
 
     <!-- Styles / Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @include('partials.site-styles')
     <style>
         /* MOBILE ONLY STYLES */
         @media (max-width: 768px) {
@@ -202,6 +203,10 @@
             }
 
             /* Mobile Header and Footer are handled globally by site-styles.blade.php */
+            .mobile-footer-home {
+                padding-left: 20px !important;
+                padding-right: 20px !important;
+            }
 
             /* Ajustements spécifiques à la page À Propos sur mobile */
             .grid {
@@ -668,7 +673,6 @@
         </div>
     </section>
 
-    <!-- Footer - Exact from Site -->
     <x-site-footer />
 
     @include('partials.site-scripts')
