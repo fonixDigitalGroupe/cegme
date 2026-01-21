@@ -7,6 +7,8 @@
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
+    <link rel="icon" href="{{ asset('Image/CEGME Logo.png') }}" type="image/png">
+
     <!-- Critical CSS to prevent white flash -->
     <style>
         html {
@@ -98,50 +100,12 @@
                 max-width: 100vw !important;
             }
 
-            * {
-                max-width: 100% !important;
-            }
+            /* Mobile styles handled by site-styles.blade.php */
 
-            /* Masquer le menu desktop sur mobile */
-            .desktop-menu {
-                display: none !important;
-            }
-
-            /* Afficher le header mobile */
-            .mobile-header {
-                display: flex !important;
-            }
-
-            /* Afficher le bouton hamburger */
-            .mobile-menu-button {
-                display: flex !important;
-                visibility: visible !important;
-                opacity: 1 !important;
-            }
-
-            /* Menu mobile - masqué par défaut avec animation slide */
-            .mobile-menu {
-                display: block;
-                position: fixed;
-                top: calc(3px + 80px);
-                left: 0;
-                right: 0;
-                background-color: rgb(255, 255, 255);
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                z-index: 999;
-                max-height: calc(100vh - 83px);
-                overflow-y: auto;
-                border-top: 1px solid rgba(229, 231, 235, 0.5);
-                transform: translateY(-100%);
-                opacity: 0;
-                transition: transform 0.3s ease, opacity 0.3s ease;
-                pointer-events: none;
-            }
-
-            .mobile-menu.active {
-                transform: translateY(0);
-                opacity: 1;
-                pointer-events: auto;
+            /* Header Styles from Contact/Services/Realisations Page - FIXED */
+            header {
+                background-color: rgba(255, 255, 255, 0.95) !important;
+                backdrop-filter: blur(10px) !important;
             }
 
             .mobile-menu a {
@@ -165,58 +129,21 @@
                 color: rgb(255, 255, 255);
             }
 
-            /* Header mobile - logo centré - Style site de référence */
+            .desktop-menu {
+                display: none !important;
+            }
+
             .mobile-header {
                 display: flex !important;
                 align-items: center;
                 justify-content: space-between;
                 width: 100%;
                 padding: 16px 24px;
-                min-height: 80px;
+                min-height: 64px;
                 position: relative;
                 z-index: 1000;
             }
 
-            .mobile-logo {
-                flex: 1;
-                display: flex;
-                align-items: center;
-                justify-content: flex-start;
-                min-width: 0;
-            }
-
-            .mobile-logo a {
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                min-width: 0;
-                flex: 1;
-            }
-
-            .mobile-logo img {
-                height: 60px !important;
-                width: auto !important;
-                flex-shrink: 0;
-            }
-
-            .mobile-logo .flex.flex-col {
-                min-width: 0;
-                flex: 1;
-            }
-
-            .mobile-logo span.font-bold {
-                font-size: 20px !important;
-                line-height: 1.2 !important;
-            }
-
-            .mobile-logo .text-xs,
-            .mobile-logo .text-sm {
-                font-size: 13px !important;
-                line-height: 1.2 !important;
-                margin-top: 2px !important;
-            }
-
-            /* Bouton hamburger - VISIBLE ET FONCTIONNEL */
             .mobile-menu-button {
                 display: flex !important;
                 flex-direction: column;
@@ -230,10 +157,10 @@
                 cursor: pointer;
                 padding: 0;
                 z-index: 1001;
+                gap: 6px;
                 position: relative;
                 visibility: visible !important;
                 opacity: 1 !important;
-                gap: 6px;
             }
 
             .mobile-menu-button span {
@@ -246,49 +173,84 @@
                 position: relative;
             }
 
-            /* Améliorer la visibilité du bouton hamburger */
-            .mobile-menu-button:hover {
-                border-color: transparent;
-                background-color: transparent;
+            .mobile-menu-button:hover,
+            .mobile-menu-button:active {
+                background: transparent !important;
+                border: none !important;
             }
 
-            .mobile-menu-button:hover span {
-                background-color: #000000 !important;
-            }
-
-            .mobile-menu-button:active span {
-                background-color: #000000 !important;
-            }
-
-            .mobile-menu-button.active span:nth-child(1) {
-                transform: rotate(45deg) translate(8px, 8px);
-            }
-
-            .mobile-menu-button.active span:nth-child(2) {
+            .mobile-menu {
+                display: block;
+                position: fixed;
+                top: calc(3px + 64px);
+                left: 0;
+                right: 0;
+                background-color: #fff;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                z-index: 999;
+                max-height: calc(100vh - 67px);
+                overflow-y: auto;
+                border-top: 1px solid rgba(229, 231, 235, 0.5);
+                transform: translateY(-100%);
                 opacity: 0;
+                transition: transform .3s ease, opacity .3s ease;
+                pointer-events: none;
             }
 
-            .mobile-menu-button.active span:nth-child(3) {
-                transform: rotate(-45deg) translate(8px, -8px);
+            .mobile-menu.active {
+                transform: translateY(0);
+                opacity: 1;
+                pointer-events: auto;
             }
 
-            /* Masquer le bouton Se connecter du header sur mobile */
+            .mobile-logo {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                min-width: 0;
+            }
+
+            .mobile-logo a {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                min-width: 0;
+                flex: 1;
+            }
+
+            .mobile-logo img {
+                height: 64px !important;
+                width: auto !important;
+                flex-shrink: 0;
+            }
+
+            .mobile-logo .flex.flex-col {
+                min-width: 0;
+                flex: 1;
+            }
+
+            .mobile-logo span.font-bold {
+                font-size: 20px !important;
+                line-height: 1.2 !important;
+                font-weight: 800 !important;
+                background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+                -webkit-background-clip: text !important;
+                -webkit-text-fill-color: transparent !important;
+                background-clip: text !important;
+            }
+
+            .mobile-logo .text-xs,
+            .mobile-logo .text-sm {
+                font-size: 13px !important;
+                line-height: 1.2 !important;
+                margin-top: 2px !important;
+            }
+
             .desktop-login-button {
                 display: none !important;
             }
 
-            /* Ajuster le padding du header */
-            header nav {
-                padding: 12px 0 !important;
-            }
-
-            /* Sections mobile - Style site de référence */
-            section {
-                padding-left: 24px !important;
-                padding-right: 24px !important;
-                padding-top: 48px !important;
-                padding-bottom: 48px !important;
-            }
 
             /* Hero section mobile - Style selon image */
             .hero-section {
@@ -582,13 +544,13 @@
 
 
             /* Images mobile */
-            img {
+            img:not([alt="CEGME Logo"]) {
                 max-width: 100% !important;
                 height: auto !important;
             }
 
             /* Boutons mobile - taille tactile */
-            button,
+            button:not(.mobile-menu-button),
             a[class*="button"],
             a[class*="btn"] {
                 min-height: 44px !important;
@@ -743,8 +705,9 @@
 </head>
 
 <body class="bg-white text-[#1b1b18] min-h-screen" style="background-color: #ffffff !important;">
+    <!-- Header from Contact/Services/Realisations Page -->
     <header class="w-full bg-white sticky top-0 z-50"
-        style="position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000; background-color: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+        style="position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000; background-color: rgb(255, 255, 255); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
         <div style="height: 3px; background-color: rgb(101, 64, 48);"></div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             @if (Route::has('login'))
@@ -752,13 +715,13 @@
                 <div class="mobile-header">
                     <div class="mobile-logo">
                         <a href="/" class="flex items-center gap-2 shrink-0" style="text-decoration: none; color: inherit;">
-                            <img src="{{ asset('Image/CEGME Logo.png') }}" alt="CEGME Logo" class="block h-12 w-auto"
-                                style="height: 48px; width: auto; object-fit: contain;">
-                            <div class="flex flex-col" style="display: flex; flex-direction: column;">
+                            <img src="{{ asset('Image/CEGME Logo.png') }}" alt="CEGME Logo" class="block h-16 w-auto"
+                                style="height: 64px; width: auto; object-fit: contain;">
+                            <div class="flex flex-col" style="display: flex; flex-direction: column !important;">
                                 <span class="font-bold"
-                                    style="font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #10b981 0%, #059669 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2;">CEGME</span>
-                                <span class="text-xs text-gray-600"
-                                    style="font-size: 11px; color: rgb(75, 85, 99); line-height: 1.2; margin-top: 2px;">Géosciences
+                                    style="font-size: 20px !important; font-weight: 800 !important; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important; background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; background-clip: text !important; line-height: 1.2 !important;">CEGME</span>
+                                <span class="text-sm text-gray-600"
+                                    style="font-size: 13px !important; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important; color: rgb(75, 85, 99) !important; line-height: 1.2 !important; margin-top: 2px !important;">Géosciences
                                     • Mines • Environnement</span>
                             </div>
                         </a>
@@ -783,17 +746,21 @@
                         class="{{ request()->is('actualites') || request()->is('actualites/*') ? 'active' : '' }}">Actualités</a>
                     <a href="/blog" class="{{ request()->is('blog') || request()->is('blog/*') ? 'active' : '' }}">Blog</a>
                     <a href="{{ route('appels-offres.index') }}"
-                        class="{{ request()->is('appels-offres') || request()->is('appels-offres/*') ? 'active' : '' }}">Appels
-                        d'Offres</a>
+                        class="{{ request()->is('appels-offres') || request()->is('appels-offres/*') ? 'active' : '' }}">Offres</a>
                     <a href="/contact"
                         class="{{ request()->is('contact') || request()->is('contact/*') ? 'active' : '' }}">Contact</a>
                     @auth
-                        <a href="{{ url('/dashboard') }}">Dashboard</a>
+                        <form method="POST" action="{{ route('logout') }}" style="display: block;">
+                            @csrf
+                            <button type="submit"
+                                style="display: block; width: 100%; text-align: left; padding: 16px 20px; color: rgb(55, 65, 81); font-size: 16px; font-weight: 600; background: none; border: none; border-bottom: 1px solid rgba(229, 231, 235, 0.5); cursor: pointer; color: rgb(10, 150, 120);">
+                                Déconnexion
+                            </button>
+                        </form>
                     @else
                         <a href="{{ route('login') }}"
-                            style="background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: rgb(255, 255, 255); margin: 12px 20px; border-radius: 8px; text-align: center;">
-                            Se connecter
-                        </a>
+                            style="background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%); color: #fff; margin: 12px 20px; border-radius: 8px; text-align: center;">Se
+                            connecter</a>
                     @endauth
                 </div>
 
@@ -1030,7 +997,7 @@
     <!-- Statistics Section - Enhanced Professional Design -->
     <section class="w-full bg-white" style="padding: 40px 0; margin: 0; background-color: #ffffff !important;">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" style="padding: 0; margin: 0;">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 stats-grid-container"
                 style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; padding: 0; margin: 0;">
                 <!-- Card 1: Missions stratégiques -->
                 <div class="text-center" style="text-align: center; padding: 0;">
@@ -1170,7 +1137,7 @@
             </div>
 
             <!-- Deux colonnes -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8"
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 identity-grid-container"
                 style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px;">
                 <!-- Colonne gauche: Une Résilience Entrepreneuriale -->
                 <div class="bg-white rounded-2xl p-10 shadow-xl border border-gray-100 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2"
@@ -1338,7 +1305,7 @@
             </div>
 
             <!-- Cards Grid - 3 cards per row -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 benefits-grid-container"
                 style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; max-width: 100%; margin: 0;">
                 <!-- Card 1: Expertise Locale -->
                 <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:-translate-y-2"
@@ -1560,7 +1527,7 @@
             </div>
 
             <!-- Cards Grid - 2x2 layout -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6"
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 activities-grid-container"
                 style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; max-width: 100%; margin: 0;">
                 <!-- Card 1: Environnement et Développement Durable -->
                 <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:-translate-y-2"
@@ -1938,7 +1905,7 @@
             </div>
 
             <!-- Projects Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 projects-grid-container"
                 style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px;">
                 <!-- Project 1 -->
                 <a href="/services"
@@ -2067,7 +2034,7 @@
             </div>
 
             <!-- Steps Grid - 4 steps -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 approach-grid-container"
                 style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; position: relative;">
                 <!-- Step 1: Analyse & Diagnostic -->
                 <div class="text-center"
@@ -2188,297 +2155,29 @@
     </section>
 
     <!-- Footer - Enhanced Professional Design -->
-    <footer class="w-full text-white px-4 sm:px-6 lg:px-8"
-        style="background: linear-gradient(to right bottom, rgb(15, 23, 42), rgb(6, 78, 59), rgb(19, 78, 74)); padding: 80px 0 32px; color: rgb(255, 255, 255); position: relative; overflow: hidden;">
-        <!-- Decorative overlay -->
-        <div
-            style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 20% 50%, rgba(16, 185, 129, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(5, 150, 105, 0.08) 0%, transparent 50%); pointer-events: none;">
-        </div>
-        <div class="relative z-10" style="position: relative; z-index: 10;">
-            <div class="max-w-7xl mx-auto" style="padding: 0px;">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12"
-                    style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 48px; margin-bottom: 48px; padding: 0px;">
-                    <!-- Company Info -->
-                    <div>
-                        <!-- Logo and Company Name -->
-                        <div class="flex items-center gap-3 mb-6"
-                            style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
-                            <img src="{{ asset('Image/CEGME Logo.png') }}" alt="CEGME Logo" class="block h-12 w-auto"
-                                style="height: 48px; width: auto; object-fit: contain;">
-                            <div class="flex flex-col" style="display: flex; flex-direction: column;">
-                                <span class="text-2xl font-bold"
-                                    style="font-size: 22px; font-weight: 800; background: linear-gradient(135deg, #34d399 0%, #10b981 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2;">CEGME</span>
-                                <span class="text-xs text-gray-200"
-                                    style="font-size: 11px; color: rgb(229, 231, 235); line-height: 1.2; margin-top: 2px;">Géosciences
-                                    • Mines • Environnement</span>
-                            </div>
-                        </div>
-                        <!-- Description -->
-                        <p class="text-white mb-5 leading-relaxed"
-                            style="font-size: 15px; color: rgb(255, 255, 255); margin-bottom: 20px; line-height: 26px; font-weight: 400;">
-                            Cabinet d'Études Géologiques, Minières et Environnementales
-                        </p>
-                        <p class="text-gray-200 text-sm leading-relaxed"
-                            style="font-size: 14px; color: rgb(229, 231, 235); line-height: 22px; margin: 0;">
-                            <strong style="font-weight: 600; color: rgb(255, 255, 255);">Plateforme d'experts nationaux
-                                agréée</strong><br>
-                            N° 004/MEDD/DIRCAB_21
-                        </p>
-                    </div>
+    <x-site-footer />
 
-                    <!-- Liens Rapides -->
-                    <div>
-                        <h3 class="text-xl font-bold mb-6"
-                            style="font-size: 20px; font-weight: 800; margin-bottom: 24px; color: rgb(255, 255, 255); letter-spacing: -0.3px;">
-                            Liens Rapides
-                        </h3>
-                        <ul class="space-y-3" style="list-style: none; padding: 0; margin: 0;">
-                            <li>
-                                <a href="/"
-                                    class="text-gray-200 hover:text-green-300 transition-all duration-200 flex items-center gap-2 group"
-                                    style="color: rgb(229, 231, 235); text-decoration: none; font-size: 15px; display: flex; align-items: center; gap: 8px; padding: 6px 0; transition: all 0.2s ease;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        class="opacity-0 group-hover:opacity-100 transition-opacity"
-                                        style="width: 16px; height: 16px; opacity: 0; transition: opacity 0.2s ease;">
-                                        <path d="M5 12h14"></path>
-                                        <path d="m12 5 7 7-7 7"></path>
-                                    </svg>
-                                    <span>Accueil</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/a-propos"
-                                    class="text-gray-300 hover:text-green-400 transition-all duration-200 flex items-center gap-2 group"
-                                    style="color: rgb(209, 213, 219); text-decoration: none; font-size: 15px; display: flex; align-items: center; gap: 8px; padding: 6px 0; transition: all 0.2s ease;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        class="opacity-0 group-hover:opacity-100 transition-opacity"
-                                        style="width: 16px; height: 16px; opacity: 0; transition: opacity 0.2s ease;">
-                                        <path d="M5 12h14"></path>
-                                        <path d="m12 5 7 7-7 7"></path>
-                                    </svg>
-                                    <span>À Propos</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/services"
-                                    class="text-gray-300 hover:text-green-400 transition-all duration-200 flex items-center gap-2 group"
-                                    style="color: rgb(209, 213, 219); text-decoration: none; font-size: 15px; display: flex; align-items: center; gap: 8px; padding: 6px 0; transition: all 0.2s ease;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        class="opacity-0 group-hover:opacity-100 transition-opacity"
-                                        style="width: 16px; height: 16px; opacity: 0; transition: opacity 0.2s ease;">
-                                        <path d="M5 12h14"></path>
-                                        <path d="m12 5 7 7-7 7"></path>
-                                    </svg>
-                                    <span>Services</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/realisations"
-                                    class="text-gray-300 hover:text-green-400 transition-all duration-200 flex items-center gap-2 group"
-                                    style="color: rgb(209, 213, 219); text-decoration: none; font-size: 15px; display: flex; align-items: center; gap: 8px; padding: 6px 0; transition: all 0.2s ease;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        class="opacity-0 group-hover:opacity-100 transition-opacity"
-                                        style="width: 16px; height: 16px; opacity: 0; transition: opacity 0.2s ease;">
-                                        <path d="M5 12h14"></path>
-                                        <path d="m12 5 7 7-7 7"></path>
-                                    </svg>
-                                    <span>Réalisations</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/actualites"
-                                    class="text-gray-300 hover:text-green-400 transition-all duration-200 flex items-center gap-2 group"
-                                    style="color: rgb(209, 213, 219); text-decoration: none; font-size: 15px; display: flex; align-items: center; gap: 8px; padding: 6px 0; transition: all 0.2s ease;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        class="opacity-0 group-hover:opacity-100 transition-opacity"
-                                        style="width: 16px; height: 16px; opacity: 0; transition: opacity 0.2s ease;">
-                                        <path d="M5 12h14"></path>
-                                        <path d="m12 5 7 7-7 7"></path>
-                                    </svg>
-                                    <span>Actualités</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/blog"
-                                    class="text-gray-300 hover:text-green-400 transition-all duration-200 flex items-center gap-2 group"
-                                    style="color: rgb(209, 213, 219); text-decoration: none; font-size: 15px; display: flex; align-items: center; gap: 8px; padding: 6px 0; transition: all 0.2s ease;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        class="opacity-0 group-hover:opacity-100 transition-opacity"
-                                        style="width: 16px; height: 16px; opacity: 0; transition: opacity 0.2s ease;">
-                                        <path d="M5 12h14"></path>
-                                        <path d="m12 5 7 7-7 7"></path>
-                                    </svg>
-                                    <span>Blog</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('appels-offres.index') }}"
-                                    class="text-gray-300 hover:text-green-400 transition-all duration-200 flex items-center gap-2 group"
-                                    style="color: rgb(209, 213, 219); text-decoration: none; font-size: 15px; display: flex; align-items: center; gap: 8px; padding: 6px 0; transition: all 0.2s ease;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        class="opacity-0 group-hover:opacity-100 transition-opacity"
-                                        style="width: 16px; height: 16px; opacity: 0; transition: opacity 0.2s ease;">
-                                        <path d="M5 12h14"></path>
-                                        <path d="m12 5 7 7-7 7"></path>
-                                    </svg>
-                                    <span>Appels d'Offres</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/contact"
-                                    class="text-gray-300 hover:text-green-400 transition-all duration-200 flex items-center gap-2 group"
-                                    style="color: rgb(209, 213, 219); text-decoration: none; font-size: 15px; display: flex; align-items: center; gap: 8px; padding: 6px 0; transition: all 0.2s ease;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        class="opacity-0 group-hover:opacity-100 transition-opacity"
-                                        style="width: 16px; height: 16px; opacity: 0; transition: opacity 0.2s ease;">
-                                        <path d="M5 12h14"></path>
-                                        <path d="m12 5 7 7-7 7"></path>
-                                    </svg>
-                                    <span>Contact</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <!-- Contact -->
-                    <div>
-                        <h3 class="text-xl font-bold mb-6"
-                            style="font-size: 20px; font-weight: 800; margin-bottom: 24px; color: rgb(255, 255, 255); letter-spacing: -0.3px;">
-                            Contact
-                        </h3>
-                        <ul class="space-y-4" style="list-style: none; padding: 0; margin: 0;">
-                            <li style="padding: 0;">
-                                <div class="flex items-start gap-3"
-                                    style="display: flex; align-items: flex-start; gap: 12px;">
-                                    <div class="w-10 h-10 bg-green-400 bg-opacity-25 rounded-lg flex items-center justify-center flex-shrink-0"
-                                        style="width: 40px; height: 40px; background-color: rgba(52, 211, 153, 0.25); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
-                                            viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round"
-                                            style="width: 18px; height: 18px; color: rgb(52, 211, 153);">
-                                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                                            <circle cx="12" cy="10" r="3"></circle>
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <span class="text-white font-semibold block mb-1"
-                                            style="color: rgb(255, 255, 255); font-weight: 600; font-size: 14px; display: block; margin-bottom: 4px;">Adresse</span>
-                                        <p class="text-gray-300 text-sm leading-relaxed"
-                                            style="color: rgb(209, 213, 219); font-size: 14px; margin: 0; line-height: 22px;">
-                                            Bangui, République Centrafricaine</p>
-                                    </div>
-                                </div>
-                            </li>
-                            <li style="padding: 0;">
-                                <div class="flex items-start gap-3"
-                                    style="display: flex; align-items: flex-start; gap: 12px;">
-                                    <div class="w-10 h-10 bg-green-400 bg-opacity-25 rounded-lg flex items-center justify-center flex-shrink-0"
-                                        style="width: 40px; height: 40px; background-color: rgba(52, 211, 153, 0.25); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
-                                            viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round"
-                                            style="width: 18px; height: 18px; color: rgb(52, 211, 153);">
-                                            <path
-                                                d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z">
-                                            </path>
-                                            <polyline points="22,6 12,13 2,6"></polyline>
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <span class="text-white font-semibold block mb-1"
-                                            style="color: rgb(255, 255, 255); font-weight: 600; font-size: 14px; display: block; margin-bottom: 4px;">Email</span>
-                                        <a href="mailto:contact@cegme.net"
-                                            class="text-gray-200 text-sm hover:text-green-300 transition-colors"
-                                            style="color: rgb(229, 231, 235); font-size: 14px; text-decoration: none; transition: color 0.2s ease;">contact@cegme.net</a>
-                                    </div>
-                                </div>
-                            </li>
-                            <li style="padding: 0;">
-                                <div class="flex items-start gap-3"
-                                    style="display: flex; align-items: flex-start; gap: 12px;">
-                                    <div class="w-10 h-10 bg-green-400 bg-opacity-25 rounded-lg flex items-center justify-center flex-shrink-0"
-                                        style="width: 40px; height: 40px; background-color: rgba(52, 211, 153, 0.25); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
-                                            viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round"
-                                            style="width: 18px; height: 18px; color: rgb(52, 211, 153);">
-                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                            <polyline points="14 2 14 8 20 8"></polyline>
-                                            <line x1="16" y1="13" x2="8" y2="13"></line>
-                                            <line x1="16" y1="17" x2="8" y2="17"></line>
-                                            <polyline points="10 9 9 9 8 9"></polyline>
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <span class="text-white font-semibold block mb-1"
-                                            style="color: rgb(255, 255, 255); font-weight: 600; font-size: 14px; display: block; margin-bottom: 4px;">Registre</span>
-                                        <p class="text-gray-300 text-sm leading-relaxed"
-                                            style="color: rgb(209, 213, 219); font-size: 14px; margin: 0; line-height: 22px;">
-                                            CA/BG/2015B514</p>
-                                    </div>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Copyright -->
-                <div class="text-center border-t border-white border-opacity-20 pt-8"
-                    style="border-top: 1px solid rgba(255, 255, 255, 0.2); padding-top: 32px; text-align: center; margin-top: 32px;">
-                    <p class="text-gray-400 text-sm" style="color: rgb(156, 163, 175); font-size: 14px; margin: 0;">
-                        © 2025 CEGME SARL. Tous droits réservés.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Mobile Menu JavaScript -->
+    @include('partials.site-scripts')
     <script>
         function toggleMobileMenu() {
             const menu = document.getElementById('mobileMenu');
             const button = document.getElementById('mobileMenuButton');
 
-            menu.classList.toggle('active');
-            button.classList.toggle('active');
+            if (menu && button) {
+                menu.classList.toggle('active');
+                button.classList.toggle('active');
+            }
         }
 
-        // Fermer le menu au clic sur un lien
-        document.querySelectorAll('.mobile-menu a').forEach(link => {
-            link.addEventListener('click', () => {
-                const menu = document.getElementById('mobileMenu');
-                const button = document.getElementById('mobileMenuButton');
-                menu.classList.remove('active');
-                button.classList.remove('active');
-            });
-        });
-
-        // Fermer le menu en cliquant en dehors
-        document.addEventListener('click', (e) => {
+        document.addEventListener('click', function (event) {
             const menu = document.getElementById('mobileMenu');
             const button = document.getElementById('mobileMenuButton');
-            const isClickInsideMenu = menu.contains(e.target);
-            const isClickOnButton = button.contains(e.target);
 
-            if (!isClickInsideMenu && !isClickOnButton && menu.classList.contains('active')) {
-                menu.classList.remove('active');
-                button.classList.remove('active');
+            if (menu && button && menu.classList.contains('active')) {
+                if (!menu.contains(event.target) && !button.contains(event.target)) {
+                    menu.classList.remove('active');
+                    button.classList.remove('active');
+                }
             }
         });
     </script>

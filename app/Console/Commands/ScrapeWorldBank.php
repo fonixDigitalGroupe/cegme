@@ -13,7 +13,7 @@ class ScrapeWorldBank extends Command
      *
      * @var string
      */
-    protected $signature = 'app:scrape-world-bank {--force : Forcer le scraping même si aucune règle active}';
+    protected $signature = 'app:scrape-world-bank {--force : Forcer le scraping même si aucune règle active} {--job-id= : ID du job pour le suivi de progression}';
 
     /**
      * The console command description.
@@ -28,7 +28,11 @@ class ScrapeWorldBank extends Command
     public function handle(WorldBankScraperService $scraper)
     {
         $source = 'World Bank';
-        
+
+        if ($this->option('job-id')) {
+            $scraper->setJobId($this->option('job-id'));
+        }
+
         // Vérifier si une règle active existe pour cette source
         if (!$this->option('force') && !ScraperHelper::hasActiveRule($source)) {
             $this->warn("⚠ Aucune règle de filtrage active trouvée pour la source '{$source}'.");

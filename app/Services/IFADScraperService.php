@@ -5,44 +5,54 @@ namespace App\Services;
 use App\Models\Offre;
 use Illuminate\Support\Facades\Log;
 
-class IFADScraperService
+class IFADScraperService implements IterativeScraperInterface
 {
-    /**
-     * Lance le scraping de tous les appels d'offres IFAD
-     * STRATÉGIE: Utiliser des liens de recherche contextuelle (comme World Bank)
-     * Les notices UNGM sont chargées dynamiquement via JavaScript
-     *
-     * @return array
-     */
-    public function scrape(): array
+    private ?string $jobId = null;
+    private bool $isExhausted = false;
+
+    public function setJobId(?string $jobId): void
     {
+        $this->jobId = $jobId;
+    }
+
+    public function initialize(): void
+    {
+        $this->isExhausted = false;
+    }
+
+    public function reset(): void
+    {
+        $this->isExhausted = false;
+    }
+
+    public function scrapeBatch(int $limit = 10): array
+    {
+        if ($this->isExhausted) {
+            return ['count' => 0, 'has_more' => false];
+        }
+
         Log::info('IFAD Scraper: Début du scraping (stratégie liens contextuels)');
-        
+
         try {
             // URL de recherche UNGM avec filtre IFAD
             $searchUrl = 'https://www.ungm.org/Public/Notice?Agency=IFAD&Status=Open';
-            
+
             // Vérifier si une offre IFAD existe déjà
             $existingOffre = Offre::where('source', 'IFAD')
                 ->where('link_type', 'search_context')
                 ->first();
-            
+
             if ($existingOffre) {
-                Log::info('IFAD Scraper: Offre contextuelle déjà existante', [
-                    'count' => Offre::where('source', 'IFAD')->count(),
-                ]);
+                Log::info('IFAD Scraper: Offre contextuelle déjà existante');
+                $this->isExhausted = true;
                 return [
                     'count' => 0,
-                    'stats' => [
-                        'total_pages_scraped' => 0,
-                        'total_notices_kept' => Offre::where('source', 'IFAD')->count(),
-                        'offres_par_page' => [],
-                    ],
+                    'has_more' => false,
                 ];
             }
-            
+
             // Créer une offre contextuelle unique pour IFAD
-            $offre = [
+            $offreData = [
                 'titre' => 'Appels d\'offres IFAD',
                 'acheteur' => 'IFAD',
                 'pays' => null,
@@ -55,34 +65,48 @@ class IFADScraperService
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
-            
-            Offre::insert($offre);
-            
-            $totalCount = 1;
-            
+
+            Offre::insert($offreData);
+
             Log::info('IFAD Scraper: Offre contextuelle créée', [
                 'url' => $searchUrl,
-                'total_ifad' => Offre::where('source', 'IFAD')->count(),
             ]);
+
+            $this->isExhausted = true;
+            return [
+                'count' => 1,
+                'has_more' => false,
+            ];
 
         } catch (\Exception $e) {
             Log::error('IFAD Scraper: Exception during scraping', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
             ]);
-            $totalCount = 0;
+            $this->isExhausted = true;
+            return [
+                'count' => 0,
+                'has_more' => false,
+            ];
         }
+    }
+
+    /**
+     * Lance le scraping de tous les appels d'offres IFAD
+     * (Conservé pour compatibilité)
+     */
+    public function scrape(): array
+    {
+        $this->initialize();
+        $result = $this->scrapeBatch(10);
 
         $stats = [
             'total_pages_scraped' => 0,
-            'total_notices_kept' => $totalCount,
+            'total_notices_kept' => $result['count'],
             'offres_par_page' => [],
         ];
 
-        Log::info('IFAD Scraper: Résumé du scraping', $stats);
-
         return [
-            'count' => $totalCount,
+            'count' => $result['count'],
             'stats' => $stats,
         ];
     }

@@ -59,29 +59,30 @@ Route::middleware(['auth', 'adminOrEditor'])->prefix('admin')->name('admin.')->g
 
     // Posts (Articles/Blog)
     Route::resource('posts', \App\Http\Controllers\Admin\PostController::class);
-    
+
     // Upload d'images pour l'éditeur
     Route::post('/posts/upload-image', [\App\Http\Controllers\Admin\PostController::class, 'uploadImage'])->name('posts.upload-image');
-    
+
     // Categories
     Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
-    
+
     // Tags
     Route::resource('tags', \App\Http\Controllers\Admin\TagController::class);
-    
+
     // Règles de filtrage des offres
     Route::resource('filtering-rules', \App\Http\Controllers\Admin\FilteringRuleController::class);
     Route::post('/filtering-rules/reapply', [\App\Http\Controllers\Admin\FilteringRuleController::class, 'reapplyFiltering'])->name('filtering-rules.reapply');
-    
+
     // Pôles d'activité
     Route::resource('activity-poles', \App\Http\Controllers\Admin\ActivityPoleController::class);
     Route::post('/activity-poles/{activityPole}/keywords', [\App\Http\Controllers\Admin\ActivityPoleController::class, 'addKeyword'])->name('activity-poles.keywords.add');
     Route::delete('/activity-poles/{activityPole}/keywords/{keyword}', [\App\Http\Controllers\Admin\ActivityPoleController::class, 'removeKeyword'])->name('activity-poles.keywords.remove');
-    
+
     // Scraping des offres
     Route::get('/scraping', [\App\Http\Controllers\Admin\ScrapingController::class, 'index'])->name('scraping.index');
     Route::post('/scraping/start', [\App\Http\Controllers\Admin\ScrapingController::class, 'start'])->name('scraping.start');
     Route::get('/scraping/progress', [\App\Http\Controllers\Admin\ScrapingController::class, 'progress'])->name('scraping.progress');
+    Route::get('/scraping/findings/{jobId}', [\App\Http\Controllers\Admin\ScrapingController::class, 'getFindings'])->name('scraping.findings');
     Route::post('/scraping/cancel', [\App\Http\Controllers\Admin\ScrapingController::class, 'cancel'])->name('scraping.cancel');
     Route::post('/scraping/truncate', [\App\Http\Controllers\Admin\ScrapingController::class, 'truncate'])->name('scraping.truncate');
 });
@@ -92,4 +93,4 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

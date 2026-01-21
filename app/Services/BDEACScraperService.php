@@ -9,102 +9,136 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Spatie\Browsershot\Browsershot;
 
-class BDEACScraperService
+class BDEACScraperService implements IterativeScraperInterface
 {
     private const BASE_URL = 'https://www.bdeac.org/jcms/rh_30762/appels-d-offres';
     private const MAX_PAGES = 100;
 
-    /**
-     * Lance le scraping de tous les appels d'offres BDEAC
-     *
-     * @return array
-     */
-    public function scrape(): array
+    private ?string $jobId = null;
+    private int $currentPage = 0;
+    private bool $isExhausted = false;
+    private array $pendingOffers = [];
+
+    public function setJobId(?string $jobId): void
     {
-        Log::info('BDEAC Scraper: Début du scraping');
-        
-        try {
-            $page = 0;
-            $totalCount = 0;
-            $pagesStats = [];
-            
-            $maxPages = max(1, min((int) env('BDEAC_MAX_PAGES', 5), self::MAX_PAGES));
-            while ($page < $maxPages) {
-                Log::debug("BDEAC Scraper: Fetching page {$page}");
-                
-                $result = $this->scrapePage($page);
-                $count = $result['count'];
-                $totalCount += $count;
-                
-                $pagesStats[$page] = $count;
-                
-                if ($page % 10 === 0 || $count > 0) {
-                    Log::info("BDEAC Scraper: Page {$page} traitée", [
-                        'offres_trouvees' => $count,
-                        'total_accumule' => $totalCount,
-                    ]);
-                }
-                
-                // Arrêter si aucune offre trouvée
-                if ($count === 0 && $page > 0) {
-                    Log::info("BDEAC Scraper: Page {$page} a retourné 0 offres, arrêt.");
-                    break;
-                }
-                
-                $page++;
-                usleep(500000); // 0.5 seconde entre les pages
-            }
-
-        } catch (\Exception $e) {
-            Log::error('BDEAC Scraper: Exception during scraping', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-        }
-
-        $stats = [
-            'total_pages_scraped' => count($pagesStats),
-            'total_notices_kept' => $totalCount,
-            'offres_par_page' => $pagesStats,
-        ];
-
-        Log::info('BDEAC Scraper: Résumé du scraping', $stats);
-
-        return [
-            'count' => $totalCount,
-            'stats' => $stats,
-        ];
+        $this->jobId = $jobId;
     }
 
-    /**
-     * Scrape une page spécifique
-     *
-     * @param int $page
-     * @return array
-     */
-    private function scrapePage(int $page): array
+    public function initialize(): void
     {
-        $count = 0;
-        $html = '';
-        
+        $this->currentPage = 0;
+        $this->isExhausted = false;
+        $this->pendingOffers = [];
+    }
+
+    public function reset(): void
+    {
+        $this->initialize();
+    }
+
+    public function scrapeBatch(int $limit = 10): array
+    {
+        Log::info("BDEAC Scraper: Début scrapeBatch(limit=$limit)");
+        $insertedCount = 0;
+
+        // 1. Servir les offres en attente si présentes
+        if (!empty($this->pendingOffers)) {
+            $batch = array_splice($this->pendingOffers, 0, $limit);
+            foreach ($batch as $offre) {
+                if ($this->saveOffre($offre)) {
+                    $insertedCount++;
+                }
+            }
+            return [
+                'count' => $insertedCount,
+                'has_more' => !empty($this->pendingOffers) || !$this->isExhausted
+            ];
+        }
+
+        if ($this->isExhausted) {
+            return ['count' => 0, 'has_more' => false];
+        }
+
+        // 2. Scrapper une nouvelle page
         try {
-            // Construire l'URL avec pagination
+            $result = $this->scrapePageForBatch($this->currentPage);
+            $offersFound = $result['offers'];
+
+            if (empty($offersFound)) {
+                $this->isExhausted = true;
+                return ['count' => 0, 'has_more' => false];
+            }
+
+            // Mettre en attente les offres trouvées
+            $this->pendingOffers = $offersFound;
+            $this->currentPage++;
+
+            // Arrêter si on a atteint le maximum de pages configuré
+            $maxPages = max(1, min((int) env('BDEAC_MAX_PAGES', 5), self::MAX_PAGES));
+            if ($this->currentPage >= $maxPages) {
+                $this->isExhausted = true;
+            }
+
+            // Servir le premier lot
+            $batch = array_splice($this->pendingOffers, 0, $limit);
+            foreach ($batch as $offre) {
+                if ($this->saveOffre($offre)) {
+                    $insertedCount++;
+                }
+            }
+
+            return [
+                'count' => $insertedCount,
+                'has_more' => !empty($this->pendingOffers) || !$this->isExhausted
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('BDEAC Scraper: Exception during scrapeBatch', [
+                'error' => $e->getMessage()
+            ]);
+            $this->isExhausted = true;
+            return ['count' => 0, 'has_more' => false];
+        }
+    }
+
+    private function saveOffre(array $offreData): bool
+    {
+        $exists = Offre::where('source', 'BDEAC')
+            ->where(function ($query) use ($offreData) {
+                $query->where('lien_source', $offreData['lien_source'])
+                    ->orWhere('titre', $offreData['titre']);
+            })
+            ->exists();
+
+        if (!$exists) {
+            $offreData['created_at'] = now();
+            $offreData['updated_at'] = now();
+            Offre::insert($offreData);
+            return true;
+        }
+
+        return false;
+    }
+
+    private function scrapePageForBatch(int $page): array
+    {
+        $offers = [];
+        $html = '';
+
+        try {
             $url = self::BASE_URL;
             if ($page > 0) {
-                // Essayer différents formats de pagination
-                $url .= '?page=' . ($page + 1); // Page 1, 2, 3...
+                $url .= '?page=' . ($page + 1);
             }
-            
+
             Log::debug('BDEAC Scraper: Fetching page', ['page' => $page, 'url' => $url]);
-            
-            // Utiliser Browsershot pour contourner la protection anti-bot
+
+            // Utiliser Browsershot
             try {
-                Log::debug('BDEAC Scraper: Using Browsershot to fetch page', ['url' => $url]);
-                
                 $html = Browsershot::url($url)
-                    ->waitUntilNetworkIdle() // Attendre que le réseau soit inactif (JS chargé)
-                    ->delay(2000) // Attendre 2 secondes pour le chargement JS
-                    ->timeout(120) // Timeout de 2 minutes
+                    ->waitUntilNetworkIdle()
+                    ->delay(2000)
+                    ->timeout(120)
                     ->setOption('args', [
                         '--no-sandbox',
                         '--disable-setuid-sandbox',
@@ -114,155 +148,78 @@ class BDEACScraperService
                     ])
                     ->dismissDialogs()
                     ->userAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
-                    ->setExtraHttpHeaders([
-                        'Accept-Language' => 'fr-FR,fr;q=0.9,en;q=0.8',
-                    ])
+                    ->setExtraHttpHeaders(['Accept-Language' => 'fr-FR,fr;q=0.9,en;q=0.8'])
                     ->bodyHtml();
-                
+
                 if (empty($html)) {
-                    Log::warning('BDEAC Scraper: Browsershot returned empty HTML', ['url' => $url]);
-                    return ['count' => 0, 'html' => ''];
+                    return ['offers' => [], 'html' => ''];
                 }
-                
-                Log::debug('BDEAC Scraper: Successfully fetched page with Browsershot', [
-                    'url' => $url,
-                    'html_length' => strlen($html),
-                ]);
-                
             } catch (\Exception $e) {
-                Log::error('BDEAC Scraper: Browsershot failed, falling back to HTTP', [
-                    'url' => $url,
-                    'error' => $e->getMessage(),
-                ]);
-                
-                // Fallback vers HTTP simple
-                $response = Http::timeout(30)
-                    ->withHeaders([
-                        'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                        'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                        'Accept-Language' => 'fr-FR,fr;q=0.9,en;q=0.8',
-                    ])
-                    ->get($url);
-                
-                if (!$response->successful()) {
-                    Log::warning('BDEAC Scraper: HTTP request failed', [
-                        'url' => $url,
-                        'status' => $response->status(),
-                    ]);
-                    return ['count' => 0, 'html' => ''];
-                }
-                
+                Log::error('BDEAC Scraper: Browsershot failed, fallback to HTTP', ['url' => $url, 'error' => $e->getMessage()]);
+                $response = Http::timeout(30)->withHeaders([
+                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                ])->get($url);
+                if (!$response->successful())
+                    return ['offers' => [], 'html' => ''];
                 $html = $response->body();
             }
-            
-            // Parser le HTML
+
             $dom = new DOMDocument();
             libxml_use_internal_errors(true);
             @$dom->loadHTML('<?xml encoding="UTF-8">' . $html);
             libxml_clear_errors();
-            
             $xpath = new DOMXPath($dom);
-            
-            // Extraire les notices de procurement
+
             $items = $this->extractProcurementItems($xpath, $dom);
-            
-            Log::info('BDEAC Scraper: Items found', ['page' => $page, 'count' => count($items)]);
-            
-            // Traiter chaque item
-            $validOffres = [];
             $titresVus = [];
-            
+
             foreach ($items as $item) {
                 try {
                     $offre = $this->extractOffreData($item, $xpath);
-                    
-                    if (!$offre || empty($offre['titre']) || empty($offre['lien_source'])) {
+
+                    if (!$offre || empty($offre['titre']) || empty($offre['lien_source']))
                         continue;
-                    }
-                    
-                    // VALIDATION: Rejeter seulement les doublons de titres
+
                     $titreNormalise = $this->normalizeTitle($offre['titre']);
-                    if (isset($titresVus[$titreNormalise])) {
-                        Log::debug('BDEAC Scraper: Titre dupliqué rejeté', ['titre' => $offre['titre']]);
+                    if (isset($titresVus[$titreNormalise]))
                         continue;
-                    }
                     $titresVus[$titreNormalise] = true;
-                    
-                    // VALIDATION: Tester l'URL HTTP (200 OK seulement)
-                    if (!$this->validateUrl($offre['lien_source'])) {
-                        Log::debug('BDEAC Scraper: URL invalide (pas 200 OK)', [
-                            'titre' => $offre['titre'],
-                            'lien' => $offre['lien_source'],
-                        ]);
+
+                    if (!$this->validateUrl($offre['lien_source']))
                         continue;
-                    }
-                    
-                    Log::debug('BDEAC Scraper: Offre acceptée', [
-                        'titre' => $offre['titre'],
-                        'lien' => $offre['lien_source'],
-                    ]);
-                    
-                    $validOffres[] = $offre;
+
+                    $offers[] = $offre;
                 } catch (\Exception $e) {
-                    Log::debug('BDEAC Scraper: Error processing item', [
-                        'error' => $e->getMessage(),
-                    ]);
                     continue;
                 }
             }
-            
-            // Vérifier les offres existantes en batch
-            if (!empty($validOffres)) {
-                $liensSources = array_column($validOffres, 'lien_source');
-                $titres = array_column($validOffres, 'titre');
-                
-                $existingLiens = Offre::where('source', 'BDEAC')
-                    ->whereIn('lien_source', $liensSources)
-                    ->pluck('lien_source')
-                    ->toArray();
-                
-                $existingTitres = Offre::where('source', 'BDEAC')
-                    ->whereIn('titre', $titres)
-                    ->pluck('titre')
-                    ->toArray();
-                
-                // Filtrer les offres qui n'existent pas déjà
-                $newOffres = [];
-                foreach ($validOffres as $offre) {
-                    $exists = in_array($offre['lien_source'], $existingLiens) 
-                           || in_array($offre['titre'], $existingTitres);
-                    
-                    if (!$exists) {
-                        $newOffres[] = $offre;
-                    }
-                }
-                
-                // Insérer en batch
-                if (!empty($newOffres)) {
-                    $now = now();
-                    foreach ($newOffres as &$offre) {
-                        $offre['created_at'] = $now;
-                        $offre['updated_at'] = $now;
-                    }
-                    unset($offre);
-                    
-                    $chunks = array_chunk($newOffres, 50);
-                    foreach ($chunks as $chunk) {
-                        Offre::insert($chunk);
-                        $count += count($chunk);
-                    }
-                }
-            }
-
         } catch (\Exception $e) {
-            Log::error('BDEAC Scraper: Exception occurred while scraping page', [
-                'page' => $page,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
+            Log::error('BDEAC Scraper: Error in scrapePageForBatch', ['page' => $page, 'error' => $e->getMessage()]);
         }
 
-        return ['count' => $count, 'html' => $html];
+        return ['offers' => $offers, 'html' => $html];
+    }
+
+    /**
+     * Lance le scraping de tous les appels d'offres BDEAC (compatibilité)
+     */
+    public function scrape(): array
+    {
+        $this->initialize();
+        $totalCount = 0;
+        $maxPages = max(1, min((int) env('BDEAC_MAX_PAGES', 5), self::MAX_PAGES));
+
+        for ($i = 0; $i < $maxPages; $i++) {
+            $batch = $this->scrapeBatch(100);
+            $totalCount += $batch['count'];
+            if (!$batch['has_more'])
+                break;
+        }
+
+        return [
+            'count' => $totalCount,
+            'stats' => ['total_notices_kept' => $totalCount]
+        ];
     }
 
     /**
@@ -275,7 +232,7 @@ class BDEACScraperService
     private function extractProcurementItems(DOMXPath $xpath, DOMDocument $dom): array
     {
         $items = [];
-        
+
         // Stratégie 1: Chercher les liens vers les appels d'offres
         $linkPatterns = [
             "//a[contains(@href, 'appels-d-offres')]",
@@ -287,7 +244,7 @@ class BDEACScraperService
             "//div[contains(@class, 'notice')]//a[@href]",
             "//li[contains(@class, 'item')]//a[@href]",
         ];
-        
+
         $allLinks = [];
         foreach ($linkPatterns as $pattern) {
             $links = $xpath->query($pattern);
@@ -295,26 +252,28 @@ class BDEACScraperService
                 $allLinks[] = $link;
             }
         }
-        
+
         foreach ($allLinks as $link) {
             $href = $link->getAttribute('href');
             $text = trim($link->textContent);
-            
+
             // Ignorer les liens de navigation
-            if (stripos($text, 'voir tout') !== false || 
+            if (
+                stripos($text, 'voir tout') !== false ||
                 stripos($text, 'voir plus') !== false ||
                 stripos($text, 'suivant') !== false ||
                 stripos($text, 'précédent') !== false ||
                 stripos($text, 'page') !== false ||
-                strlen($text) < 20) {
+                strlen($text) < 20
+            ) {
                 continue;
             }
-            
+
             // Trouver le conteneur parent
             $parent = $link->parentNode;
             $maxDepth = 5;
             $depth = 0;
-            
+
             while ($parent && $depth < $maxDepth) {
                 $parentText = trim($parent->textContent);
                 if (strlen($parentText) > 50) {
@@ -335,7 +294,7 @@ class BDEACScraperService
                 $depth++;
             }
         }
-        
+
         // Stratégie 2: Chercher par structure de liste/carte
         $selectors = [
             "//article",
@@ -345,7 +304,7 @@ class BDEACScraperService
             "//li[contains(@class, 'item')]",
             "//tr[contains(@class, 'item')]",
         ];
-        
+
         foreach ($selectors as $selector) {
             try {
                 $nodes = $xpath->query($selector);
@@ -353,8 +312,10 @@ class BDEACScraperService
                     $nodeLinks = $xpath->query(".//a[@href]", $node);
                     if ($nodeLinks->length > 0) {
                         $nodeHref = $nodeLinks->item(0)->getAttribute('href');
-                        if (stripos($nodeHref, 'appels-d-offres') !== false || 
-                            stripos($nodeHref, '/jcms/') !== false) {
+                        if (
+                            stripos($nodeHref, 'appels-d-offres') !== false ||
+                            stripos($nodeHref, '/jcms/') !== false
+                        ) {
                             $found = false;
                             foreach ($items as $existing) {
                                 $existingLinks = $xpath->query(".//a[@href]", $existing);
@@ -373,7 +334,7 @@ class BDEACScraperService
                 continue;
             }
         }
-        
+
         return $items;
     }
 
@@ -390,34 +351,38 @@ class BDEACScraperService
             // Extraire le titre et le lien
             $titre = null;
             $lien = null;
-            
+
             // Chercher les liens dans l'élément
             $linkNodes = $xpath->query(".//a[@href]", $item);
-            
+
             foreach ($linkNodes as $link) {
                 $href = $link->getAttribute('href');
                 $linkText = trim($link->textContent);
-                
+
                 // Ignorer les liens de navigation
-                if (stripos($href, 'javascript:') !== false ||
+                if (
+                    stripos($href, 'javascript:') !== false ||
                     stripos($href, '#') === 0 ||
                     stripos($href, 'mailto:') !== false ||
                     stripos($linkText, 'voir tout') !== false ||
                     stripos($linkText, 'voir plus') !== false ||
                     stripos($linkText, 'suivant') !== false ||
                     stripos($linkText, 'précédent') !== false ||
-                    strlen($linkText) < 20) {
+                    strlen($linkText) < 20
+                ) {
                     continue;
                 }
-                
+
                 // Si le lien pointe vers un appel d'offres ou une page de détail
-                if (stripos($href, 'appels-d-offres') !== false ||
+                if (
+                    stripos($href, 'appels-d-offres') !== false ||
                     stripos($href, 'appel-d-offre') !== false ||
                     stripos($href, 'avis') !== false ||
-                    stripos($href, '/jcms/') !== false) {
-                    
+                    stripos($href, '/jcms/') !== false
+                ) {
+
                     $hrefNormalized = $this->normalizeUrl($href);
-                    
+
                     // Si le texte du lien est substantiel, c'est notre notice
                     if (strlen($linkText) > 20 && strlen($linkText) < 500) {
                         $titre = $linkText;
@@ -426,27 +391,31 @@ class BDEACScraperService
                     }
                 }
             }
-            
+
             // Si pas de lien titre trouvé, chercher "En savoir plus"
             if (!$lien && $linkNodes->length > 0) {
                 foreach ($linkNodes as $link) {
                     $href = $link->getAttribute('href');
                     $linkText = strtolower(trim($link->textContent));
-                    
-                    if (stripos($linkText, 'en savoir plus') !== false ||
+
+                    if (
+                        stripos($linkText, 'en savoir plus') !== false ||
                         stripos($linkText, 'lire la suite') !== false ||
-                        stripos($linkText, 'détails') !== false) {
-                        
+                        stripos($linkText, 'détails') !== false
+                    ) {
+
                         $hrefNormalized = $this->normalizeUrl($href);
-                        if (stripos($hrefNormalized, 'appels-d-offres') !== false ||
-                            stripos($hrefNormalized, '/jcms/') !== false) {
+                        if (
+                            stripos($hrefNormalized, 'appels-d-offres') !== false ||
+                            stripos($hrefNormalized, '/jcms/') !== false
+                        ) {
                             $lien = $hrefNormalized;
                             break;
                         }
                     }
                 }
             }
-            
+
             // Si toujours pas de lien, chercher le titre dans les balises h*
             if (!$titre) {
                 $titreNodes = $xpath->query(".//h1 | .//h2 | .//h3 | .//h4 | .//h5 | .//h6", $item);
@@ -460,7 +429,7 @@ class BDEACScraperService
                     }
                 }
             }
-            
+
             // Si toujours pas de titre, chercher dans le texte complet
             if (!$titre) {
                 $fullText = trim($item->textContent);
@@ -473,21 +442,21 @@ class BDEACScraperService
                     }
                 }
             }
-            
+
             if (!$titre || !$lien) {
                 return null;
             }
-            
+
             // Extraire le type d'avis
             $type = $this->extractType($item, $xpath);
-            
+
             // Extraire le pays/zone
             $pays = $this->extractCountry($item, $xpath);
-            
+
             // Extraire les dates
             $datePublication = $this->extractPublicationDate($item, $xpath);
             $dateLimite = $this->extractDeadline($item, $xpath);
-            
+
             return [
                 'titre' => $titre,
                 'acheteur' => 'Banque de Développement des États de l\'Afrique Centrale (BDEAC)',
@@ -514,21 +483,20 @@ class BDEACScraperService
     private function extractType(\DOMElement $item, DOMXPath $xpath): ?string
     {
         $text = strtolower($item->textContent);
-        
+
         $types = [
             'appel d\'offres' => 'Appel d\'offres',
-            'avis de préqualification' => 'Avis de préqualification',
             'avis de préqualification' => 'Avis de préqualification',
             'expression d\'intérêt' => 'Expression d\'intérêt',
             'consultation' => 'Consultation',
         ];
-        
+
         foreach ($types as $keyword => $type) {
             if (stripos($text, $keyword) !== false) {
                 return $type;
             }
         }
-        
+
         return null;
     }
 
@@ -538,18 +506,25 @@ class BDEACScraperService
     private function extractCountry(\DOMElement $item, DOMXPath $xpath): ?string
     {
         $text = $item->textContent;
-        
+
         $countries = [
-            'Cameroun', 'Congo', 'Gabon', 'Guinée équatoriale', 'République centrafricaine',
-            'Tchad', 'São Tomé-et-Príncipe', 'Afrique centrale', 'CEMAC',
+            'Cameroun',
+            'Congo',
+            'Gabon',
+            'Guinée équatoriale',
+            'République centrafricaine',
+            'Tchad',
+            'São Tomé-et-Príncipe',
+            'Afrique centrale',
+            'CEMAC',
         ];
-        
+
         foreach ($countries as $country) {
             if (stripos($text, $country) !== false) {
                 return $country;
             }
         }
-        
+
         return null;
     }
 
@@ -559,13 +534,13 @@ class BDEACScraperService
     private function extractPublicationDate(\DOMElement $item, DOMXPath $xpath): ?string
     {
         $text = $item->textContent;
-        
+
         $patterns = [
             '/(\d{1,2})\/(\d{1,2})\/(\d{4})/',
             '/(\d{4})-(\d{2})-(\d{2})/',
             '/(\d{1,2})\s+(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\s+(\d{4})/i',
         ];
-        
+
         foreach ($patterns as $pattern) {
             if (preg_match($pattern, $text, $matches)) {
                 try {
@@ -577,7 +552,7 @@ class BDEACScraperService
                 }
             }
         }
-        
+
         return null;
     }
 
@@ -587,22 +562,22 @@ class BDEACScraperService
     private function extractDeadline(\DOMElement $item, DOMXPath $xpath): ?string
     {
         $text = strtolower($item->textContent);
-        
+
         // Chercher des patterns comme "date limite", "clôture", "deadline"
         $deadlineKeywords = ['date limite', 'clôture', 'deadline', 'date de clôture', 'échéance'];
-        
+
         foreach ($deadlineKeywords as $keyword) {
             if (stripos($text, $keyword) !== false) {
                 // Chercher une date après le mot-clé
                 $pos = stripos($text, $keyword);
                 $substring = substr($text, $pos, 100);
-                
+
                 $patterns = [
                     '/(\d{1,2})\/(\d{1,2})\/(\d{4})/',
                     '/(\d{4})-(\d{2})-(\d{2})/',
                     '/(\d{1,2})\s+(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\s+(\d{4})/i',
                 ];
-                
+
                 foreach ($patterns as $pattern) {
                     if (preg_match($pattern, $substring, $matches)) {
                         try {
@@ -616,7 +591,7 @@ class BDEACScraperService
                 }
             }
         }
-        
+
         return null;
     }
 
@@ -660,20 +635,20 @@ class BDEACScraperService
             $response = Http::withoutVerifying()
                 ->timeout(10)
                 ->head($url);
-            
+
             $status = $response->status();
-            
+
             // Accepter seulement 200 OK
             if ($status === 200) {
                 return true;
             }
-            
+
             Log::debug('BDEAC Scraper: URL returned invalid status', [
                 'url' => $url,
                 'status' => $status,
             ]);
             return false;
-            
+
         } catch (\Exception $e) {
             Log::debug('BDEAC Scraper: URL validation failed', [
                 'url' => $url,

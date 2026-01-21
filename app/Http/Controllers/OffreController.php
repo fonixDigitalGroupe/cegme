@@ -25,19 +25,19 @@ class OffreController extends Controller
         // Appliquer les filtres
         if ($marketType) {
             // Filtrer par type de marché (basé sur le titre et l'acheteur)
-            $query->where(function($q) use ($marketType) {
+            $query->where(function ($q) use ($marketType) {
                 $text = '%';
                 if ($marketType === 'bureau_d_etude') {
                     $keywords = ['bureau d\'étude', 'bureau d\'études', 'cabinet', 'consulting', 'étude', 'études'];
                     foreach ($keywords as $kw) {
                         $q->orWhere('titre', 'like', '%' . $kw . '%')
-                          ->orWhere('acheteur', 'like', '%' . $kw . '%');
+                            ->orWhere('acheteur', 'like', '%' . $kw . '%');
                     }
                 } elseif ($marketType === 'consultant_individuel') {
                     $keywords = ['consultant individuel', 'individual consultant', 'expert individuel', 'individual expert'];
                     foreach ($keywords as $kw) {
                         $q->orWhere('titre', 'like', '%' . $kw . '%')
-                          ->orWhere('acheteur', 'like', '%' . $kw . '%');
+                            ->orWhere('acheteur', 'like', '%' . $kw . '%');
                     }
                 }
             });
@@ -48,10 +48,10 @@ class OffreController extends Controller
             $activityPole = ActivityPole::with('keywords')->find($activityPoleId);
             if ($activityPole && $activityPole->keywords->isNotEmpty()) {
                 $keywords = $activityPole->keywords->pluck('keyword')->toArray();
-                $query->where(function($q) use ($keywords) {
+                $query->where(function ($q) use ($keywords) {
                     foreach ($keywords as $kw) {
                         $q->orWhere('titre', 'like', '%' . $kw . '%')
-                          ->orWhere('acheteur', 'like', '%' . $kw . '%');
+                            ->orWhere('acheteur', 'like', '%' . $kw . '%');
                     }
                 });
             }
@@ -59,10 +59,10 @@ class OffreController extends Controller
 
         if ($keyword) {
             // Filtrer par mot-clé
-            $query->where(function($q) use ($keyword) {
+            $query->where(function ($q) use ($keyword) {
                 $q->where('titre', 'like', '%' . $keyword . '%')
-                  ->orWhere('acheteur', 'like', '%' . $keyword . '%')
-                  ->orWhere('pays', 'like', '%' . $keyword . '%');
+                    ->orWhere('acheteur', 'like', '%' . $keyword . '%')
+                    ->orWhere('pays', 'like', '%' . $keyword . '%');
             });
         }
 
@@ -72,33 +72,43 @@ class OffreController extends Controller
         $filteredOffres = $filteringService->filterOffers($allOffres);
 
         // Règle métier: inclure TOUTES les World Bank, même si elles ne matchent pas les règles
-        $wbOffres = $allOffres->filter(function ($o) { return $o->source === 'World Bank'; });
+        $wbOffres = $allOffres->filter(function ($o) {
+            return $o->source === 'World Bank'; });
         $filteredOffres = $filteredOffres->merge($wbOffres)->unique('id');
 
         // Compter avant le filtre de date
         $countBeforeDateFilter = $filteredOffres->count();
 
-        // Règle métier: garder les World Bank même si la date est NULL
+        // Filtres demandés par l'utilisateur: pays non nul et date non expirée
         $filteredOffres = $filteredOffres->filter(function ($offre) {
-            // Si source = World Bank et date NULL -> garder
-            if ($offre->source === 'World Bank' && is_null($offre->date_limite_soumission)) {
-                return true;
-            }
-            // Sinon, exiger une date valide
-            if (is_null($offre->date_limite_soumission)) {
+            // 1. Pays ne doit pas être null ou vide
+            if (empty($offre->pays)) {
                 return false;
             }
-            if (is_string($offre->date_limite_soumission) && trim($offre->date_limite_soumission) === '') {
-                return false;
-            }
-            if (is_object($offre->date_limite_soumission) && method_exists($offre->date_limite_soumission, 'format')) {
+
+            // 2. La date limite ne doit pas être expirée
+            if (!empty($offre->date_limite_soumission)) {
                 try {
-                    $offre->date_limite_soumission->format('Y-m-d');
-                    return true;
+                    $dateLimite = null;
+                    if (is_object($offre->date_limite_soumission) && method_exists($offre->date_limite_soumission, 'isPast')) {
+                        $dateLimite = $offre->date_limite_soumission;
+                    } else {
+                        $dateLimite = \Carbon\Carbon::parse($offre->date_limite_soumission);
+                    }
+
+                    if ($dateLimite->isPast() && !$dateLimite->isToday()) {
+                        return false;
+                    }
                 } catch (\Exception $e) {
-                    return false;
+                    // Si la date est malformée, on peut choisir de la garder ou non. 
+                    // Pour plus de sécurité, on la garde si elle n'est pas explicitement expirée.
                 }
+            } else {
+                // Si pas de date limite, on garde l'offre pour l'instant (ex: World Bank sans date)
+                // Sauf si l'utilisateur veut AUSSI exclure les dates vides. 
+                // "don't show the data whose deadline date is expired" implique que si elle n'est pas expirée (pas de date), on peut l'afficher.
             }
+
             return true;
         });
 
@@ -123,7 +133,8 @@ class OffreController extends Controller
                     }
                     return '0-' . (string) $offre->date_limite_soumission;
                 }
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) {
+            }
             // Groupe 1 = WB sans date, Groupe 2 = autres sans date (devraient déjà être filtrées)
             return ($offre->source === 'World Bank') ? '1-9999-12-31' : '2-9999-12-31';
         });

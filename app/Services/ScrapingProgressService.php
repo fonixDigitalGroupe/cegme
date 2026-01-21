@@ -48,8 +48,29 @@ class ScrapingProgressService
 
         $progress['current'] = $current;
         $progress['current_source'] = $sourceName;
-        $progress['percentage'] = $current > 0 ? (int)(($current / $progress['total']) * 100) : 0;
+        $progress['percentage'] = $progress['total'] > 0 ? (int) ((($current - 1) / $progress['total']) * 100) : 0;
         $progress['message'] = "Scraping de {$sourceName}... ({$current}/{$progress['total']})";
+
+        Cache::put(self::CACHE_PREFIX . $jobId, $progress, self::CACHE_DURATION);
+    }
+
+    /**
+     * Met à jour des champs spécifiques de la progression
+     *
+     * @param string $jobId
+     * @param array $data Données à mettre à jour
+     * @return void
+     */
+    public function updateProgress(string $jobId, array $data): void
+    {
+        $progress = $this->getProgress($jobId);
+        if (!$progress) {
+            return;
+        }
+
+        foreach ($data as $key => $value) {
+            $progress[$key] = $value;
+        }
 
         Cache::put(self::CACHE_PREFIX . $jobId, $progress, self::CACHE_DURATION);
     }
@@ -175,6 +196,58 @@ class ScrapingProgressService
     {
         $progress = $this->getProgress($jobId);
         return $progress && isset($progress['status']) && $progress['status'] === 'cancelled';
+    }
+
+    /**
+     * Ajoute des offres découvertes à la liste des trouvailles récentes
+     *
+     * @param string $jobId
+     * @param array $findings Liste d'offres (tableaux associatifs avec titre, pays, etc.)
+     * @return void
+     */
+    public function addFindings(string $jobId, array $findings): void
+    {
+        $progress = $this->getProgress($jobId);
+        if (!$progress) {
+            return;
+        }
+
+        if (!isset($progress['recent_findings'])) {
+            $progress['recent_findings'] = [];
+        }
+
+        // Ajouter les nouvelles trouvailles au début
+        $newFindings = array_map(function ($f) {
+            return [
+                'titre' => $f['titre'] ?? 'Sans titre',
+                'pays' => $f['pays'] ?? 'N/A',
+                'source' => $f['source'] ?? 'N/A',
+                'date_limite' => $f['date_limite_soumission'] ?? 'N/A',
+                'found_at' => now()->format('H:i:s'),
+            ];
+        }, $findings);
+
+        $progress['recent_findings'] = array_merge($newFindings, $progress['recent_findings']);
+
+        // Garder seulement les 20 dernières trouvailles pour ne pas exploser le cache
+        $progress['recent_findings'] = array_slice($progress['recent_findings'], 0, 20);
+
+        // Mettre à jour aussi le nombre total d'offres en base (estimation rapide)
+        $progress['total_offres'] = \App\Models\Offre::count();
+
+        Cache::put(self::CACHE_PREFIX . $jobId, $progress, self::CACHE_DURATION);
+    }
+
+    /**
+     * Récupère les dernières trouvailles
+     *
+     * @param string $jobId
+     * @return array
+     */
+    public function getFindings(string $jobId): array
+    {
+        $progress = $this->getProgress($jobId);
+        return $progress['recent_findings'] ?? [];
     }
 
     /**

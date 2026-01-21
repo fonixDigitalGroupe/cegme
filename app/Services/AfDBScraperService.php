@@ -9,7 +9,7 @@ use Spatie\Browsershot\Browsershot;
 use DOMDocument;
 use DOMXPath;
 
-class AfDBScraperService
+class AfDBScraperService implements IterativeScraperInterface
 {
     /**
      * URL de base pour les appels d'offres AfDB
@@ -20,6 +20,27 @@ class AfDBScraperService
      * Nombre maximum de pages à scraper (sécurité pour éviter les boucles infinies)
      */
     private const MAX_PAGES = 200;
+
+    /**
+     * ID du job en cours pour le suivi de progression
+     * @var string|null
+     */
+    private $jobId = null;
+
+    /**
+     * État du scraper pour le mode itératif
+     */
+    private $currentPage = 0;        // Page courante
+    private $isExhausted = false;    // Plus d'offres disponibles
+    private $pendingOffers = [];     // Buffer d'offres en attente de traitement
+
+    /**
+     * Définit l'ID du job pour le suivi de progression
+     */
+    public function setJobId(?string $jobId): void
+    {
+        $this->jobId = $jobId;
+    }
 
     /**
      * Scrape les appels d'offres depuis le site AfDB
@@ -85,6 +106,221 @@ class AfDBScraperService
     }
 
     /**
+     * Initialise le scraper pour le mode itératif
+     */
+    public function initialize(): void
+    {
+        $this->currentPage = 0;
+        $this->isExhausted = false;
+        $this->pendingOffers = [];
+    }
+
+    /**
+     * Réinitialise l'état du scraper
+     */
+    public function reset(): void
+    {
+        $this->initialize();
+    }
+
+    /**
+     * Scrappe un lot d'offres (mode itératif pour round-robin)
+     * 
+     * @param int $limit Nombre maximum d'offres à scraper
+     * @return array ['count' => int, 'has_more' => bool, 'findings' => array]
+     */
+    public function scrapeBatch(int $limit = 10): array
+    {
+        $findings = [];
+        $count = 0; // Nouvelles offres
+        $processed = 0; // Total traitées
+
+        // D'abord, traiter les offres en attente dans le buffer
+        while (count($this->pendingOffers) > 0 && $processed < $limit) {
+            $offerData = array_shift($this->pendingOffers);
+            $processed++;
+
+            try {
+                $existing = Offre::where('source', 'African Development Bank')
+                    ->where(function ($q) use ($offerData) {
+                        $q->where('lien_source', $offerData['lien_source'])
+                            ->orWhere('titre', $offerData['titre']);
+                    })
+                    ->first();
+
+                if ($existing) {
+                    $existing->update([
+                        'pays' => $offerData['pays'] ?? $existing->pays,
+                        'date_limite_soumission' => $offerData['date_limite_soumission'] ?? $existing->date_limite_soumission,
+                        'updated_at' => now(),
+                    ]);
+                } else {
+                    $offerData['created_at'] = now();
+                    $offerData['updated_at'] = now();
+                    Offre::create($offerData);
+                    $count++;
+                }
+
+                $findings[] = $offerData;
+            } catch (\Exception $e) {
+                Log::error('AfDB Scraper: Error saving offer', [
+                    'titre' => $offerData['titre'] ?? 'N/A',
+                    'error' => $e->getMessage()
+                ]);
+            }
+        }
+
+        // Si on n'a pas atteint la limite et qu'on n'est pas épuisé, scraper plus
+        while ($processed < $limit && !$this->isExhausted) {
+            $result = $this->scrapePageForBatch($this->currentPage);
+
+            if ($result['count'] === 0) {
+                $this->isExhausted = true;
+                break;
+            }
+
+            // Ajouter les nouvelles offres au buffer
+            $this->pendingOffers = array_merge($this->pendingOffers, $result['offers']);
+            $this->currentPage++;
+
+            // Traiter le buffer jusqu'à atteindre la limite
+            while (count($this->pendingOffers) > 0 && $processed < $limit) {
+                $offerData = array_shift($this->pendingOffers);
+                $processed++;
+
+                try {
+                    $existing = Offre::where('source', 'African Development Bank')
+                        ->where(function ($q) use ($offerData) {
+                            $q->where('lien_source', $offerData['lien_source'])
+                                ->orWhere('titre', $offerData['titre']);
+                        })
+                        ->first();
+
+                    if ($existing) {
+                        $existing->update([
+                            'pays' => $offerData['pays'] ?? $existing->pays,
+                            'date_limite_soumission' => $offerData['date_limite_soumission'] ?? $existing->date_limite_soumission,
+                            'updated_at' => now(),
+                        ]);
+                    } else {
+                        $offerData['created_at'] = now();
+                        $offerData['updated_at'] = now();
+                        Offre::create($offerData);
+                        $count++;
+                    }
+
+                    $findings[] = $offerData;
+                } catch (\Exception $e) {
+                    Log::error('AfDB Scraper: Error saving offer', [
+                        'titre' => $offerData['titre'] ?? 'N/A',
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
+        }
+
+        $hasMore = !$this->isExhausted || count($this->pendingOffers) > 0;
+
+        return [
+            'count' => $processed,
+            'new_count' => $count,
+            'has_more' => $hasMore,
+            'findings' => $findings,
+        ];
+    }
+
+    /**
+     * Scrape une page spécifique et retourne les offres (pour mode batch)
+     */
+    private function scrapePageForBatch(int $page): array
+    {
+        $offers = [];
+
+        try {
+            $url = self::BASE_URL;
+            if ($page > 0) {
+                $url .= '?page=' . ($page + 1);
+            }
+
+            Log::debug("AfDB Scraper: Fetching page for batch", ['page' => $page, 'url' => $url]);
+
+            try {
+                $html = Browsershot::url($url)
+                    ->waitUntilNetworkIdle()
+                    ->timeout(90)
+                    ->setOption('args', [
+                        '--no-sandbox',
+                        '--disable-setuid-sandbox',
+                        '--disable-dev-shm-usage',
+                        '--disable-accelerated-2d-canvas',
+                        '--disable-gpu',
+                        '--disable-blink-features=AutomationControlled',
+                    ])
+                    ->userAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
+                    ->bodyHtml();
+
+                if (empty($html)) {
+                    return ['count' => 0, 'offers' => []];
+                }
+
+            } catch (\Exception $e) {
+                Log::error('AfDB Scraper: Browsershot failed', [
+                    'error' => $e->getMessage(),
+                    'url' => $url,
+                ]);
+                return ['count' => 0, 'offers' => []];
+            }
+
+            // Parser le HTML
+            $dom = new DOMDocument();
+            libxml_use_internal_errors(true);
+            @$dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
+            libxml_clear_errors();
+            $xpath = new DOMXPath($dom);
+
+            // Extraire les notices
+            $items = $this->extractProcurementItems($xpath, $dom);
+
+            // Traiter chaque item
+            $titresVus = [];
+            foreach ($items as $item) {
+                try {
+                    $offre = $this->extractOffreData($item, $xpath);
+
+                    if (!$offre || empty($offre['titre']) || empty($offre['lien_source'])) {
+                        continue;
+                    }
+
+                    // Rejeter les doublons
+                    $titreNormalise = $this->normalizeTitle($offre['titre']);
+                    if (isset($titresVus[$titreNormalise])) {
+                        continue;
+                    }
+                    $titresVus[$titreNormalise] = true;
+
+                    $offers[] = $offre;
+                } catch (\Exception $e) {
+                    Log::debug('AfDB Scraper: Error processing item', [
+                        'error' => $e->getMessage(),
+                    ]);
+                    continue;
+                }
+            }
+
+        } catch (\Exception $e) {
+            Log::error('AfDB Scraper: Exception in scrapePageForBatch', [
+                'page' => $page,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        return [
+            'count' => count($offers),
+            'offers' => $offers,
+        ];
+    }
+
+    /**
      * Scrape une page spécifique
      *
      * @param int $page Numéro de la page
@@ -94,6 +330,8 @@ class AfDBScraperService
     {
         $count = 0;
         $html = '';
+        $findingsBuffer = [];
+        $progressService = $this->jobId ? app(\App\Services\ScrapingProgressService::class) : null;
 
         try {
             // Construire l'URL avec pagination
@@ -229,50 +467,51 @@ class AfDBScraperService
                 }
             }
 
-            // Vérifier les offres existantes en batch (optimisation)
+            // Traiter les offres et les sauvegarder immédiatement
             if (!empty($validOffres)) {
-                $liensSources = array_column($validOffres, 'lien_source');
-                $titres = array_column($validOffres, 'titre');
-
-                // Récupérer toutes les offres existantes en une seule requête
-                $existingLiens = Offre::where('source', 'African Development Bank')
-                    ->whereIn('lien_source', $liensSources)
-                    ->pluck('lien_source')
-                    ->toArray();
-
-                $existingTitres = Offre::where('source', 'African Development Bank')
-                    ->whereIn('titre', $titres)
-                    ->pluck('titre')
-                    ->toArray();
-
-                // Filtrer les offres qui n'existent pas déjà
-                $newOffres = [];
                 foreach ($validOffres as $offre) {
-                    $exists = in_array($offre['lien_source'], $existingLiens)
-                        || in_array($offre['titre'], $existingTitres);
+                    try {
+                        $existing = Offre::where('source', 'African Development Bank')
+                            ->where(function ($q) use ($offre) {
+                                $q->where('lien_source', $offre['lien_source'])
+                                    ->orWhere('titre', $offre['titre']);
+                            })
+                            ->first();
 
-                    if (!$exists) {
-                        $newOffres[] = $offre;
+                        if ($existing) {
+                            $existing->update([
+                                'pays' => $offre['pays'] ?? $existing->pays,
+                                'date_limite_soumission' => $offre['date_limite_soumission'] ?? $existing->date_limite_soumission,
+                                'updated_at' => now(),
+                            ]);
+                        } else {
+                            $offre['created_at'] = now();
+                            $offre['updated_at'] = now();
+                            Offre::create($offre);
+                            $count++;
+                        }
+
+                        // Ajouter au buffer pour le feedback UI
+                        $findingsBuffer[] = $offre;
+                        if (count($findingsBuffer) >= 10) {
+                            if ($progressService && $this->jobId) {
+                                $progressService->addFindings($this->jobId, $findingsBuffer);
+                            }
+                            $findingsBuffer = [];
+                        }
+
+                    } catch (\Exception $e) {
+                        Log::error('AfDB Scraper: Error saving offer', [
+                            'titre' => $offre['titre'],
+                            'error' => $e->getMessage()
+                        ]);
                     }
                 }
+            }
 
-                // Insérer en batch (optimisation majeure)
-                if (!empty($newOffres)) {
-                    // Ajouter les timestamps pour l'insertion en batch
-                    $now = now();
-                    foreach ($newOffres as &$offre) {
-                        $offre['created_at'] = $now;
-                        $offre['updated_at'] = $now;
-                    }
-                    unset($offre);
-
-                    // Insérer par chunks pour éviter les problèmes de mémoire
-                    $chunks = array_chunk($newOffres, 50);
-                    foreach ($chunks as $chunk) {
-                        Offre::insert($chunk);
-                        $count += count($chunk);
-                    }
-                }
+            // Envoyer le reste du buffer
+            if (!empty($findingsBuffer) && $progressService && $this->jobId) {
+                $progressService->addFindings($this->jobId, $findingsBuffer);
             }
 
         } catch (\Exception $e) {

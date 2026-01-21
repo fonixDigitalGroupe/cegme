@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\FilteringRule;
+use Illuminate\Support\Facades\Log;
 
 class ScraperHelper
 {
@@ -38,6 +39,12 @@ class ScraperHelper
      * @param string $scraperSource Le nom de source du scraper
      * @return string Le nom de source correspondant dans les règles
      */
+    /**
+     * Mappe le nom de source utilisé dans les scrapers vers le nom utilisé dans les règles de filtrage
+     *
+     * @param string $scraperSource Le nom de source du scraper
+     * @return string Le nom de source correspondant dans les règles
+     */
     public static function mapScraperSourceToRuleSource(string $scraperSource): string
     {
         $mapping = [
@@ -50,6 +57,59 @@ class ScraperHelper
         ];
 
         return $mapping[$scraperSource] ?? $scraperSource;
+    }
+
+    /**
+     * Récupère les IDs des offres qui correspondent aux filtres actifs
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public static function getIdsMatchingActiveFilters(): \Illuminate\Support\Collection
+    {
+        $activeRules = FilteringRule::with('countries')->where('is_active', true)->get();
+        $allIds = collect();
+
+        Log::info('Filtrage post-scraping: Début', [
+            'active_sources' => $activeRules->pluck('source')->toArray()
+        ]);
+
+        foreach ($activeRules as $rule) {
+            $allowedCountries = $rule->countries->pluck('country_name')->toArray();
+            $query = \App\Models\Offre::where('source', $rule->source);
+
+            $sourceCountBefore = $query->count();
+
+            if ($rule->source === 'World Bank') {
+                $ids = $query->pluck('id');
+                $allIds = $allIds->merge($ids);
+                Log::info("Filtrage post-scraping: World Bank (règle active)", ['kept_count' => count($ids)]);
+                continue;
+            }
+
+            if (!empty($allowedCountries)) {
+                $offres = $query->get();
+                $keptCount = 0;
+                foreach ($offres as $offre) {
+                    if ($offre->getFilteredPays($allowedCountries)) {
+                        $allIds->push($offre->id);
+                        $keptCount++;
+                    }
+                }
+                Log::info("Filtrage post-scraping: {$rule->source}", [
+                    'total_found' => $sourceCountBefore,
+                    'kept_after_country_filter' => $keptCount
+                ]);
+            } else {
+                $ids = $query->pluck('id');
+                $allIds = $allIds->merge($ids);
+                Log::info("Filtrage post-scraping: {$rule->source} (pas de filtre pays)", ['kept_count' => count($ids)]);
+            }
+        }
+
+        $result = $allIds->unique();
+        Log::info('Filtrage post-scraping: Terminé', ['total_ids_to_keep' => $result->count()]);
+
+        return $result;
     }
 }
 
