@@ -53,7 +53,7 @@
     }
 
     /* MOBILE ONLY STYLES - Ne pas affecter le desktop */
-    @media (max-width: 768px) {
+    @media (max-width: 1024px) {
 
         /* Empêcher le débordement horizontal */
         body {
@@ -133,107 +133,57 @@
             color: rgb(255, 255, 255);
         }
 
-        /* Header mobile - logo centré - Style site de référence */
+        /* Header mobile - Style site de référence (Contact) */
         .mobile-header {
             display: flex !important;
             align-items: center;
             justify-content: space-between;
             width: 100%;
-            padding: 12px 20px;
-            min-height: 70px;
+            padding: 16px 24px !important;
+            min-height: 64px !important;
             position: relative;
             z-index: 1000;
-            background-color: #f8fafc !important;
-            /* Light grey/blue background */
+            background-color: transparent !important;
             box-shadow: none !important;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: none !important;
         }
 
-        header {
-            background-color: #f8fafc !important;
-            /* Contextual background */
-            box-shadow: none !important;
-        }
-
-        .mobile-logo {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            min-width: 0;
-        }
-
-        .mobile-logo a {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            min-width: 0;
-            flex: 1;
-            text-decoration: none !important;
-        }
-
-        .mobile-logo img {
-            height: 48px !important;
-            width: auto !important;
-            flex-shrink: 0;
-        }
-
-        .mobile-logo .flex.flex-col {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            min-width: 0;
-            flex: 1;
-        }
-
-        .mobile-logo span.font-bold {
-            font-size: 22px !important;
-            line-height: 1.1 !important;
-            font-weight: 800 !important;
-            color: #00bf8f !important;
-            /* Green color match */
-            background: none !important;
-            -webkit-text-fill-color: #00bf8f !important;
-            font-family: 'Inter', sans-serif !important;
-            text-transform: uppercase;
-        }
-
-        .mobile-logo .text-xs,
-        .mobile-logo .text-sm {
-            font-size: 11px !important;
-            line-height: 1.2 !important;
-            margin-top: 1px !important;
-            color: #475569 !important;
-            /* Slate 600 */
-            font-weight: 500 !important;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        /* Bouton hamburger */
+        /* Bouton hamburger - Style Contact */
         .mobile-menu-button {
             display: flex !important;
             flex-direction: column;
-            justify-content: space-between;
-            align-items: flex-end;
-            width: 32px;
-            height: 22px;
+            justify-content: center;
+            align-items: center;
+            width: 44px;
+            height: 44px;
             background: transparent;
             border: none !important;
+            border-radius: 0;
+            cursor: pointer;
             padding: 0;
             z-index: 1001;
-            cursor: pointer;
-            margin-left: 16px;
+            gap: 6px;
+            position: relative;
+            visibility: visible !important;
+            opacity: 1 !important;
+            margin-left: 0 !important;
+            /* Reset margin */
         }
 
         .mobile-menu-button span {
-            width: 100%;
+            width: 24px;
             height: 3px;
             background-color: #000000 !important;
-            border-radius: 2px;
+            border-radius: 0;
             transition: all 0.3s ease;
             display: block;
+            position: relative;
+        }
+
+        .mobile-menu-button:hover,
+        .mobile-menu-button:active {
+            background: transparent !important;
+            border: none !important;
         }
 
         /* Masquer le bouton Se connecter du header sur mobile */
@@ -580,21 +530,35 @@
 
         /* Section "L'Expertise au Service de l'Émergence" mobile - Style site de référence */
         section[style*="background: linear-gradient(to bottom, rgb(248, 250, 252)"] {
-            padding: 48px 24px !important;
+            padding: 48px 24px 24px !important;
+            /* Reduced bottom padding */
         }
 
         /* Image dans section About mobile */
         section[style*="background: linear-gradient(to bottom, rgb(248, 250, 252)"] .relative.w-full {
+            display: block !important;
             order: 1 !important;
             width: 100% !important;
-            margin-bottom: 24px !important;
+            margin-bottom: 16px !important;
+        }
+
+        /* Remove card styling (shadow, border) from the inner wrapper on mobile */
+        section[style*="background: linear-gradient(to bottom, rgb(248, 250, 252)"] .relative.w-full>div {
+            box-shadow: none !important;
+            border: none !important;
+            background: transparent !important;
+            min-height: auto !important;
+            /* Override inline min-height */
+            height: auto !important;
         }
 
         section[style*="background: linear-gradient(to bottom, rgb(248, 250, 252)"] img[alt="Équipe CEGME"] {
             width: 100% !important;
-            height: auto !important;
-            min-height: 300px !important;
-            max-height: 400px !important;
+            height: 250px !important;
+            /* Reduced height */
+            min-height: auto !important;
+            max-height: 250px !important;
+            /* Reduced height */
             object-fit: cover !important;
             object-position: center !important;
         }
@@ -693,12 +657,220 @@
             display: block !important;
         }
 
+        /* FIX: Force footer logo size */
+        .mobile-footer-home img {
+            height: 40px !important;
+            width: auto !important;
+            max-width: none !important;
+        }
+    }
+
+    /* FIX: Force vertical stacking up to 1024px (Tablet & Mobile) */
+    @media (max-width: 1024px) {
+
         .stats-grid-container,
         .identity-grid-container,
         .approach-grid-container,
         .benefits-grid-container,
         .activities-grid-container,
         .projects-grid-container {
+            display: grid !important;
+            grid-template-columns: 1fr !important;
+            gap: 32px !important;
+        }
+
+        /* Stats items vertical alignment */
+        .stats-grid-container>div {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            text-align: center !important;
+            margin-bottom: 32px !important;
+        }
+
+        .stats-grid-container>div:last-child {
+            margin-bottom: 0 !important;
+        }
+    }
+
+    /* Desktop - masquer le menu mobile */
+    @media (min-width: 769px) {
+
+        .mobile-menu-button,
+        .mobile-menu,
+        .mobile-header {
+            display: none !important;
+        }
+
+        ```css footer {
+            padding: 40px 24px 24px !important;
+        }
+
+        footer .grid {
+            grid-template-columns: 1fr !important;
+            gap: 32px !important;
+        }
+
+        footer h3 {
+            font-size: 18px !important;
+            margin-bottom: 16px !important;
+        }
+
+        /* About section mobile - empiler image et texte */
+        .grid.grid-cols-1.lg\:grid-cols-2,
+        section[style*="background: linear-gradient(to bottom, #ffffff"] .grid {
+            grid-template-columns: 1fr !important;
+            gap: 32px !important;
+            align-items: flex-start !important;
+        }
+
+        /* Section "L'Expertise au Service de l'Émergence" mobile - Style site de référence */
+        section[style*="background: linear-gradient(to bottom, rgb(248, 250, 252)"] {
+            padding: 48px 24px 24px !important;
+            /* Reduced bottom padding */
+        }
+
+        /* Image dans section About mobile */
+        section[style*="background: linear-gradient(to bottom, rgb(248, 250, 252)"] .relative.w-full {
+            display: block !important;
+            order: 1 !important;
+            width: 100% !important;
+            margin-bottom: 16px !important;
+        }
+
+        /* Remove card styling (shadow, border) from the inner wrapper on mobile */
+        section[style*="background: linear-gradient(to bottom, rgb(248, 250, 252)"] .relative.w-full>div {
+            box-shadow: none !important;
+            border: none !important;
+            background: transparent !important;
+            min-height: auto !important;
+            /* Override inline min-height */
+            height: auto !important;
+        }
+
+        section[style*="background: linear-gradient(to bottom, rgb(248, 250, 252)"] img[alt="Équipe CEGME"] {
+            width: 100% !important;
+            height: 250px !important;
+            /* Reduced height */
+            min-height: auto !important;
+            max-height: 250px !important;
+            /* Reduced height */
+            object-fit: cover !important;
+            object-position: center !important;
+        }
+
+        /* Grid mobile pour section About */
+        section[style*="background: linear-gradient(to bottom, rgb(248, 250, 252)"] .grid {
+            grid-template-columns: 1fr !important;
+            gap: 32px !important;
+        }
+
+        section[style*="background: linear-gradient(to bottom, #ffffff"] div[style*="min-height: 550px"] {
+            min-height: 300px !important;
+            max-height: 400px !important;
+        }
+
+        /* Texte dans section About mobile */
+        section[style*="background: linear-gradient(to bottom, #ffffff"] .w-full:not(.relative) {
+            order: 2 !important;
+            width: 100% !important;
+            padding: 0 !important;
+        }
+
+        section[style*="background: linear-gradient(to bottom, #ffffff"] h2 {
+            font-size: 26px !important;
+            line-height: 34px !important;
+            margin-bottom: 16px !important;
+            padding: 0 !important;
+        }
+
+        section[style*="background: linear-gradient(to bottom, #ffffff"] p {
+            font-size: 15px !important;
+            line-height: 24px !important;
+            margin-bottom: 16px !important;
+            padding: 0 !important;
+        }
+
+        section[style*="background: linear-gradient(to bottom, #ffffff"] .space-y-6 {
+            gap: 16px !important;
+        }
+
+        /* Projets récents mobile */
+        .project-card,
+        a[href="/services"] {
+            margin-bottom: 24px !important;
+            width: 100% !important;
+        }
+
+        /* Images de projets mobile */
+        .project-card img,
+        a[href="/services"] img {
+            height: 200px !important;
+            object-fit: cover !important;
+        }
+
+        /* Logos partenaires mobile */
+        .flex.flex-wrap {
+            justify-content: center !important;
+            gap: 12px !important;
+            padding: 0 16px !important;
+        }
+
+        /* Cartes de logos partenaires mobile */
+        .flex.flex-wrap>div {
+            min-width: 120px !important;
+            min-height: 100px !important;
+            padding: 16px !important;
+        }
+
+        .flex.flex-wrap img {
+            max-height: 50px !important;
+        }
+
+        /* Mot de la direction mobile */
+        .max-w-3xl {
+            max-width: 100% !important;
+            padding: 0 16px !important;
+        }
+
+        /* Espacement général mobile */
+        .mb-16,
+        .mb-12 {
+            margin-bottom: 24px !important;
+        }
+
+        .gap-12,
+        .gap-16 {
+            gap: 24px !important;
+        }
+
+        /* Footer visibility */
+        .desktop-footer {
+            display: none !important;
+        }
+
+        .mobile-footer-home {
+            display: block !important;
+        }
+
+        /* FIX: Force footer logo size */
+        .mobile-footer-home img {
+            height: 40px !important;
+            width: auto !important;
+            max-width: none !important;
+        }
+    }
+
+    /* FIX: Force vertical stacking up to 1024px (Tablet & Mobile) */
+    @media (max-width: 1024px) {
+
+        .stats-grid-container,
+        .identity-grid-container,
+        .approach-grid-container,
+        .benefits-grid-container,
+        .activities-grid-container,
+        .projects-grid-container {
+            display: grid !important;
             grid-template-columns: 1fr !important;
             gap: 32px !important;
         }
@@ -733,5 +905,59 @@
         .mobile-footer-home {
             display: none !important;
         }
+
+        /* Restored Mobile Logo Styles - Placed correctly inside style block */
+        .mobile-logo {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            min-width: 0;
+        }
+
+        .mobile-logo a {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+            flex: 1;
+            text-decoration: none !important;
+        }
+
+        .mobile-logo img {
+            height: 64px !important;
+            width: auto !important;
+            flex-shrink: 0;
+        }
+
+        .mobile-logo .flex.flex-col {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .mobile-logo span.font-bold {
+            font-size: 20px !important;
+            line-height: 1.2 !important;
+            font-weight: 800 !important;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            background-clip: text !important;
+        }
+
+        .mobile-logo .text-xs,
+        .mobile-logo .text-sm {
+            font-size: 13px !important;
+            line-height: 1.2 !important;
+            margin-top: 2px !important;
+        }
+    }
+
+    /* GLOBAL HEADER IMAGE RESTRAINT (Outside media query) */
+    header img {
+        height: 64px !important;
+        width: auto !important;
+        max-width: none !important;
     }
 </style>
+```

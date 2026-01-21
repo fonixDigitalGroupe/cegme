@@ -1,0 +1,46 @@
+
+        /* Mobile Logo Styles - Restored */
+        .mobile-logo {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            min-width: 0;
+        }
+
+        .mobile-logo a {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+            flex: 1;
+            text-decoration: none !important;
+        }
+
+        .mobile-logo img {
+            height: 64px !important;
+            width: auto !important;
+            flex-shrink: 0;
+        }
+
+        .mobile-logo .flex.flex-col {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .mobile-logo span.font-bold {
+            font-size: 20px !important;
+            line-height: 1.2 !important;
+            font-weight: 800 !important;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            background-clip: text !important;
+        }
+
+        .mobile-logo .text-xs,
+        .mobile-logo .text-sm {
+            font-size: 13px !important;
+            line-height: 1.2 !important;
+            margin-top: 2px !important;
+        }
