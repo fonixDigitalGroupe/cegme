@@ -39,6 +39,45 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @include('partials.site-styles')
 
+    <!-- Forced Logos Layout 6-3 on Desktop - Match Image Exactly -->
+    <style>
+        @media (min-width: 1024px) {
+            .logos-grid-container {
+                display: flex !important;
+                flex-wrap: wrap !important;
+                justify-content: center !important;
+                gap: 20px !important;
+                max-width: 1100px !important;
+                margin: 48px auto !important;
+                padding: 0 !important;
+            }
+
+            .logos-grid-container>div {
+                flex: 0 0 auto !important;
+                width: 155px !important;
+                height: 140px !important;
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+                background-color: #ffffff !important;
+                border: 1px solid rgba(229, 231, 235, 0.5) !important;
+                border-radius: 12px !important;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+            }
+
+            /* Rectangle size for OXFAM (Logo 7) */
+            .logos-grid-container>div:nth-child(7) {
+                width: 280px !important;
+            }
+
+            /* Standard square for others */
+            .logos-grid-container>div:nth-child(8),
+            .logos-grid-container>div:nth-child(9) {
+                width: 155px !important;
+            }
+        }
+    </style>
+
 </head>
 
 <body class="bg-white text-[#1b1b18] min-h-screen" style="background-color: #ffffff !important;">
@@ -107,7 +146,7 @@
     </section>
 
     <section class="w-full"
-        style="padding: 220px 0 100px 0; margin: 0; background: linear-gradient(to bottom, rgb(248, 250, 252), rgb(255, 255, 255));">
+        style="padding: 100px 0 !important; margin-top: 100px !important; position: relative; z-index: 5; background: linear-gradient(to bottom, rgb(248, 250, 252), rgb(255, 255, 255));">
         <style>
             /* Responsive Hero Positioning */
             .hero-content-container {
@@ -263,12 +302,14 @@
                     }
 
                     .expertise-image-container {
-                        height: 800px !important;
-                        min-height: 800px !important;
+                        height: 600px !important;
+                        /* Reduced from 800px */
+                        min-height: 600px !important;
                     }
 
                     .expertise-image-img {
                         height: 100% !important;
+                        object-position: center !important;
                     }
                 }
 
@@ -1022,80 +1063,80 @@
                 </div>
             </div>
 
-            <!-- Logos Container - Centered Flex -->
-            <div class="flex flex-wrap justify-center items-center gap-4 md:gap-6 lg:gap-8 max-w-7xl lg:max-w-[1100px] mx-auto"
-                style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; lg:gap: 32px;">
+            <!-- Logos Container - Forced 6-col Grid on Desktop via Head CSS -->
+            <div
+                class="logos-grid-container flex flex-wrap justify-center items-center gap-4 md:gap-6 max-w-7xl mx-auto">
 
                 <!-- Logo 1: Banque Mondiale -->
                 <div class="bg-white rounded-xl lg:rounded-2xl p-6 lg:p-4 shadow-md lg:shadow-[0_4px_20px_rgb(0,0,0,0.04)] border border-gray-200 lg:border-white flex items-center justify-center flex-shrink-0 lg:flex-shrink"
-                    style="background-color: #ffffff; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; lg:height: 120px; lg:width: 150px;">
+                    style="background-color: #ffffff; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; lg:min-height: 140px; lg:min-width: 0;">
                     <img src="{{ asset('Image/Wordbank.png') }}" alt="Banque Mondiale"
                         class="max-w-full max-h-full object-contain lg:filter lg:grayscale lg:hover:grayscale-0 transition-all duration-300"
-                        style="max-width: 100%; max-height: 70px; lg:max-height: 60px; object-fit: contain;">
+                        style="max-width: 100%; max-height: 70px; lg:max-height: 80px; object-fit: contain;">
                 </div>
 
                 <!-- Logo 2: USAID -->
                 <div class="bg-white rounded-xl lg:rounded-2xl p-6 lg:p-4 shadow-md lg:shadow-[0_4px_20px_rgb(0,0,0,0.04)] border border-gray-200 lg:border-white flex items-center justify-center flex-shrink-0 lg:flex-shrink"
-                    style="background-color: #ffffff; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; lg:height: 120px; lg:width: 150px;">
+                    style="background-color: #ffffff; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; lg:min-height: 140px; lg:min-width: 0;">
                     <img src="{{ asset('Image/Usaid.png') }}" alt="USAID"
                         class="max-w-full max-h-full object-contain lg:filter lg:grayscale lg:hover:grayscale-0 transition-all duration-300"
-                        style="max-width: 100%; max-height: 70px; lg:max-height: 60px; object-fit: contain;">
+                        style="max-width: 100%; max-height: 70px; lg:max-height: 80px; object-fit: contain;">
                 </div>
 
                 <!-- Logo 3: BAD -->
                 <div class="bg-white rounded-xl lg:rounded-2xl p-6 lg:p-4 shadow-md lg:shadow-[0_4px_20px_rgb(0,0,0,0.04)] border border-gray-200 lg:border-white flex items-center justify-center flex-shrink-0 lg:flex-shrink"
-                    style="background-color: #ffffff; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; lg:height: 120px; lg:width: 150px;">
+                    style="background-color: #ffffff; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; lg:min-height: 140px; lg:min-width: 0;">
                     <img src="{{ asset('Image/BAD.png') }}" alt="BAD"
                         class="max-w-full max-h-full object-contain lg:filter lg:grayscale lg:hover:grayscale-0 transition-all duration-300"
-                        style="max-width: 100%; max-height: 70px; lg:max-height: 60px; object-fit: contain;">
+                        style="max-width: 100%; max-height: 70px; lg:max-height: 80px; object-fit: contain;">
                 </div>
 
                 <!-- Logo 4: BDEAC -->
                 <div class="bg-white rounded-xl lg:rounded-2xl p-6 lg:p-4 shadow-md lg:shadow-[0_4px_20px_rgb(0,0,0,0.04)] border border-gray-200 lg:border-white flex items-center justify-center flex-shrink-0 lg:flex-shrink"
-                    style="background-color: #ffffff; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; lg:height: 120px; lg:width: 150px;">
+                    style="background-color: #ffffff; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; lg:min-height: 140px; lg:min-width: 0;">
                     <img src="{{ asset('Image/BDEAC.png') }}" alt="BDEAC"
                         class="max-w-full max-h-full object-contain lg:filter lg:grayscale lg:hover:grayscale-0 transition-all duration-300"
-                        style="max-width: 100%; max-height: 70px; lg:max-height: 60px; object-fit: contain;">
+                        style="max-width: 100%; max-height: 70px; lg:max-height: 80px; object-fit: contain;">
                 </div>
 
                 <!-- Logo 5: FIDA -->
                 <div class="bg-white rounded-xl lg:rounded-2xl p-6 lg:p-4 shadow-md lg:shadow-[0_4px_20px_rgb(0,0,0,0.04)] border border-gray-200 lg:border-white flex items-center justify-center flex-shrink-0 lg:flex-shrink"
-                    style="background-color: #ffffff; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; lg:height: 120px; lg:width: 150px;">
+                    style="background-color: #ffffff; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; lg:min-height: 140px; lg:min-width: 0;">
                     <img src="{{ asset('Image/FIDA.png') }}" alt="FIDA"
                         class="max-w-full max-h-full object-contain lg:filter lg:grayscale lg:hover:grayscale-0 transition-all duration-300"
-                        style="max-width: 100%; max-height: 70px; lg:max-height: 60px; object-fit: contain;">
+                        style="max-width: 100%; max-height: 70px; lg:max-height: 80px; object-fit: contain;">
                 </div>
 
                 <!-- Logo 6: UNICEF -->
                 <div class="bg-white rounded-xl lg:rounded-2xl p-6 lg:p-4 shadow-md lg:shadow-[0_4px_20px_rgb(0,0,0,0.04)] border border-gray-200 lg:border-white flex items-center justify-center flex-shrink-0 lg:flex-shrink"
-                    style="background-color: #ffffff; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; lg:height: 120px; lg:width: 150px;">
+                    style="background-color: #ffffff; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; lg:min-height: 140px; lg:min-width: 0;">
                     <img src="{{ asset('Image/unicef.png') }}" alt="UNICEF"
                         class="max-w-full max-h-full object-contain lg:filter lg:grayscale lg:hover:grayscale-0 transition-all duration-300"
-                        style="max-width: 100%; max-height: 70px; lg:max-height: 60px; object-fit: contain;">
+                        style="max-width: 100%; max-height: 70px; lg:max-height: 80px; object-fit: contain;">
                 </div>
 
                 <!-- Logo 7: OXFAM -->
-                <div class="bg-white rounded-xl lg:rounded-2xl p-6 lg:p-4 shadow-md lg:shadow-[0_4px_20px_rgb(0,0,0,0.04)] border border-gray-200 lg:border-white flex items-center justify-center flex-shrink-0 lg:flex-shrink"
-                    style="background-color: #ffffff; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; lg:height: 120px; lg:width: 280px;">
+                <div class="bg-white rounded-xl lg:rounded-2xl p-6 lg:p-4 shadow-md lg:shadow-[0_4px_20px_rgb(0,0,0,0.04)] border border-gray-200 lg:border-white flex items-center justify-center flex-shrink-0 lg:flex-shrink "
+                    style="background-color: #ffffff; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; lg:min-height: 140px; lg:min-width: 0;">
                     <img src="{{ asset('Image/oxfam.png') }}" alt="OXFAM"
                         class="max-w-full max-h-full object-contain lg:filter lg:grayscale lg:hover:grayscale-0 transition-all duration-300"
-                        style="max-width: 100%; max-height: 70px; lg:max-height: 60px; object-fit: contain;">
+                        style="max-width: 100%; max-height: 70px; lg:max-height: 80px; object-fit: contain;">
                 </div>
 
                 <!-- Logo 8: FAO -->
                 <div class="bg-white rounded-xl lg:rounded-2xl p-6 lg:p-4 shadow-md lg:shadow-[0_4px_20px_rgb(0,0,0,0.04)] border border-gray-200 lg:border-white flex items-center justify-center flex-shrink-0 lg:flex-shrink"
-                    style="background-color: #ffffff; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; lg:height: 120px; lg:width: 150px;">
+                    style="background-color: #ffffff; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; lg:min-height: 140px; lg:min-width: 0;">
                     <img src="{{ asset('Image/FAO.png') }}" alt="FAO"
                         class="max-w-full max-h-full object-contain lg:filter lg:grayscale lg:hover:grayscale-0 transition-all duration-300"
-                        style="max-width: 100%; max-height: 70px; lg:max-height: 60px; object-fit: contain;">
+                        style="max-width: 100%; max-height: 70px; lg:max-height: 80px; object-fit: contain;">
                 </div>
 
                 <!-- Logo 9: African Parks -->
-                <div class="bg-white rounded-xl lg:rounded-2xl p-6 lg:p-4 shadow-md lg:shadow-[0_4px_20px_rgb(0,0,0,0.04)] border border-gray-200 lg:border-white flex items-center justify-center flex-shrink-0 lg:flex-shrink"
-                    style="background-color: #ffffff; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; lg:height: 120px; lg:width: 150px;">
+                <div class="bg-white rounded-xl lg:rounded-2xl p-6 lg:p-4 shadow-md lg:shadow-[0_4px_20_rgb(0,0,0,0.04)] border border-gray-200 lg:border-white flex items-center justify-center flex-shrink-0 lg:flex-shrink"
+                    style="background-color: #ffffff; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; lg:min-height: 140px; lg:min-width: 0;">
                     <img src="{{ asset('Image/Africain park.png') }}" alt="African Parks"
                         class="max-w-full max-h-full object-contain lg:filter lg:grayscale lg:hover:grayscale-0 transition-all duration-300"
-                        style="max-width: 100%; max-height: 70px; lg:max-height: 60px; object-fit: contain;">
+                        style="max-width: 100%; max-height: 70px; lg:max-height: 80px; object-fit: contain;">
                 </div>
             </div>
         </div>

@@ -1,49 +1,19 @@
-/* Mobile Logo Styles - Reduced */
-.mobile-logo {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    min-width: 0;
-}
+/* Styles forcés pour la section des logos en 6-3 sur desktop */
+@media (min-width: 1024px) {
+    .logos-grid-container {
+        display: grid !important;
+        grid-template-columns: repeat(6, 1fr) !important;
+        gap: 2rem !important;
+        max-width: 1240px !important;
+        margin: 0 auto !important;
+    }
 
-.mobile-logo a {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    /* Reduced gap slightly */
-    min-width: 0;
-    flex: 1;
-    text-decoration: none !important;
-}
+    .logos-grid-container>div {
+        grid-column: span 1 !important;
+    }
 
-.mobile-logo img {
-    height: 40px !important;
-    /* Reduced from 64px */
-    width: auto !important;
-    flex-shrink: 0;
-}
-
-.mobile-logo .flex.flex-col {
-    min-width: 0;
-    flex: 1;
-}
-
-.mobile-logo span.font-bold {
-    font-size: 18px !important;
-    /* Reduced from 20px */
-    line-height: 1.2 !important;
-    font-weight: 800 !important;
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
-    -webkit-background-clip: text !important;
-    -webkit-text-fill-color: transparent !important;
-    background-clip: text !important;
-}
-
-.mobile-logo .text-xs,
-.mobile-logo .text-sm {
-    font-size: 12px !important;
-    /* Reduced from 13px */
-    line-height: 1.2 !important;
-    margin-top: 1px !important;
+    /* Les 3 derniers logos (OXFAM, FAO, African Parks) sur la deuxième ligne */
+    .logos-grid-container>div:nth-last-child(-n+3) {
+        grid-column: span 2 !important;
+    }
 }
