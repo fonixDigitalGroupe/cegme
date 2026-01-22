@@ -257,11 +257,14 @@
                         order: 2 !important;
                         flex-basis: 55% !important;
                         width: 55% !important;
+                        margin-top: 0 !important;
+                        /* Force top alignment */
+                        padding-top: 0 !important;
                     }
 
                     .expertise-image-container {
-                        height: 500px !important;
-                        min-height: 500px !important;
+                        height: 800px !important;
+                        min-height: 800px !important;
                     }
 
                     .expertise-image-img {
@@ -430,16 +433,16 @@
             </div>
 
             <!-- Deux colonnes -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 identity-grid-container">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 identity-grid-container items-stretch">
                 <!-- Colonne gauche: Une Résilience Entrepreneuriale -->
-                <div class="bg-white rounded-2xl p-10 shadow-xl border border-gray-100 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2"
-                    style="background-color: #ffffff; border-radius: 16px; padding: 32px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); border: 1px solid rgb(243, 244, 246); transition: all 0.3s ease; cursor: default; position: relative; overflow: hidden;">
+                <div class="bg-white rounded-2xl p-10 shadow-xl border border-gray-100 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 h-full"
+                    style="background-color: #ffffff; border-radius: 16px; padding: 32px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); border: 1px solid rgb(243, 244, 246); transition: all 0.3s ease; cursor: default; position: relative; overflow: hidden; height: 100%;">
                     <!-- Effet de fond décoratif -->
                     <div class="absolute top-0 right-0 w-32 h-32 bg-green-50 rounded-full -mr-16 -mt-16 opacity-50"
                         style="position: absolute; top: 0; right: 0; width: 128px; height: 128px; background-color: rgb(240, 253, 250); border-radius: 50%; margin-right: -64px; margin-top: -64px; opacity: 0.5;">
                     </div>
-                    <div class="relative z-10" style="position: relative; z-index: 10;">
-                        <div class="flex flex-col" style="display: flex; flex-direction: column;">
+                    <div class="relative z-10 h-full" style="position: relative; z-index: 10; height: 100%;">
+                        <div class="flex flex-col h-full" style="display: flex; flex-direction: column; height: 100%;">
                             <!-- Icône verte -->
                             <div class="mb-6" style="margin-bottom: 24px;">
                                 <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-lg"
@@ -453,7 +456,7 @@
                                 </div>
                             </div>
                             <!-- Contenu -->
-                            <div>
+                            <div class="flex-grow" style="flex-grow: 1;">
                                 <h3 class="text-2xl font-bold mb-5"
                                     style="font-size: 26px; font-weight: 800; color: rgb(17, 24, 39); margin-bottom: 20px; line-height: 34px;">
                                     Une Résilience Entrepreneuriale
@@ -472,14 +475,14 @@
                 </div>
 
                 <!-- Colonne droite: Un Socle Académique et International -->
-                <div class="bg-white rounded-2xl p-10 shadow-xl border border-gray-100 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2"
-                    style="background-color: #ffffff; border-radius: 16px; padding: 32px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); border: 1px solid rgb(243, 244, 246); transition: all 0.3s ease; cursor: default; position: relative; overflow: hidden;">
+                <div class="bg-white rounded-2xl p-10 shadow-xl border border-gray-100 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 h-full"
+                    style="background-color: #ffffff; border-radius: 16px; padding: 32px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); border: 1px solid rgb(243, 244, 246); transition: all 0.3s ease; cursor: default; position: relative; overflow: hidden; height: 100%;">
                     <!-- Effet de fond décoratif -->
                     <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full -mr-16 -mt-16 opacity-50"
                         style="position: absolute; top: 0; right: 0; width: 128px; height: 128px; background-color: rgb(239, 246, 255); border-radius: 50%; margin-right: -64px; margin-top: -64px; opacity: 0.5;">
                     </div>
-                    <div class="relative z-10" style="position: relative; z-index: 10;">
-                        <div class="flex flex-col" style="display: flex; flex-direction: column;">
+                    <div class="relative z-10 h-full" style="position: relative; z-index: 10; height: 100%;">
+                        <div class="flex flex-col h-full" style="display: flex; flex-direction: column; height: 100%;">
                             <!-- Icône bleue -->
                             <div class="mb-6" style="margin-bottom: 24px;">
                                 <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg"
@@ -495,7 +498,7 @@
                                 </div>
                             </div>
                             <!-- Contenu -->
-                            <div>
+                            <div class="flex-grow" style="flex-grow: 1;">
                                 <h3 class="text-2xl font-bold mb-5"
                                     style="font-size: 26px; font-weight: 800; color: rgb(17, 24, 39); margin-bottom: 20px; line-height: 34px;">
                                     Un Socle Académique et International
@@ -999,117 +1002,127 @@
         </div>
     </section>
 
-    <!-- Ils nous font confiance Section -->
-    <section class="w-full bg-gray-50 px-4 sm:px-6 lg:px-8"
-        style="padding: 80px 0; margin: 0; background-color: #f9fafb !important;">
+    <!-- Ils nous font confiance Section - STRICTLY TWO LINES -->
+    <section class="w-full bg-white px-4 sm:px-6 lg:px-8"
+        style="padding: 100px 0; margin: 0; background-color: #ffffff !important;">
         <div class="max-w-7xl mx-auto">
             <!-- Header -->
             <div class="text-center mb-16" style="text-align: center; margin-bottom: 64px;">
-                <h2 class="text-4xl font-bold text-black mb-4"
-                    style="font-size: 40px; font-weight: 800; color: rgb(17, 24, 39); margin-bottom: 16px; text-align: center; line-height: 48px; letter-spacing: -0.5px;">
+                <h2 class="text-4xl font-extrabold text-[#111827] mb-4"
+                    style="font-size: 48px; font-weight: 900; color: #111827; margin-bottom: 16px; text-align: center; line-height: 1.2; letter-spacing: -1px;">
                     Ils nous font confiance
                 </h2>
-                <div class="w-24 h-1 bg-gradient-to-r from-green-500 to-green-600 rounded-full mx-auto mb-6"
-                    style="width: 96px; height: 4px; background: linear-gradient(90deg, rgb(5, 150, 105) 0%, rgb(16, 185, 129) 100%); border-radius: 9999px; margin: 0 auto 24px;">
+                <div class="w-20 h-1.5 bg-[#10B981] rounded-full mx-auto"
+                    style="width: 80px; height: 6px; background-color: #10B981; border-radius: 9999px; margin: 0 auto;">
                 </div>
             </div>
 
-            <!-- Logos Grid - Horizontal -->
-            <div class="flex flex-wrap justify-center items-center gap-4 md:gap-6"
-                style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 24px;">
+            <!-- Logos Container - Centered Flex that wraps into exactly 2 lines -->
+            <div class="flex flex-wrap justify-center items-center gap-4 md:gap-8 max-w-6xl mx-auto"
+                style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 32px; max-width: 1100px; margin: 0 auto;">
+
                 <!-- Logo 1: Banque Mondiale -->
-                <div class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 hover:-translate-y-1 flex items-center justify-center flex-shrink-0"
-                    style="background-color: #ffffff; border-radius: 12px; padding: 24px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); border: 1px solid rgb(229, 231, 235); transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; flex-shrink: 0;">
+                <div class="bg-white rounded-2xl p-4 shadow-[0_4px_20px_rgb(0,0,0,0.04)] border border-gray-50 flex items-center justify-center"
+                    style="background-color: #ffffff; border-radius: 16px; padding: 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04); border: 1px solid #f9fafb; display: flex; align-items: center; justify-content: center; height: 120px; width: 150px;">
                     <img src="{{ asset('Image/Wordbank.png') }}" alt="Banque Mondiale"
-                        class="max-w-full max-h-full object-contain"
-                        style="max-width: 100%; max-height: 70px; object-fit: contain;">
+                        class="max-w-full max-h-full object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
+                        style="max-width: 100%; max-height: 60px; object-fit: contain;">
                 </div>
 
                 <!-- Logo 2: USAID -->
-                <div class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 hover:-translate-y-1 flex items-center justify-center flex-shrink-0"
-                    style="background-color: #ffffff; border-radius: 12px; padding: 24px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); border: 1px solid rgb(229, 231, 235); transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; flex-shrink: 0;">
-                    <img src="{{ asset('Image/Usaid.png') }}" alt="USAID" class="max-w-full max-h-full object-contain"
-                        style="max-width: 100%; max-height: 70px; object-fit: contain;">
+                <div class="bg-white rounded-2xl p-4 shadow-[0_4px_20px_rgb(0,0,0,0.04)] border border-gray-50 flex items-center justify-center"
+                    style="background-color: #ffffff; border-radius: 16px; padding: 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04); border: 1px solid #f9fafb; display: flex; align-items: center; justify-content: center; height: 120px; width: 150px;">
+                    <img src="{{ asset('Image/Usaid.png') }}" alt="USAID"
+                        class="max-w-full max-h-full object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
+                        style="max-width: 100%; max-height: 60px; object-fit: contain;">
                 </div>
 
                 <!-- Logo 3: BAD -->
-                <div class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 hover:-translate-y-1 flex items-center justify-center flex-shrink-0"
-                    style="background-color: #ffffff; border-radius: 12px; padding: 24px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); border: 1px solid rgb(229, 231, 235); transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; flex-shrink: 0;">
-                    <img src="{{ asset('Image/BAD.png') }}" alt="BAD" class="max-w-full max-h-full object-contain"
-                        style="max-width: 100%; max-height: 70px; object-fit: contain;">
+                <div class="bg-white rounded-2xl p-4 shadow-[0_4px_20px_rgb(0,0,0,0.04)] border border-gray-50 flex items-center justify-center"
+                    style="background-color: #ffffff; border-radius: 16px; padding: 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04); border: 1px solid #f9fafb; display: flex; align-items: center; justify-content: center; height: 120px; width: 150px;">
+                    <img src="{{ asset('Image/BAD.png') }}" alt="BAD"
+                        class="max-w-full max-h-full object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
+                        style="max-width: 100%; max-height: 60px; object-fit: contain;">
                 </div>
 
                 <!-- Logo 4: BDEAC -->
-                <div class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 hover:-translate-y-1 flex items-center justify-center flex-shrink-0"
-                    style="background-color: #ffffff; border-radius: 12px; padding: 24px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); border: 1px solid rgb(229, 231, 235); transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; flex-shrink: 0;">
-                    <img src="{{ asset('Image/BDEAC.png') }}" alt="BDEAC" class="max-w-full max-h-full object-contain"
-                        style="max-width: 100%; max-height: 70px; object-fit: contain;">
+                <div class="bg-white rounded-2xl p-4 shadow-[0_4px_20px_rgb(0,0,0,0.04)] border border-gray-50 flex items-center justify-center"
+                    style="background-color: #ffffff; border-radius: 16px; padding: 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04); border: 1px solid #f9fafb; display: flex; align-items: center; justify-content: center; height: 120px; width: 150px;">
+                    <img src="{{ asset('Image/BDEAC.png') }}" alt="BDEAC"
+                        class="max-w-full max-h-full object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
+                        style="max-width: 100%; max-height: 60px; object-fit: contain;">
                 </div>
 
                 <!-- Logo 5: FIDA -->
-                <div class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 hover:-translate-y-1 flex items-center justify-center flex-shrink-0"
-                    style="background-color: #ffffff; border-radius: 12px; padding: 24px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); border: 1px solid rgb(229, 231, 235); transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; flex-shrink: 0;">
-                    <img src="{{ asset('Image/FIDA.png') }}" alt="FIDA" class="max-w-full max-h-full object-contain"
-                        style="max-width: 100%; max-height: 70px; object-fit: contain;">
+                <div class="bg-white rounded-2xl p-4 shadow-[0_4px_20px_rgb(0,0,0,0.04)] border border-gray-50 flex items-center justify-center"
+                    style="background-color: #ffffff; border-radius: 16px; padding: 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04); border: 1px solid #f9fafb; display: flex; align-items: center; justify-content: center; height: 120px; width: 150px;">
+                    <img src="{{ asset('Image/FIDA.png') }}" alt="FIDA"
+                        class="max-w-full max-h-full object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
+                        style="max-width: 100%; max-height: 60px; object-fit: contain;">
                 </div>
 
                 <!-- Logo 6: UNICEF -->
-                <div class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 hover:-translate-y-1 flex items-center justify-center flex-shrink-0"
-                    style="background-color: #ffffff; border-radius: 12px; padding: 24px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); border: 1px solid rgb(229, 231, 235); transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; flex-shrink: 0;">
-                    <img src="{{ asset('Image/unicef.png') }}" alt="UNICEF" class="max-w-full max-h-full object-contain"
-                        style="max-width: 100%; max-height: 70px; object-fit: contain;">
+                <div class="bg-white rounded-2xl p-4 shadow-[0_4px_20px_rgb(0,0,0,0.04)] border border-gray-50 flex items-center justify-center"
+                    style="background-color: #ffffff; border-radius: 16px; padding: 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04); border: 1px solid #f9fafb; display: flex; align-items: center; justify-content: center; height: 120px; width: 150px;">
+                    <img src="{{ asset('Image/unicef.png') }}" alt="UNICEF"
+                        class="max-w-full max-h-full object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
+                        style="max-width: 100%; max-height: 60px; object-fit: contain;">
                 </div>
 
+                <!-- Break for Row 2 (Optional if flex-wrap works, but helpful to guide it) -->
+
                 <!-- Logo 7: OXFAM -->
-                <div class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 hover:-translate-y-1 flex items-center justify-center flex-shrink-0"
-                    style="background-color: #ffffff; border-radius: 12px; padding: 24px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); border: 1px solid rgb(229, 231, 235); transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; flex-shrink: 0;">
-                    <img src="{{ asset('Image/oxfam.png') }}" alt="OXFAM" class="max-w-full max-h-full object-contain"
-                        style="max-width: 100%; max-height: 70px; object-fit: contain;">
+                <div class="bg-white rounded-2xl p-4 shadow-[0_4px_20px_rgb(0,0,0,0.04)] border border-gray-50 flex items-center justify-center"
+                    style="background-color: #ffffff; border-radius: 16px; padding: 16px 32px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04); border: 1px solid #f9fafb; display: flex; align-items: center; justify-content: center; height: 120px; width: 280px;">
+                    <img src="{{ asset('Image/oxfam.png') }}" alt="OXFAM"
+                        class="max-w-full max-h-full object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
+                        style="max-width: 100%; max-height: 60px; object-fit: contain;">
                 </div>
 
                 <!-- Logo 8: FAO -->
-                <div class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 hover:-translate-y-1 flex items-center justify-center flex-shrink-0"
-                    style="background-color: #ffffff; border-radius: 12px; padding: 24px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); border: 1px solid rgb(229, 231, 235); transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; flex-shrink: 0;">
-                    <img src="{{ asset('Image/FAO.png') }}" alt="FAO" class="max-w-full max-h-full object-contain"
-                        style="max-width: 100%; max-height: 70px; object-fit: contain;">
+                <div class="bg-white rounded-2xl p-4 shadow-[0_4px_20px_rgb(0,0,0,0.04)] border border-gray-50 flex items-center justify-center"
+                    style="background-color: #ffffff; border-radius: 16px; padding: 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04); border: 1px solid #f9fafb; display: flex; align-items: center; justify-content: center; height: 120px; width: 150px;">
+                    <img src="{{ asset('Image/FAO.png') }}" alt="FAO"
+                        class="max-w-full max-h-full object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
+                        style="max-width: 100%; max-height: 60px; object-fit: contain;">
                 </div>
 
                 <!-- Logo 9: African Parks -->
-                <div class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 hover:-translate-y-1 flex items-center justify-center flex-shrink-0"
-                    style="background-color: #ffffff; border-radius: 12px; padding: 24px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); border: 1px solid rgb(229, 231, 235); transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; flex-shrink: 0;">
+                <div class="bg-white rounded-2xl p-4 shadow-[0_4px_20px_rgb(0,0,0,0.04)] border border-gray-50 flex items-center justify-center"
+                    style="background-color: #ffffff; border-radius: 16px; padding: 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04); border: 1px solid #f9fafb; display: flex; align-items: center; justify-content: center; height: 120px; width: 150px;">
                     <img src="{{ asset('Image/Africain park.png') }}" alt="African Parks"
-                        class="max-w-full max-h-full object-contain"
-                        style="max-width: 100%; max-height: 70px; object-fit: contain;">
+                        class="max-w-full max-h-full object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
+                        style="max-width: 100%; max-height: 60px; object-fit: contain;">
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Mot de la direction Section -->
-    <section class="w-full bg-gradient-to-b from-white to-gray-50 px-4 sm:px-6 lg:px-8"
-        style="padding: 100px 0; margin: 0; background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);">
-        <div class="max-w-3xl mx-auto px-2 md:px-4 lg:px-6"
-            style="max-width: 768px; margin: 0 auto; padding-left: 16px; padding-right: 16px;">
+    <!-- Mot de la direction Section - Redesigned for more margins -->
+    <section class="w-full bg-white px-4 sm:px-6 lg:px-8"
+        style="padding: 100px 0; margin: 0; background-color: #ffffff !important;">
+        <div class="max-w-2xl mx-auto"
+            style="max-width: 700px; margin: 0 auto; padding-left: 16px; padding-right: 16px;">
             <!-- Header -->
-            <div class="text-center mb-16" style="text-align: center; margin-bottom: 64px;">
-                <h2 class="text-4xl font-bold text-black mb-4"
-                    style="font-size: 42px; font-weight: 800; color: rgb(17, 24, 39); margin-bottom: 16px; text-align: center; line-height: 50px; letter-spacing: -0.5px;">
+            <div class="text-center mb-12" style="text-align: center; margin-bottom: 48px;">
+                <h2 class="text-4xl font-extrabold text-[#111827] mb-4"
+                    style="font-size: 48px; font-weight: 900; color: #111827; margin-bottom: 16px; text-align: center; line-height: 1.2; letter-spacing: -1px;">
                     Mot de la direction
                 </h2>
-                <div class="w-24 h-1 bg-gradient-to-r from-green-500 to-green-600 rounded-full mx-auto mb-6"
-                    style="width: 96px; height: 4px; background: linear-gradient(90deg, rgb(5, 150, 105) 0%, rgb(16, 185, 129) 100%); border-radius: 9999px; margin: 0 auto 24px;">
+                <div class="w-20 h-1.5 bg-[#10B981] rounded-full mx-auto"
+                    style="width: 80px; height: 6px; background-color: #10B981; border-radius: 9999px; margin: 0 auto;">
                 </div>
             </div>
 
             <!-- Content -->
             <div class="relative" style="position: relative;">
-                <!-- Quote icon en haut -->
-                <div class="flex justify-center mb-6"
-                    style="display: flex; justify-content: center; margin-bottom: 24px;">
-                    <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center shadow-md"
-                        style="width: 64px; height: 64px; background: linear-gradient(135deg, rgb(16, 185, 129) 0%, rgb(5, 150, 105) 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);">
+                <!-- Quote icon -->
+                <div class="flex justify-center mb-10"
+                    style="display: flex; justify-content: center; margin-bottom: 40px;">
+                    <div class="w-16 h-16 bg-[#10B981] rounded-full flex items-center justify-center shadow-lg"
+                        style="width: 64px; height: 64px; background-color: #10B981; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3);">
                         <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
-                            stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
                             style="width: 32px; height: 32px; color: #ffffff;">
                             <path
                                 d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z">
@@ -1121,59 +1134,51 @@
                     </div>
                 </div>
 
-                <!-- Text -->
-                <div class="space-y-6" style="display: flex; flex-direction: column; gap: 24px;">
-                    <p class="text-xl text-gray-700 leading-relaxed"
-                        style="font-size: 20px; color: rgb(55, 65, 81); line-height: 36px; margin: 0; font-weight: 400; text-align: justify;">
+                <!-- Text with more horizontal space -->
+                <div class="space-y-8" style="display: flex; flex-direction: column; gap: 32px;">
+                    <p class="text-[19px] text-gray-600 leading-[1.8]"
+                        style="font-size: 19px; color: #4b5563; line-height: 1.8; margin: 0; font-weight: 400; text-align: left;">
                         « Notre identité repose sur une conviction forte : <strong
-                            style="font-weight: 700; color: rgb(17, 24, 39);">l'expertise de pointe et la connaissance
+                            style="font-weight: 800; color: #111827;">l'expertise de pointe et la connaissance
                             profonde du terrain sont indissociables</strong>. Le CEGME Sarl., mobilise un réseau d'élite
                         composé d'universitaires et de consultants ayant évolué au sein de groupes mondiaux tels
-                        qu'<strong style="font-weight: 600; color: rgb(17, 24, 39);">AREVA, DEBEERS, AURAFRIQUE et
+                        qu'<strong style="font-weight: 700; color: #111827;">AREVA, DEBEERS, AURAFRIQUE et
                             DIGOIL</strong>.
                     </p>
-                    <p class="text-xl text-gray-700 leading-relaxed"
-                        style="font-size: 20px; color: rgb(55, 65, 81); line-height: 36px; margin: 0; font-weight: 400; text-align: justify;">
+                    <p class="text-[19px] text-gray-600 leading-[1.8]"
+                        style="font-size: 19px; color: #4b5563; line-height: 1.8; margin: 0; font-weight: 400; text-align: left;">
                         Cette dualité constitue notre <strong
-                            style="font-weight: 700; color: rgb(5, 150, 105);">"plus-value"</strong> : nous offrons aux
+                            style="font-weight: 800; color: #10B981;">"plus-value"</strong> : nous offrons aux
                         investisseurs internationaux et nationaux la rigueur des bonnes pratiques (<strong
-                            style="font-weight: 600; color: rgb(17, 24, 39);">SFI, Banque Mondiale, BAD</strong>) tout
+                            style="font-weight: 700; color: #111827;">SFI, Banque Mondiale, BAD</strong>) tout
                         en garantissant un ancrage local et une maîtrise des réalités sociopolitiques de la région. En
                         valorisant le contenu local et le capital humain centrafricain, nous sécurisons vos actifs et
                         bâtissons une prospérité durable pour la Nation. »
                     </p>
                 </div>
 
-                <!-- Ligne de séparation décorative -->
-                <div class="w-32 h-0.5 bg-gradient-to-r from-transparent via-green-500 to-transparent mx-auto mt-10 mb-8"
-                    style="width: 128px; height: 2px; background: linear-gradient(90deg, transparent 0%, rgb(5, 150, 105) 50%, transparent 100%); margin: 40px auto 32px;">
-                </div>
-
                 <!-- Signature -->
-                <div class="flex items-center justify-center gap-4"
-                    style="display: flex; align-items: center; justify-content: center; gap: 16px;">
-                    <!-- Cercle vert avec DG -->
-                    <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center shadow-md flex-shrink-0"
-                        style="width: 64px; height: 64px; background: linear-gradient(135deg, rgb(16, 185, 129) 0%, rgb(5, 150, 105) 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25); flex-shrink: 0;">
-                        <span class="text-white font-bold text-xl"
-                            style="color: #ffffff; font-weight: 800; font-size: 20px;">
+                <div class="flex items-center justify-center gap-4 mt-12"
+                    style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 48px;">
+                    <div class="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center shadow-md flex-shrink-0"
+                        style="width: 56px; height: 56px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); flex-shrink: 0;">
+                        <span class="text-white font-bold text-lg"
+                            style="color: #ffffff; font-weight: 800; font-size: 18px;">
                             DG
                         </span>
                     </div>
-                    <!-- Texte -->
                     <div class="text-left" style="text-align: left;">
-                        <p class="text-lg font-semibold text-gray-800"
-                            style="font-size: 18px; font-weight: 700; color: rgb(31, 41, 55); margin: 0; line-height: 24px;">
+                        <p class="text-lg font-bold text-[#111827]"
+                            style="font-size: 18px; font-weight: 800; color: #111827; margin: 0; line-height: 1.2;">
                             Directeur Général
                         </p>
-                        <p class="text-base text-gray-600 mt-1"
-                            style="font-size: 16px; color: rgb(75, 85, 99); margin-top: 4px; margin-bottom: 0; line-height: 22px;">
+                        <p class="text-base text-gray-500 mt-1"
+                            style="font-size: 15px; color: #6b7280; margin-top: 4px; margin-bottom: 0; line-height: 1.2;">
                             CEGME Sarl.
                         </p>
                     </div>
                 </div>
             </div>
-        </div>
         </div>
     </section>
 

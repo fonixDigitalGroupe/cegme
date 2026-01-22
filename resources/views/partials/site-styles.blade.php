@@ -870,8 +870,8 @@
 
     }
 
-    /* FIX: Force vertical stacking up to 1024px (Tablet & Mobile) */
-    @media (max-width: 1024px) {
+    /* FIX: Force vertical stacking up to 1023px (Tablet & Mobile) */
+    @media (max-width: 1023px) {
 
         .stats-grid-container,
         .identity-grid-container,
@@ -922,13 +922,6 @@
 
 
 
-        /* About section mobile - empiler image et texte */
-        .grid.grid-cols-1.lg\:grid-cols-2,
-        section[style*="background: linear-gradient(to bottom, #ffffff"] .grid {
-            grid-template-columns: 1fr !important;
-            gap: 32px !important;
-            align-items: flex-start !important;
-        }
 
         /* Section "L'Expertise au Service de l'Émergence" mobile - Style site de référence */
         section[style*="background: linear-gradient(to bottom, rgb(248, 250, 252)"] {
@@ -961,11 +954,6 @@
             object-position: center !important;
         }
 
-        /* Grid mobile pour section About */
-        section[style*="background: linear-gradient(to bottom, rgb(248, 250, 252)"] .grid {
-            grid-template-columns: 1fr !important;
-            gap: 32px !important;
-        }
 
         section[style*="background: linear-gradient(to bottom, #ffffff"] div[style*="min-height: 550px"] {
             min-height: 300px !important;
@@ -1049,9 +1037,9 @@
 
     }
 
-    /* FIX: Force vertical stacking up to 1024px (Tablet & Mobile) */
-    @media (max-width: 1024px) {
 
+    /* FIX: Layout Overrides */
+    @media (max-width: 1023px) {
         .stats-grid-container,
         .identity-grid-container,
         .approach-grid-container,
@@ -1063,83 +1051,30 @@
             gap: 32px !important;
         }
 
-        /* Stats items vertical alignment */
-        .stats-grid-container>div {
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: center !important;
-            text-align: center !important;
-            margin-bottom: 32px !important;
-        }
-
-        .stats-grid-container>div:last-child {
-            margin-bottom: 0 !important;
+        .identity-grid-container > div {
+            min-height: auto !important;
+            height: auto !important;
         }
     }
 
-    /* Desktop - masquer le menu mobile */
-    @media (min-width: 769px) {
-
-        .mobile-menu-button,
-        .mobile-menu,
-        .mobile-header {
-            display: none !important;
+    @media (min-width: 1024px) {
+        .identity-grid-container {
+            display: grid !important;
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 48px !important;
+            align-items: stretch !important;
         }
-
+        
         .desktop-menu {
             display: flex !important;
         }
-
-
-
-        /* Restored Mobile Logo Styles - Placed correctly inside style block */
-        .mobile-logo {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            min-width: 0;
-        }
-
-        .mobile-logo a {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            min-width: 0;
-            flex: 1;
-            text-decoration: none !important;
-        }
-
-        .mobile-logo img {
-            height: 64px !important;
-            width: auto !important;
-            flex-shrink: 0;
-        }
-
-        .mobile-logo .flex.flex-col {
-            min-width: 0;
-            flex: 1;
-        }
-
-        .mobile-logo span.font-bold {
-            font-size: 20px !important;
-            line-height: 1.2 !important;
-            font-weight: 800 !important;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
-            -webkit-background-clip: text !important;
-            -webkit-text-fill-color: transparent !important;
-            background-clip: text !important;
-        }
-
-        .mobile-logo .text-xs,
-        .mobile-logo .text-sm {
-            font-size: 13px !important;
-            line-height: 1.2 !important;
-            margin-top: 2px !important;
+        
+        .mobile-header, .mobile-menu-button {
+            display: none !important;
         }
     }
 
-    /* GLOBAL HEADER IMAGE RESTRAINT (Outside media query) */
+    /* GLOBAL HEADER IMAGE RESTRAINT */
     header img {
         height: 64px !important;
         width: auto !important;
