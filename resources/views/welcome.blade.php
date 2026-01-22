@@ -60,67 +60,66 @@
         </div>
 
         <!-- Content Container - Centered Aligned for Hero Desktop -->
-        <div class="relative z-10 w-full max-w-[1200px] mx-auto px-4 text-center flex flex-col items-center justify-start"
-            style="min-height: 100vh; padding-top: 120px; z-index: 10; position: relative;">
-            <!-- Badge - Plateforme d'Experts Nationaux Agréée -->
-            <div class="inline-block px-8 py-3 mb-6 rounded-full mx-auto"
-                style="background-color: rgba(16, 185, 129, 0.3); border: 1px solid rgb(5, 150, 105) !important; border-radius: 9999px; padding: 20px 48px; margin-bottom: 24px; margin-top: 20px; display: table; margin-left: auto; margin-right: auto;position: relative; left: -30px;">
-                <p class="text-center"
-                    style="color: rgb(110, 231, 183) !important; font-size: 18px; font-weight: 600; margin: 0; letter-spacing: 0.5px;">
+        <div class="hero-content-container relative z-10 w-full max-w-7xl mx-auto px-4 flex flex-col items-center justify-start text-center"
+            style="min-height: 100vh; position: relative; z-index: 10;">
+
+            <!-- Badge -->
+            <div class="inline-flex items-center px-4 py-2 mb-2 lg:px-6 lg:mb-4 hero-badge"
+                style="background-color: rgba(16, 185, 129, 0.2); border: 1px solid rgba(5, 150, 105, 0.5); border-radius: 9999px;">
+                <span style="color: #D1FAE5; font-weight: 500;" class="text-[13px] lg:text-[16px] whitespace-nowrap">
                     Plateforme d'Experts Nationaux Agréée
-                </p>
+                </span>
             </div>
 
-            <!-- Main Title - Centered & Structured from Mockup -->
-            <h1 class="hero-title mb-6 text-center"
-                style="font-size: 84px; font-weight: 700; line-height: 84px; margin-bottom: 24px; margin-top: 40px; color: #ffffff; text-align: center;">
-                <span class="block text-white">Expertise en</span>
-                <span class="block text-white">Géosciences,</span>
-                <span class="block"
-                    style="background: linear-gradient(to right, rgb(52, 211, 153), rgb(45, 212, 191)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; color: transparent; text-align: center;">
-                    <span class="block">Mines &amp;</span>
-                    <span class="block">Environnement</span>
-                </span>
+            <!-- Main Title (H1) -->
+            <h1 class="hero-title mb-8" style="font-size: 84px; font-weight: 700; line-height: 1.1; color: #ffffff;">
+                <span class="block">Expertise en Géosciences,</span>
+                <span class="block" style="color: #10B981; font-weight: 800;">Mines & Environnement</span>
             </h1>
 
-            <!-- Descriptive Paragraph - Centered -->
-            <p class="hero-description mb-10 text-center mx-auto"
-                style="font-size: 20px; color: rgb(229, 231, 235); line-height: 32.5px; margin-bottom: 24px; max-width: 768px; text-align: center; display: block; margin-left: auto; margin-right: auto;">
+            <!-- Subtitle -->
+            <p class="hero-description mb-12 mx-auto"
+                style="font-size: 20px; color: #E5E7EB; line-height: 1.6; max-width: 800px;">
                 CEGME accompagne vos projets en République Centrafricaine avec une approche durable et responsable
             </p>
 
-            <!-- Call-to-Action Buttons - Centered -->
-            <div class="hero-buttons flex flex-row items-center justify-center w-full"
-                style="gap: 20px; margin-top: 20px; justify-content: center;">
-                <!-- Nos Services Button - Exact from Site -->
-                <!-- Prendre un RDV Button -->
+            <!-- Buttons -->
+            <div class="hero-buttons flex flex-wrap items-center justify-center" style="gap: 24px;">
+                <!-- Prendre un RDV -->
                 <a href="https://calendly.com/cegme" target="_blank" rel="noopener noreferrer"
-                    class="inline-flex items-center justify-center gap-2 px-8 py-2 text-white font-medium transition-all duration-200 hover:opacity-90"
-                    style="background-color: rgb(5, 150, 105); border-radius: 9999px; padding: 10px 32px; font-size: 18px;">
+                    class="inline-flex items-center justify-center gap-2 px-8 py-3.5 text-white font-medium transition-all duration-200 hover:opacity-90"
+                    style="background-color: #10B981; border-radius: 9999px; font-size: 18px;">
                     <span>Prendre un RDV</span>
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                        style="width: 20px; height: 20px; stroke-width: 2.5;">
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                        <line x1="16" y1="2" x2="16" y2="6"></line>
-                        <line x1="8" y1="2" x2="8" y2="6"></line>
-                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                        xmlns="http://www.w3.org/2000/svg" style="width: 20px; height: 20px; stroke-width: 2.5;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path>
                     </svg>
                 </a>
 
-                <!-- Nous Contacter Button - Exact from Site -->
+                <!-- Nous Contacter -->
                 <a href="/contact"
-                    class="inline-flex items-center justify-center px-8 py-2 text-white font-medium transition-all duration-200 hover:bg-white/10"
-                    style="background-color: rgba(55, 65, 81, 0.8) !important; border: 2px solid rgba(255, 255, 255, 0.3) !important; border-radius: 9999px; padding: 10px 32px; font-size: 18px; text-decoration: none;">
+                    class="inline-flex items-center justify-center px-8 py-3.5 text-white font-medium border border-white transition-all duration-200 hover:bg-white/10"
+                    style="background-color: transparent; border: 1px solid #FFFFFF !important; border-radius: 9999px; font-size: 18px;">
                     <span>Nous Contacter</span>
                 </a>
             </div>
         </div>
     </section>
 
-    <!-- About Section - Before Statistics -->
     <section class="w-full"
         style="padding: 100px 0; margin: 0; background: linear-gradient(to bottom, rgb(248, 250, 252), rgb(255, 255, 255));">
         <style>
+            /* Responsive Hero Positioning */
+            .hero-content-container {
+                padding-top: 65px !important;
+            }
+
+            @media (min-width: 1024px) {
+                .hero-content-container {
+                    padding-top: 140px !important;
+                }
+            }
+
             /* Mobile-only styles: emphasize and reorganize hero text without touching desktop */
             @media (max-width: 639px) {
                 .mobile-hero-block {
