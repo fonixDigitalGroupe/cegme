@@ -107,7 +107,7 @@
     </section>
 
     <section class="w-full"
-        style="padding: 100px 0; margin: 0; background: linear-gradient(to bottom, rgb(248, 250, 252), rgb(255, 255, 255));">
+        style="padding: 220px 0 100px 0; margin: 0; background: linear-gradient(to bottom, rgb(248, 250, 252), rgb(255, 255, 255));">
         <style>
             /* Responsive Hero Positioning */
             .hero-content-container {
@@ -117,6 +117,26 @@
             @media (min-width: 1024px) {
                 .hero-content-container {
                     padding-top: 140px !important;
+                }
+            }
+
+            /* About Section Desktop Layout Fix */
+            @media (min-width: 1024px) {
+                .about-grid-container {
+                    display: grid !important;
+                    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+                    gap: 4rem !important;
+                    /* gap-16 */
+                }
+
+                .about-image-col {
+                    grid-column: span 2 / span 2 !important;
+                    order: 1 !important;
+                }
+
+                .about-text-col {
+                    grid-column: span 3 / span 3 !important;
+                    order: 2 !important;
                 }
             }
 
@@ -162,57 +182,108 @@
             }
         </style>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 lg:grid-cols-5 gap-12 items-center"
-                style="display: grid; grid-template-columns: repeat(1, minmax(0, 1fr)); gap: 48px; align-items: stretch;">
-                <!-- Image à gauche (2/5) -->
-                <div class="relative w-full flex items-stretch lg:col-span-2"
-                    style="position: relative; width: 100%; display: flex; align-items: stretch;">
-                    <!-- Decorative card/glow: hidden on small screens to avoid 'card effect' under image -->
-                    <div class="hidden sm:block absolute -inset-4 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl opacity-20 blur-xl"
-                        style="position: absolute; top: -16px; right: -16px; bottom: -16px; left: -16px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.3) 0%, rgba(5, 150, 105, 0.3) 100%); border-radius: 16px; opacity: 0.2; filter: blur(20px); z-index: 0;">
-                    </div>
-                    <div class="relative overflow-hidden rounded-2xl shadow-2xl w-fullmobile-hero-image-container"
-                        style="position: relative; overflow: hidden; border-radius: 16px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03); z-index: 1; width: 100%; height: 100%; min-height: 550px;">
-                        <img src="{{ asset('Image/Personnel.jpg') }}" alt="Équipe CEGME"
-                            class="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
-                            style="width: 100%; height: 100%; min-height: inherit; object-fit: cover; transition: transform 0.7s ease; display: block;">
+            <!-- Flex container for About Section: Column by default (mobile), Row on desktop -->
+            <div class="about-flex-container"
+                style="display: flex; flex-direction: column; gap: 48px; align-items: stretch;">
+
+                <!-- Image (Index 1 - Left on Desktop) -->
+                <div class="about-image-col" style="width: 100%; order: 2;">
+                    <!-- Image Container -->
+                    <div class="about-image-card expertise-image-container"
+                        style="background: transparent; border-radius: 12px; padding: 0; overflow: hidden;">
+                        <div class="relative w-full h-full">
+                            <div class="relative overflow-hidden w-full h-full"
+                                style="position: relative; overflow: hidden; border-radius: 12px; width: 100%; height: 100%;">
+                                <img src="{{ asset('Image/Personnel.jpg') }}" alt="Équipe CEGME"
+                                    class="w-full h-full object-cover expertise-image-img"
+                                    style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Texte à droite (3/5) -->
-                <div class="w-full lg:col-span-3" style="width: 100%;">
+                <!-- Texte (Index 2 - Right on Desktop) -->
+                <div class="about-text-col" style="width: 100%; order: 1;">
                     <div class="space-y-6 mobile-hero-block" style="display: flex; flex-direction: column; gap: 24px;">
-                        <!-- Titre et Ligne déplacés ici pour alignement mobile -->
+                        <!-- Titre et Ligne -->
                         <div>
                             <h2 class="text-4xl font-bold mb-6 leading-tight mobile-hero-title"
-                                style="font-size: 42px; font-weight: 800; color: rgb(17, 24, 39); margin-bottom: 24px; line-height: 1.2; letter-spacing: -0.5px;">
+                                style="font-size: 42px; font-weight: 800; color: #111827; margin-bottom: 16px; line-height: 1.2; letter-spacing: -0.5px;">
                                 L'Expertise au Service de l'Émergence
                             </h2>
-                            <div class="w-20 h-1 bg-gradient-to-r from-green-500 to-green-600 rounded-full mobile-hero-decor"
-                                style="width: 80px; height: 4px; background: linear-gradient(90deg, rgb(5, 150, 105) 0%, rgb(16, 185, 129) 100%); border-radius: 9999px;">
+                            <div class="w-16 h-1 bg-[#16a34a] rounded-full mobile-hero-decor"
+                                style="width: 80px; height: 4px; background-color: #16a34a; border-radius: 2px; margin-bottom: 24px;">
                             </div>
                         </div>
 
-                        <p class="text-lg text-gray-700 leading-relaxed mobile-hero-para"
-                            style="font-size: 17px; color: rgb(55, 65, 81); line-height: 32px; margin: 0; font-weight: 400;">
-                            Le <strong style="font-weight: 700; color: rgb(17, 24, 39);">Cabinet d'Études Géologiques,
+                        <p class="text-[17px] text-[#374151] leading-[32px] mobile-hero-para"
+                            style="font-size: 17px; color: #374151; line-height: 32px; margin: 0 0 16px 0; font-weight: 400; text-align: justify;">
+                            Le <strong style="font-weight: 700; color: #111827;">Cabinet d'Études Géologiques,
                                 Minières et Environnementales (CEGME) Sarl.</strong>, est le partenaire de référence
                             pour la conception et la concrétisation de projets stratégiques en République Centrafricaine
                             (RCA) et en Afrique Centrale. Spécialisé dans les géosciences, les mines et le développement
                             durable, le cabinet transforme les enjeux complexes en leviers de croissance responsable
                             pour les investisseurs et les institutions.
                         </p>
-                        <p class="text-lg text-gray-700 leading-relaxed mobile-hero-para"
-                            style="font-size: 17px; color: rgb(55, 65, 81); line-height: 32px; margin: 0; font-weight: 400;">
-                            Enregistré sous le numéro <strong style="font-weight: 700; color: rgb(17, 24, 39);">N°RCCM :
+                        <p class="text-[17px] text-[#374151] leading-[32px] mobile-hero-para"
+                            style="font-size: 17px; color: #374151; line-height: 32px; margin: 0; font-weight: 400; text-align: justify;">
+                            Enregistré sous le numéro <strong style="font-weight: 700; color: #111827;">N°RCCM :
                                 CA/BG/2015B541</strong>, le CEGME est une structure multidisciplinaire agréée et
                             accréditée par le Ministère de l'Environnement et du Développement Durable (<strong
-                                style="font-weight: 700; color: rgb(17, 24, 39);">N°004/MEEDD/DIR.CAB_21</strong> et
-                            <strong style="font-weight: 700; color: rgb(17, 24, 39);">N°29/MEEDD/DIR.CAB</strong>).
+                                style="font-weight: 700; color: #111827;">N°004/MEEDD/DIR.CAB_21</strong> et
+                            <strong style="font-weight: 700; color: #111827;">N°29/MEEDD/DIR.CAB</strong>).
                         </p>
                     </div>
                 </div>
             </div>
+
+            <style>
+                /* Force Desktop Layout side-by-side with exact proportions */
+                @media (min-width: 1024px) {
+                    .about-flex-container {
+                        flex-direction: row !important;
+                        gap: 48px !important;
+                        align-items: flex-start !important;
+                        /* Top align image and text */
+                    }
+
+                    .about-image-col {
+                        order: 1 !important;
+                        flex-basis: 45% !important;
+                        width: 45% !important;
+                    }
+
+                    .about-text-col {
+                        order: 2 !important;
+                        flex-basis: 55% !important;
+                        width: 55% !important;
+                    }
+
+                    .expertise-image-container {
+                        height: 500px !important;
+                        min-height: 500px !important;
+                    }
+
+                    .expertise-image-img {
+                        height: 100% !important;
+                    }
+                }
+
+                /* Mobile: Protect vertical layout and fixed height */
+                @media (max-width: 1023px) {
+                    .about-image-card {
+                        background: transparent !important;
+                        border-radius: 12px !important;
+                        padding: 0 !important;
+                        box-shadow: none !important;
+                    }
+
+                    .expertise-image-container {
+                        height: 350px !important;
+                        min-height: 350px !important;
+                    }
+                }
+            </style>
         </div>
     </section>
 

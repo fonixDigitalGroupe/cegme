@@ -71,9 +71,9 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20"
                 style="display: grid; gap: 48px; align-items: center; margin-bottom: 80px;">
                 <!-- Image -->
-                <div class="w-full">
+                <div class="w-full lg:w-[110%]">
                     <img src="{{ asset('Image/Cabinet d\'Études Géologiques.jpg') }}" alt="Cabinet d'Études Géologiques"
-                        class="w-full h-[300px] lg:h-[500px] object-cover"
+                        class="w-full h-[300px] lg:h-[650px] object-cover"
                         style="width: 100%; object-fit: cover; border-radius: 0px;">
                 </div>
                 <!-- Text Content -->

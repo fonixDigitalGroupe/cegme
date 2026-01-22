@@ -591,18 +591,14 @@
             box-shadow: none !important;
             border: none !important;
             background: transparent !important;
-            min-height: auto !important;
+            min-height: inherit !important;
             /* Override inline min-height */
-            height: auto !important;
+            height: 100% !important;
         }
 
         section[style*="background: linear-gradient(to bottom, rgb(248, 250, 252)"] img[alt="Équipe CEGME"] {
             width: 100% !important;
-            height: 250px !important;
-            /* Reduced height */
-            min-height: auto !important;
-            max-height: 250px !important;
-            /* Reduced height */
+            height: 100% !important;
             object-fit: cover !important;
             object-position: center !important;
         }
@@ -953,18 +949,14 @@
             box-shadow: none !important;
             border: none !important;
             background: transparent !important;
-            min-height: auto !important;
+            min-height: inherit !important;
             /* Override inline min-height */
-            height: auto !important;
+            height: 100% !important;
         }
 
         section[style*="background: linear-gradient(to bottom, rgb(248, 250, 252)"] img[alt="Équipe CEGME"] {
             width: 100% !important;
-            height: 250px !important;
-            /* Reduced height */
-            min-height: auto !important;
-            max-height: 250px !important;
-            /* Reduced height */
+            height: 100% !important;
             object-fit: cover !important;
             object-position: center !important;
         }
