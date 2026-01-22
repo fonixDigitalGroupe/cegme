@@ -68,25 +68,6 @@
                 gap: 12px !important;
             }
 
-            .blog-search-box {
-                min-width: 0 !important;
-                max-width: 520px !important;
-                width: 100% !important;
-                margin-left: auto !important;
-                margin-right: auto !important;
-            }
-
-            .blog-filter-buttons {
-                width: 100% !important;
-                justify-content: flex-start !important;
-                flex-wrap: nowrap !important;
-                overflow-x: auto !important;
-                -webkit-overflow-scrolling: touch;
-                padding-bottom: 6px !important;
-            }
-
-
-
         }
 
         /* Desktop - masquer le menu mobile */
@@ -121,9 +102,10 @@
 
 
     <!-- Hero Section - Page Header -->
-    <section class="relative w-full flex items-center justify-center overflow-hidden"
+    <section class="relative w-full flex items-center justify-center overflow-hidden blog-hero-section"
         style="min-height: 45vh; padding: 60px 0; background: linear-gradient(to right bottom, rgb(6, 78, 59), rgb(17, 94, 89), rgb(15, 23, 42));">
-        <div class="relative z-10 w-full max-w-4xl mx-auto px-4 text-center" style="margin-top: 100px;">
+        <div class="relative z-10 w-full max-w-4xl mx-auto px-4 text-center blog-hero-content"
+            style="margin-top: 100px;">
             <h1 class="mb-6"
                 style="font-size: 60px; font-weight: 700; color: rgb(255, 255, 255); margin-bottom: 24px; text-align: center; line-height: 72px;">
                 Blog & Actualités
@@ -157,7 +139,7 @@
                         <input type="text" name="search" value="{{ request()->get('search') }}"
                             placeholder="Rechercher un article..."
                             class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                            style="width: 100%; padding-left: 40px; padding-right: 16px; padding-top: 8px; padding-bottom: 8px; border: 1px solid rgb(209, 213, 219); border-radius: 6px; font-size: 14px;">
+                            style="width: 100%; padding-left: 44px; padding-right: 16px; padding-top: 12px; padding-bottom: 12px; border: 2px solid rgb(209, 213, 219); border-radius: 10px; font-size: 16px; background-color: #fff;">
                         @if(request()->has('category'))
                             <input type="hidden" name="category" value="{{ request()->get('category') }}">
                         @endif
@@ -169,7 +151,7 @@
 
                 <!-- Filter Buttons - Right -->
                 <div class="flex flex-wrap gap-3 justify-end blog-filter-buttons"
-                    style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: flex-end; align-items: center;">
+                    style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; align-items: center;">
                     <a href="{{ route('blog.index') }}"
                         class="px-6 py-2.5 rounded-full font-bold transition-all duration-200 {{ !request()->has('category') && !request()->has('tag') ? 'bg-teal-500 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}"
                         style="padding: 10px 24px; border-radius: 9999px; font-size: 14px; font-weight: 700; text-decoration: none; display: inline-block; {{ !request()->has('category') && !request()->has('tag') ? 'background-color: rgb(20, 184, 166); color: rgb(255, 255, 255); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);' : 'background-color: rgb(243, 244, 246); color: rgb(55, 65, 81);' }}">

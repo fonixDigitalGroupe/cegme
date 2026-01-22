@@ -307,10 +307,15 @@
         }
 
         /* Largeur des éléments pour correspondre exactement */
+        .hero-section>div[style*="padding-top: 120px"] {
+            align-items: center !important;
+            text-align: center !important;
+        }
+
         .hero-section>div[style*="padding-top: 120px"]>.hero-title,
         .hero-section>div[style*="padding-top: 120px"]>.hero-description,
         .hero-section>div[style*="padding-top: 120px"]>.hero-buttons {
-            max-width: 344px !important;
+            max-width: 100% !important;
             width: 100% !important;
         }
 
@@ -330,7 +335,7 @@
 
         /* Badge Hero mobile - Pixel perfect site de référence */
         .hero-section .inline-block {
-            padding: 8px 12px !important;
+            padding: 16px 24px !important;
             font-size: 14px !important;
             margin-bottom: 24px !important;
             margin-top: -20px !important;
@@ -341,7 +346,10 @@
             max-width: 98% !important;
             margin-left: auto !important;
             margin-right: auto !important;
-            display: inline-block !important;
+            position: relative !important;
+            left: -20px !important;
+            display: table !important;
+            float: none !important;
             white-space: nowrap !important;
             visibility: visible !important;
             opacity: 1 !important;
@@ -359,27 +367,32 @@
             visibility: visible !important;
             opacity: 1 !important;
             display: block !important;
+            text-align: center !important;
         }
 
         /* Titre Hero mobile - Pixel perfect site de référence */
         .hero-title {
-            font-size: 48px !important;
-            line-height: 60px !important;
+            font-size: 40px !important;
+            line-height: 48px !important;
             padding: 0 !important;
             margin-bottom: 24px !important;
             margin-top: 0 !important;
             font-weight: 700 !important;
-            width: 344px !important;
+            width: 100% !important;
             max-width: 100% !important;
             color: rgb(255, 255, 255) !important;
+            text-align: center !important;
         }
 
         .hero-title span {
             display: block !important;
             margin-bottom: 0 !important;
-            font-size: 48px !important;
-            line-height: 60px !important;
+            font-size: 40px !important;
+            /* Match parent */
+            line-height: 48px !important;
+            /* Match parent */
             font-weight: 700 !important;
+            text-align: center !important;
         }
 
         .hero-title span.hidden {
@@ -404,15 +417,16 @@
 
         /* Description Hero mobile - Pixel perfect site de référence */
         .hero-description {
-            font-size: 24px !important;
-            line-height: 48px !important;
+            font-size: 18px !important;
+            line-height: 28px !important;
             padding: 0 !important;
             margin-bottom: 40px !important;
             margin-top: 0 !important;
             color: rgb(229, 231, 235) !important;
-            max-width: 768px !important;
-            width: 344px !important;
+            max-width: 100% !important;
+            width: 100% !important;
             font-weight: 400 !important;
+            text-align: center !important;
         }
 
         /* Boutons Hero mobile - Pixel perfect site de référence */
@@ -425,10 +439,11 @@
             margin-bottom: 32px !important;
             width: 100% !important;
             max-width: 100% !important;
-            align-items: stretch !important;
+            align-items: center !important;
             justify-content: center !important;
-            margin-left: 0 !important;
-            margin-right: 0 !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            text-align: center !important;
         }
 
         .hero-buttons a {
@@ -611,8 +626,8 @@
         }
 
         section[style*="background: linear-gradient(to bottom, #ffffff"] h2 {
-            font-size: 26px !important;
-            line-height: 34px !important;
+            font-size: 24px !important;
+            line-height: 32px !important;
             margin-bottom: 16px !important;
             padding: 0 !important;
         }
@@ -677,6 +692,185 @@
             gap: 24px !important;
         }
 
+
+        /* About Hero Mobile height */
+        .about-hero-section {
+            min-height: 25vh !important;
+            padding: 40px 0 !important;
+        }
+
+        /* Services Hero Mobile height */
+        .services-hero-section {
+            min-height: 25vh !important;
+            padding: 40px 0 !important;
+        }
+
+        .services-hero-content {
+            margin-top: 40px !important;
+        }
+
+        /* Pole Header Mobile Styling */
+        .pole-header-flex {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 20px !important;
+        }
+
+        .pole-contact-link {
+            width: 100% !important;
+            margin-left: 0 !important;
+        }
+
+        .pole-contact-button {
+            width: 100% !important;
+            padding: 14px !important;
+            justify-content: center !important;
+            border-radius: 8px !important;
+            font-size: 16px !important;
+            border: 1px solid #10b981 !important;
+            color: #065f46 !important;
+        }
+
+        /* Realisations Mobile Styles */
+        .realisations-filters-row {
+            flex-direction: column !important;
+            align-items: stretch !important;
+        }
+
+        .realisations-year-filter {
+            margin-left: 0 !important;
+            padding-bottom: 8px !important;
+        }
+
+        .project-card {
+            max-width: 100% !important;
+        }
+
+        /* Realisations Hero Mobile height & centering */
+        .realisations-hero-section {
+            min-height: 25vh !important;
+            padding: 40px 0 !important;
+        }
+
+        .realisations-hero-content {
+            margin-top: 40px !important;
+        }
+
+        /* Actualités Hero & Grid Mobile Styles */
+        .actualites-hero-section {
+            min-height: 25vh !important;
+            padding: 40px 0 !important;
+        }
+
+        .actualites-hero-content {
+            margin-top: 40px !important;
+        }
+
+        .actualites-main-row {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 48px !important;
+        }
+
+        .actualites-left-column {
+            max-width: 100% !important;
+        }
+
+        .actualites-facebook-widget {
+            margin-left: 0 !important;
+            max-width: 100% !important;
+        }
+
+        /* Blog Hero & Search Mobile Styles */
+        .blog-hero-section {
+            min-height: 25vh !important;
+            padding: 40px 0 !important;
+        }
+
+        .blog-hero-content {
+            margin-top: 40px !important;
+        }
+
+        .blog-filter-buttons {
+            justify-content: center !important;
+            flex-wrap: wrap !important;
+            gap: 8px !important;
+            width: 100% !important;
+        }
+
+        .blog-filter-buttons a {
+            padding: 8px 16px !important;
+            font-size: 13px !important;
+            white-space: nowrap !important;
+        }
+
+        /* Blog Show Mobile Styles */
+        .blog-show-hero-section {
+            min-height: 40vh !important;
+            padding-top: 80px !important;
+            padding-bottom: 40px !important;
+        }
+
+        .blog-show-hero-container {
+            padding-left: 12px !important;
+            padding-right: 12px !important;
+        }
+
+        .blog-show-hero-inner {
+            max-width: 100% !important;
+            margin-left: 0 !important;
+        }
+
+        .blog-show-main-section {
+            padding-top: 40px !important;
+            padding-bottom: 40px !important;
+        }
+
+        .blog-show-main-section .excerpt {
+            margin-bottom: 30px !important;
+            margin-top: 0 !important;
+            padding: 20px 16px !important;
+            font-size: 19px !important;
+            width: 100% !important;
+        }
+
+        .blog-show-main-section .article-content-wrapper {
+            padding: 0 12px !important;
+            max-width: 100% !important;
+        }
+
+        .blog-show-main-section .article-content p:first-of-type {
+            margin-bottom: 24px !important;
+        }
+
+        /* Offres Hero Mobile Styles */
+        .offres-hero-section {
+            min-height: 25vh !important;
+            padding: 40px 0 !important;
+        }
+
+        .offres-hero-content {
+            margin-top: 40px !important;
+        }
+
+        /* Contact Hero & Cards Mobile Styles */
+        .contact-hero-section {
+            min-height: 25vh !important;
+            padding: 40px 0 !important;
+        }
+
+        .contact-hero-content {
+            margin-top: 40px !important;
+        }
+
+        .contact-cards-grid {
+            grid-template-columns: 1fr !important;
+            gap: 24px !important;
+        }
+
+        .contact-input {
+            border: 1.5px solid #94a3b8 !important;
+        }
 
     }
 
@@ -958,5 +1152,24 @@
         height: 64px !important;
         width: auto !important;
         max-width: none !important;
+    }
+
+    /* Auth Pages Styling */
+    .auth-input:focus,
+    .auth-button:focus,
+    input[type="email"]:focus,
+    input[type="password"]:focus,
+    input[type="text"]:focus,
+    input[type="tel"]:focus,
+    textarea:focus {
+        border-color: #10b981 !important;
+        outline: none !important;
+        box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2) !important;
+    }
+
+    .auth-input,
+    .auth-button {
+        border: 1.5px solid #d1d5db !important;
+        box-shadow: none !important;
     }
 </style>

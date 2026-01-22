@@ -59,37 +59,39 @@
             </div>
         </div>
 
-        <!-- Content Container - Centered, Exact Positioning from Site -->
+        <!-- Content Container - Centered Aligned for Hero Desktop -->
         <div class="relative z-10 w-full max-w-[1200px] mx-auto px-4 text-center flex flex-col items-center justify-start"
             style="min-height: 100vh; padding-top: 120px; z-index: 10; position: relative;">
             <!-- Badge - Plateforme d'Experts Nationaux Agréée -->
-            <div class="inline-block px-8 py-3 mb-6 rounded-full"
-                style="background-color: rgba(16, 185, 129, 0.3); border: 1px solid rgb(5, 150, 105) !important; border-radius: 9999px; padding: 12px 32px; margin-bottom: 24px; margin-top: 20px;">
+            <div class="inline-block px-8 py-3 mb-6 rounded-full mx-auto"
+                style="background-color: rgba(16, 185, 129, 0.3); border: 1px solid rgb(5, 150, 105) !important; border-radius: 9999px; padding: 20px 48px; margin-bottom: 24px; margin-top: 20px; display: table; margin-left: auto; margin-right: auto;position: relative; left: -30px;">
                 <p class="text-center"
                     style="color: rgb(110, 231, 183) !important; font-size: 18px; font-weight: 600; margin: 0; letter-spacing: 0.5px;">
                     Plateforme d'Experts Nationaux Agréée
                 </p>
             </div>
 
-            <!-- Main Title - Exact Typography from Site -->
+            <!-- Main Title - Centered & Structured from Mockup -->
             <h1 class="hero-title mb-6 text-center"
-                style="font-size: 84px; font-weight: 700; line-height: 84px; margin-bottom: 24px; margin-top: 40px; color: #ffffff;">
-                <span class="block text-white">Expertise en Géosciences,</span>
-                <span class="block text-center"
+                style="font-size: 84px; font-weight: 700; line-height: 84px; margin-bottom: 24px; margin-top: 40px; color: #ffffff; text-align: center;">
+                <span class="block text-white">Expertise en</span>
+                <span class="block text-white">Géosciences,</span>
+                <span class="block"
                     style="background: linear-gradient(to right, rgb(52, 211, 153), rgb(45, 212, 191)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; color: transparent; text-align: center;">
-                    <span class="hidden md:inline">Mines &amp; Environnement</span>
-                    <span class="md:hidden">Mines &amp;<br>Environnement</span>
+                    <span class="block">Mines &amp;</span>
+                    <span class="block">Environnement</span>
                 </span>
             </h1>
 
-            <!-- Descriptive Paragraph - Exact from Site -->
-            <p class="hero-description mb-10 mx-auto text-center"
+            <!-- Descriptive Paragraph - Centered -->
+            <p class="hero-description mb-10 text-center mx-auto"
                 style="font-size: 20px; color: rgb(229, 231, 235); line-height: 32.5px; margin-bottom: 24px; max-width: 768px; text-align: center; display: block; margin-left: auto; margin-right: auto;">
                 CEGME accompagne vos projets en République Centrafricaine avec une approche durable et responsable
             </p>
 
-            <!-- Call-to-Action Buttons - Exact from Site -->
-            <div class="hero-buttons flex flex-row items-center justify-center" style="gap: 20px; margin-top: 20px;">
+            <!-- Call-to-Action Buttons - Centered -->
+            <div class="hero-buttons flex flex-row items-center justify-center w-full"
+                style="gap: 20px; margin-top: 20px; justify-content: center;">
                 <!-- Nos Services Button - Exact from Site -->
                 <!-- Prendre un RDV Button -->
                 <a href="https://calendly.com/cegme" target="_blank" rel="noopener noreferrer"
@@ -133,8 +135,8 @@
                 }
 
                 .mobile-hero-title {
-                    font-size: 1.85rem !important;
-                    line-height: 1.2 !important;
+                    font-size: 1.6rem !important;
+                    line-height: 1.3 !important;
                     margin-bottom: 1.5rem !important;
                     text-align: center !important;
                 }

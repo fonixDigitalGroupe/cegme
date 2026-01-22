@@ -39,9 +39,10 @@
     <x-site-header />
 
     <!-- Hero Section - Page Header -->
-    <section class="relative w-full flex items-center justify-center overflow-hidden"
+    <section class="relative w-full flex items-center justify-center overflow-hidden services-hero-section"
         style="min-height: 45vh; padding: 60px 0; background: linear-gradient(to right bottom, rgb(6, 78, 59), rgb(17, 94, 89), rgb(15, 23, 42));">
-        <div class="relative z-10 w-full max-w-4xl mx-auto px-4 text-center" style="margin-top: 100px;">
+        <div class="relative z-10 w-full max-w-4xl mx-auto px-4 text-center services-hero-content"
+            style="margin-top: 100px;">
             <h1 class="mb-6"
                 style="font-size: 60px; font-weight: 700; color: rgb(255, 255, 255); margin-bottom: 24px; text-align: center; line-height: 72px;">
                 Nos Pôles d'Activités
@@ -180,7 +181,7 @@
                             Services proposés :
                         </h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 services-proposes-grid"
-                            style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px;">
+                            style="display: grid; gap: 24px;">
                             <!-- Service 1: EIES -->
                             <div class="bg-white rounded-lg p-6 border border-gray-200"
                                 style="background-color: rgb(255, 255, 255); border-radius: 8px; padding: 24px; border: 1px solid rgb(229, 231, 235);">
@@ -385,7 +386,7 @@
                             Services proposés :
                         </h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 services-proposes-grid"
-                            style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px;">
+                            style="display: grid; gap: 24px;">
                             <!-- Service 1: Exploration géologique -->
                             <div class="bg-white rounded-lg p-6 border border-gray-200"
                                 style="background-color: rgb(255, 255, 255); border-radius: 8px; padding: 24px; border: 1px solid rgb(229, 231, 235);">
@@ -626,7 +627,7 @@
                             Services proposés :
                         </h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 services-proposes-grid"
-                            style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px;">
+                            style="display: grid; gap: 24px;">
                             <!-- Service 1: Études hydrogéologiques -->
                             <div class="bg-white rounded-lg p-6 border border-gray-200"
                                 style="background-color: rgb(255, 255, 255); border-radius: 8px; padding: 24px; border: 1px solid rgb(229, 231, 235);">
@@ -798,7 +799,7 @@
                             Services proposés :
                         </h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 services-proposes-grid"
-                            style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px;">
+                            style="display: grid; gap: 24px;">
                             <!-- Service 1: Accompagnement investisseurs -->
                             <div class="bg-white rounded-lg p-6 border border-gray-200"
                                 style="background-color: rgb(255, 255, 255); border-radius: 8px; padding: 24px; border: 1px solid rgb(229, 231, 235);">
@@ -922,7 +923,7 @@
                 </p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 standards-grid"
-                style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px;">
+                style="display: grid; gap: 20px;">
                 <!-- Card 1: MEEDD - RCA -->
                 <div class="bg-gray-50 rounded-lg p-4 text-center"
                     style="background-color: rgb(248, 250, 252); border-radius: 8px; padding: 20px; text-align: center;">
@@ -1023,7 +1024,7 @@
         style="padding: 96px 0; background-color: rgb(255, 255, 255);">
         <div class="max-w-7xl mx-auto">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center livrables-grid"
-                style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px; align-items: center;">
+                style="display: grid; gap: 48px; align-items: center;">
                 <!-- Left Section: Text Content -->
                 <div>
                     <h2 class="text-4xl font-bold mb-6"

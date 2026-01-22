@@ -87,272 +87,7 @@
         < !-- Styles / Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         @include('partials.site-styles')
-
-        /* MOBILE ONLY STYLES - Ne pas affecter le desktop */
-        @media (max-width: 768px) {
-
-            /* Header Styles from Contact/Services Page - FIXED */
-            header {
-                background-color: rgba(255, 255, 255, 0.95) !important;
-                backdrop-filter: blur(10px) !important;
-            }
-
-            .mobile-menu a {
-                display: block;
-                padding: 16px 20px;
-                color: rgb(55, 65, 81);
-                text-decoration: none;
-                font-size: 16px;
-                font-weight: 600;
-                border-bottom: 1px solid rgba(229, 231, 235, 0.5);
-                transition: background-color 0.2s ease;
-            }
-
-            .mobile-menu a:hover,
-            .mobile-menu a:active {
-                background-color: rgb(249, 250, 251);
-            }
-
-            .mobile-menu a.active {
-                background: linear-gradient(180deg, rgb(10, 150, 120) 0%, rgb(16, 185, 150) 100%);
-                color: rgb(255, 255, 255);
-            }
-
-            .desktop-menu {
-                display: none !important;
-            }
-
-            .mobile-header {
-                display: flex !important;
-                align-items: center;
-                justify-content: space-between;
-                width: 100%;
-                padding: 16px 24px;
-                min-height: 64px;
-                position: relative;
-                z-index: 1000;
-            }
-
-            .mobile-menu-button {
-                display: flex !important;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                width: 44px;
-                height: 44px;
-                background: transparent;
-                border: none !important;
-                border-radius: 0;
-                cursor: pointer;
-                padding: 0;
-                z-index: 1001;
-                gap: 6px;
-                position: relative;
-                visibility: visible !important;
-                opacity: 1 !important;
-            }
-
-            .mobile-menu-button span {
-                width: 24px;
-                height: 3px;
-                background-color: #000000 !important;
-                border-radius: 0;
-                transition: all 0.3s ease;
-                display: block;
-                position: relative;
-            }
-
-            .mobile-menu-button:hover,
-            .mobile-menu-button:active {
-                background: transparent !important;
-                border: none !important;
-            }
-
-            .mobile-menu {
-                display: block;
-                position: fixed;
-                top: calc(3px + 64px);
-                left: 0;
-                right: 0;
-                background-color: #fff;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                z-index: 999;
-                max-height: calc(100vh - 67px);
-                overflow-y: auto;
-                border-top: 1px solid rgba(229, 231, 235, 0.5);
-                transform: translateY(-100%);
-                opacity: 0;
-                transition: transform .3s ease, opacity .3s ease;
-                pointer-events: none;
-            }
-
-            .mobile-menu.active {
-                transform: translateY(0);
-                opacity: 1;
-                pointer-events: auto;
-            }
-
-            .mobile-logo {
-                flex: 1;
-                display: flex;
-                align-items: center;
-                justify-content: flex-start;
-                min-width: 0;
-            }
-
-            .mobile-logo a {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                min-width: 0;
-                flex: 1;
-            }
-
-            .mobile-logo img {
-                height: 64px !important;
-                width: auto !important;
-                flex-shrink: 0;
-            }
-
-            .mobile-logo .flex.flex-col {
-                min-width: 0;
-                flex: 1;
-            }
-
-            .mobile-logo span.font-bold {
-                font-size: 20px !important;
-                line-height: 1.2 !important;
-                font-weight: 800 !important;
-                background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
-                -webkit-background-clip: text !important;
-                -webkit-text-fill-color: transparent !important;
-                background-clip: text !important;
-            }
-
-            .mobile-logo .text-xs,
-            .mobile-logo .text-sm {
-                font-size: 13px !important;
-                line-height: 1.2 !important;
-                margin-top: 2px !important;
-            }
-
-            .desktop-login-button {
-                display: none !important;
-            }
-
-            /* Empêcher le débordement horizontal */
-            body {
-                overflow-x: hidden !important;
-                max-width: 100vw !important;
-            }
-
-            * {
-                max-width: 100% !important;
-            }
-
-
-
-            .realisations-filters-row {
-                flex-direction: column !important;
-                align-items: stretch !important;
-                gap: 12px !important;
-            }
-
-            .realisations-filters-row select {
-                width: 100% !important;
-                max-width: 320px !important;
-                min-width: 0 !important;
-                align-self: flex-start !important;
-            }
-
-            .realisations-year-filter {
-                margin-left: 0 !important;
-                overflow-x: visible !important;
-                width: 100% !important;
-                display: grid !important;
-                grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
-                gap: 8px !important;
-            }
-
-            .realisations-year-filter button {
-                width: 100% !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                padding: 8px 0 !important;
-                font-size: 12px !important;
-            }
-
-            .realisations-projects-grid {
-                grid-template-columns: 1fr !important;
-                gap: 16px !important;
-                justify-items: center !important;
-            }
-
-            .project-card {
-                padding: 16px !important;
-                width: 100% !important;
-                max-width: 460px !important;
-            }
-
-            footer.desktop-footer {
-                display: none !important;
-            }
-
-            footer.mobile-footer-home {
-                display: block !important;
-            }
-
-            footer.mobile-footer-home .grid {
-                grid-template-columns: 1fr !important;
-                gap: 32px !important;
-            }
-
-            /* Mobile Header and Footer are handled globally by site-styles.blade.php */
-
-            .mobile-menu-button:hover span {
-                background-color: rgb(5, 150, 105);
-            }
-
-            .mobile-menu-button:active span {
-                background-color: rgb(5, 150, 105);
-            }
-
-            .mobile-menu-button.active span:nth-child(1) {
-                transform: rotate(45deg) translate(8px, 8px);
-            }
-
-            .mobile-menu-button.active span:nth-child(2) {
-                opacity: 0;
-            }
-
-            .mobile-menu-button.active span:nth-child(3) {
-                transform: rotate(-45deg) translate(8px, -8px);
-            }
-
-            /* Masquer le bouton Se connecter du header sur mobile */
-            .desktop-login-button {
-                display: none !important;
-            }
-
-            /* Ajuster le padding du header */
-            header nav {
-                padding: 12px 0 !important;
-            }
-
-            /* Styles pour les cartes de projets - Hauteur uniforme et positionnement icône/date */
-            .project-card {
-                display: flex;
-                flex-direction: column;
-                height: 100%;
-                min-height: 420px;
-            }
-
-            .project-card-content {
-                flex: 1;
-                display: flex;
-                flex-direction: column;
-            }
+    </style>
     </style>
 
     <!-- Fonts -->
@@ -376,9 +111,10 @@
     <x-site-header />
 
     <!-- Hero Section - Page Header -->
-    <section class="relative w-full flex items-center justify-center overflow-hidden"
+    <section class="relative w-full flex items-center justify-center overflow-hidden realisations-hero-section"
         style="min-height: 45vh; padding: 60px 0; background: linear-gradient(to right bottom, rgb(6, 78, 59), rgb(17, 94, 89), rgb(15, 23, 42));">
-        <div class="relative z-10 w-full max-w-4xl mx-auto px-4 text-center" style="margin-top: 100px;">
+        <div class="relative z-10 w-full max-w-4xl mx-auto px-4 text-center realisations-hero-content"
+            style="margin-top: 100px;">
             <h1 class="mb-6"
                 style="font-size: 60px; font-weight: 700; color: rgb(255, 255, 255); margin-bottom: 24px; text-align: center; line-height: 72px;">
                 Nos Réalisations
@@ -456,8 +192,8 @@
         <div class="max-w-7xl mx-auto">
             <!-- Filtres -->
             <div class="mb-8" style="margin-bottom: 32px;">
-                <div class="flex items-center gap-4 justify-start flex-wrap realisations-filters-row"
-                    style="display: flex; align-items: center; gap: 16px; justify-content: flex-start; flex-wrap: nowrap;">
+                <div class="flex flex-col md:flex-row md:items-center gap-4 justify-start realisations-filters-row"
+                    style="display: flex; gap: 16px; justify-content: flex-start;">
                     <div class="flex items-center gap-2" style="display: flex; align-items: center; gap: 8px;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -468,8 +204,8 @@
                             :</span>
                     </div>
                     <select x-model="activeSector"
-                        class="px-4 py-2 rounded-lg font-medium transition-colors border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
-                        style="padding: 12px 20px; border-radius: 6px; font-size: 16px; font-weight: 600; background-color: rgb(255, 255, 255); color: rgb(55, 65, 81); border: 1px solid rgb(209, 213, 219); cursor: pointer; min-width: 180px; max-width: 200px;">
+                        class="w-full md:w-auto px-4 py-2 rounded-lg font-medium transition-colors border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        style="padding: 12px 20px; border-radius: 6px; font-size: 16px; font-weight: 600; background-color: rgb(255, 255, 255); color: rgb(55, 65, 81); border: 1px solid rgb(209, 213, 219); cursor: pointer; min-width: 180px;">
                         <option value="all">Tous les secteurs</option>
                         <option value="eau-humanitaire">Eau, Humanitaire et Développement Rural</option>
                         <option value="conservation-environnement">Conservation et Environnement</option>
@@ -551,8 +287,8 @@
             </div>
 
             <!-- Grille de projets -->
-            <div class="realisations-projects-grid"
-                style="display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 32px; padding: 0; align-items: stretch;">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 realisations-projects-grid"
+                style="display: grid; gap: 32px; padding: 0; align-items: stretch;">
                 <!-- 2025 Projects -->
                 <!-- Project 1: Études hydrogéologiques - Programmes d'urgence -->
                 <div x-show="matchesFilter('eau-humanitaire', '2025')" style="position: relative;"

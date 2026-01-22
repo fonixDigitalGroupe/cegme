@@ -56,7 +56,7 @@
 
 
         <!-- Hero Section - Article Header -->
-        <section class="relative w-full flex items-center justify-center overflow-hidden" style="min-height: 75vh; padding-top: 140px; padding-bottom: 120px; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%); position: relative;">
+        <section class="relative w-full flex items-center justify-center overflow-hidden blog-show-hero-section" style="min-height: 75vh; padding-top: 140px; padding-bottom: 120px; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%); position: relative;">
             @if($post->header_image ?? $post->featured_image)
                 <div class="absolute inset-0 z-0" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 0;">
                     <img src="{{ asset('storage/' . ($post->header_image ?? $post->featured_image)) }}" alt="{{ $post->title }}" style="width: 100%; height: 100%; object-fit: cover;">
@@ -64,9 +64,9 @@
                     <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, rgba(26, 26, 26, 0.92) 0%, rgba(45, 45, 45, 0.88) 50%, rgba(26, 26, 26, 0.95) 100%); z-index: 1;"></div>
                 </div>
             @endif
-            <div class="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8" style="position: relative; z-index: 10;">
+            <div class="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 blog-show-hero-container" style="position: relative; z-index: 10;">
                 <!-- Contenu organisé verticalement avec espacement professionnel -->
-                <div style="max-width: 900px; margin: 0 auto;">
+                <div class="blog-show-hero-inner" style="max-width: 900px; margin: 0 auto;">
                     <!-- Lien retour - première ligne -->
                     <div style="margin-bottom: 40px;">
                         <a href="{{ route('blog.index') }}" style="color: rgba(255, 255, 255, 0.7); text-decoration: none; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 10px; transition: all 0.3s ease; letter-spacing: 0.5px; text-transform: uppercase; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;" onmouseover="this.style.color='rgba(255, 255, 255, 1)'; this.style.gap='12px';" onmouseout="this.style.color='rgba(255, 255, 255, 0.7)'; this.style.gap='10px';">
@@ -118,7 +118,7 @@
         </section>
 
         <!-- Article Content -->
-        <section class="w-full bg-white" style="padding: 100px 0 80px; min-height: 300px; background: #ffffff;">
+        <section class="w-full bg-white blog-show-main-section" style="padding: 100px 0 80px; min-height: 300px; background: #ffffff;">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="article-content-wrapper" style="max-width: 900px; margin: 0 auto; padding: 0 60px;">
                     @if($post->excerpt)

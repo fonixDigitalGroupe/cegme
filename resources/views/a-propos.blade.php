@@ -47,9 +47,10 @@
     <x-site-header />
 
     <!-- Hero Section - Page Header -->
-    <section class="relative w-full flex items-center justify-center overflow-hidden"
-        style="min-height: 45vh; padding: 60px 0; background: linear-gradient(to right bottom, rgb(6, 78, 59), rgb(17, 94, 89), rgb(15, 23, 42)); font-family: 'Georgia', 'Times New Roman', Times, serif;">
-        <div class="relative z-10 w-full max-w-4xl mx-auto px-4 text-center" style="margin-top: 100px;">
+    <section class="relative w-full flex items-center justify-center overflow-hidden about-hero-section"
+        style="min-height: 25vh; padding: 60px 0; background: linear-gradient(to right bottom, rgb(6, 78, 59), rgb(17, 94, 89), rgb(15, 23, 42)); font-family: 'Georgia', 'Times New Roman', Times, serif;">
+        <div class="relative z-10 w-full max-w-4xl mx-auto px-4 text-center about-hero-content"
+            style="margin-top: 40px;">
             <h1 class="mb-6"
                 style="font-size: 60px; font-weight: 700; color: rgb(255, 255, 255); margin-bottom: 24px; text-align: center; line-height: 72px; font-family: 'Georgia', 'Times New Roman', Times, serif;">
                 À Propos de Nous
@@ -68,12 +69,12 @@
         <div class="max-w-7xl mx-auto" style="padding: 96px 0;">
             <!-- Image and Text Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20"
-                style="display: grid; grid-template-columns: 592px 592px; gap: 48px; align-items: center; margin-bottom: 80px;">
+                style="display: grid; gap: 48px; align-items: center; margin-bottom: 80px;">
                 <!-- Image -->
-                <div>
+                <div class="w-full">
                     <img src="{{ asset('Image/Cabinet d\'Études Géologiques.jpg') }}" alt="Cabinet d'Études Géologiques"
-                        class="w-full h-auto"
-                        style="width: 592px; height: 500px; object-fit: cover; border-radius: 0px;">
+                        class="w-full h-[300px] lg:h-[500px] object-cover"
+                        style="width: 100%; object-fit: cover; border-radius: 0px;">
                 </div>
                 <!-- Text Content -->
                 <div style="font-family: 'Georgia', 'Times New Roman', Times, serif;">
@@ -120,8 +121,7 @@
                     style="font-size: 36px; font-weight: 700; color: rgb(17, 24, 39); margin-bottom: 48px; text-align: center;">
                     Agréments & Certifications
                 </h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8"
-                    style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px;">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8" style="display: grid; gap: 32px;">
                     <!-- Card 1: Agrément Ministériel -->
                     <div class="bg-white rounded-lg p-6 shadow-md"
                         style="background-color: rgb(255, 255, 255); border-radius: 8px; padding: 24px; box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.1) 0px 4px 6px -4px;">
@@ -211,8 +211,7 @@
                     style="font-size: 36px; font-weight: 700; color: rgb(17, 24, 39); margin-bottom: 48px; text-align: center;">
                     Nos Valeurs
                 </h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
-                    style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px;">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8" style="display: grid; gap: 32px;">
                     <!-- Card 1: Développement Durable -->
                     <div class="bg-white rounded-lg p-6 shadow-md"
                         style="background-color: rgb(255, 255, 255); border-radius: 8px; padding: 24px; box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.1) 0px 4px 6px -4px;">
