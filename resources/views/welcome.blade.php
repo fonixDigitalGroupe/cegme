@@ -1103,8 +1103,8 @@
 
     <!-- Mot de la direction Section - RESTORED MOBILE / REDESIGNED DESKTOP -->
     <section class="w-full bg-gradient-to-b from-white to-gray-50 lg:bg-white px-4 sm:px-6 lg:px-8"
-        style="padding: 100px 0; margin: 0; lg:background: #ffffff !important;">
-        <div class="max-w-3xl lg:max-w-2xl mx-auto px-2 md:px-4 lg:px-6" style="margin: 0 auto; lg:max-width: 700px;">
+        style="padding: 100px 0; margin: 0;">
+        <div class="max-w-3xl lg:max-w-[700px] mx-auto px-2 md:px-4 lg:px-12" style="margin: 0 auto;">
             <!-- Header -->
             <div class="text-center mb-16 lg:mb-12" style="text-align: center;">
                 <h2 class="text-4xl lg:text-[48px] font-bold lg:font-black text-[#111827] mb-4"
