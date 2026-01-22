@@ -1104,11 +1104,11 @@
     <!-- Mot de la direction Section - RESTORED MOBILE / REDESIGNED DESKTOP -->
     <section class="w-full bg-gradient-to-b from-white to-gray-50 lg:bg-white px-4 sm:px-6 lg:px-8"
         style="padding: 100px 0; margin: 0;">
-        <div class="max-w-3xl lg:max-w-[700px] mx-auto px-2 md:px-4 lg:px-12" style="margin: 0 auto;">
+        <div class="max-w-3xl lg:max-w-[1000px] mx-auto px-2 md:px-4 lg:px-32" style="margin: 0 auto;">
             <!-- Header -->
             <div class="text-center mb-16 lg:mb-12" style="text-align: center;">
-                <h2 class="text-4xl lg:text-[48px] font-bold lg:font-black text-[#111827] mb-4"
-                    style="margin-bottom: 16px; text-align: center; line-height: 1.2;">
+                <h2 class="text-4xl lg:text-[56px] font-bold lg:font-black text-[#1F2937] lg:text-[#0f172a] mb-4"
+                    style="margin-bottom: 24px; text-align: center; line-height: 1.1; letter-spacing: -2px;">
                     Mot de la direction
                 </h2>
                 <!-- Mobile Underline -->
@@ -1116,69 +1116,48 @@
                     style="width: 96px; height: 4px; background: linear-gradient(90deg, rgb(5, 150, 105) 0%, rgb(16, 185, 129) 100%);">
                 </div>
                 <!-- Desktop Underline -->
-                <div class="hidden lg:block w-20 h-1.5 bg-[#10B981] rounded-full mx-auto"
-                    style="width: 80px; height: 6px; background-color: #10B981;">
+                <div class="hidden lg:block w-24 h-1.5 bg-[#10B981] mx-auto"
+                    style="width: 100px; height: 5px; background-color: #10B981;">
                 </div>
             </div>
 
             <!-- Content -->
             <div class="relative" style="position: relative;">
                 <!-- Quote icon -->
-                <div class="flex justify-center mb-6 lg:mb-10" style="margin-bottom: 24px;">
+                <div class="flex justify-center mb-8 lg:mb-16" style="margin-bottom: 32px;">
                     <!-- Mobile Icon Style -->
                     <div class="lg:hidden w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center shadow-md"
-                        style="background: linear-gradient(135deg, rgb(16, 185, 129) 0%, rgb(5, 150, 105) 100%); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);">
+                        style="width: 64px; height: 64px; background: linear-gradient(135deg, rgb(16, 185, 129) 0%, rgb(5, 150, 105) 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);">
                         <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
                             stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                             style="width: 32px; height: 32px; color: #ffffff;">
-                            <path
-                                d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z">
-                            </path>
-                            <path
-                                d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z">
-                            </path>
+                            <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"></path>
+                            <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"></path>
                         </svg>
                     </div>
                     <!-- Desktop Icon Style -->
-                    <div class="hidden lg:flex w-16 h-16 bg-[#10B981] rounded-full items-center justify-center shadow-lg"
-                        style="background-color: #10B981; box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3);">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
+                    <div class="hidden lg:flex w-20 h-20 bg-[#10B981] rounded-full items-center justify-center shadow-xl"
+                        style="width: 80px; height: 80px; background-color: #10B981; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 15px 30px -5px rgba(16, 185, 129, 0.4);">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none"
                             stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
-                            style="width: 32px; height: 32px; color: #ffffff;">
-                            <path
-                                d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z">
-                            </path>
-                            <path
-                                d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z">
-                            </path>
+                            style="width: 40px; height: 40px; color: #ffffff;">
+                            <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"></path>
+                            <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"></path>
                         </svg>
                     </div>
                 </div>
 
                 <!-- Text -->
-                <div class="space-y-6 lg:space-y-8" style="display: flex; flex-direction: column;">
-                    <p class="text-[19px] lg:text-[19px] text-gray-700 lg:text-gray-600 leading-relaxed lg:leading-[1.8] text-justify lg:text-left"
+                <div class="space-y-6 lg:space-y-10" style="display: flex; flex-direction: column;">
+                    <p class="text-[20px] lg:text-[22px] text-gray-700 lg:text-[#374151] leading-relaxed lg:leading-[1.8] text-justify lg:text-left"
                         style="margin: 0; font-weight: 400;">
                         « Notre identité repose sur une conviction forte : <strong
-                            class="font-bold lg:font-black text-black lg:text-[#111827]">l'expertise de pointe et la
-                            connaissance
-                            profonde du terrain sont indissociables</strong>. Le CEGME Sarl., mobilise un réseau d'élite
-                        composé d'universitaires et de consultants ayant évolué au sein de groupes mondiaux tels
-                        qu'<strong class="font-bold lg:font-bold text-black lg:text-[#111827]">AREVA, DEBEERS,
-                            AURAFRIQUE et
-                            DIGOIL</strong>.
+                            class="font-bold lg:font-bold text-black lg:text-[#111827]">l'expertise de pointe et la connaissance profonde du terrain sont indissociables</strong>. Le CEGME Sarl., mobilise un réseau d'élite composé d'universitaires et de consultants ayant évolué au sein de groupes mondiaux tels qu'<strong class="font-bold lg:font-bold text-black lg:text-[#111827]">AREVA, DEBEERS, AURAFRIQUE et DIGOIL</strong>.
                     </p>
-                    <p class="text-[19px] lg:text-[19px] text-gray-700 lg:text-gray-600 leading-relaxed lg:leading-[1.8] text-justify lg:text-left"
+                    <p class="text-[20px] lg:text-[22px] text-gray-700 lg:text-[#374151] leading-relaxed lg:leading-[1.8] text-justify lg:text-left"
                         style="margin: 0; font-weight: 400;">
                         Cette dualité constitue notre <strong
-                            class="font-bold lg:font-extrabold text-[#059669] lg:text-[#10B981]">"plus-value"</strong> :
-                        nous offrons aux
-                        investisseurs internationaux et nationaux la rigueur des bonnes pratiques (<strong
-                            class="font-bold lg:font-bold text-black lg:text-[#111827]">SFI, Banque Mondiale,
-                            BAD</strong>) tout
-                        en garantissant un ancrage local et une maîtrise des réalités sociopolitiques de la région. En
-                        valorisant le contenu local et le capital humain centrafricain, nous sécurisons vos actifs et
-                        bâtissons une prospérité durable pour la Nation. »
+                            class="font-bold lg:font-bold text-[#059669] lg:text-[#10B981]">"plus-value"</strong> : nous offrons aux investisseurs internationaux et nationaux la rigueur des bonnes pratiques (<strong class="font-bold lg:font-bold text-black lg:text-[#111827]">SFI, Banque Mondiale, BAD</strong>) tout en garantissant un ancrage local et une maîtrise des réalités sociopolitiques de la région. En valorisant le contenu local et le capital humain centrafricain, nous sécurisons vos actifs et bâtissons une prospérité durable pour la Nation. »
                     </p>
                 </div>
 
