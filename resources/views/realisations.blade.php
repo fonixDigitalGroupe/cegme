@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>Réalisations - {{ config('app.name', 'Laravel') }}</title>
+    <link rel="icon" href="{{ asset('Image/CEGME favicon.JPG') }}" type="image/png">
 
     <!-- Critical CSS to prevent white flash -->
     <style>

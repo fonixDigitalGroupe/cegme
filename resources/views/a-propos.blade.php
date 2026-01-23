@@ -7,7 +7,7 @@
 
     <title>À Propos - {{ config('app.name', 'Laravel') }}</title>
 
-    <link rel="icon" href="{{ asset('Image/CEGME Logo.png') }}" type="image/png">
+    <link rel="icon" href="{{ asset('Image/CEGME favicon.JPG') }}" type="image/png">
 
     <!-- Critical CSS to prevent white flash -->
     <style>
@@ -305,24 +305,24 @@
             </section>
 
             <!-- Coopération Régionale Section -->
-            <section class="mb-20"
-                style="margin-bottom: 80px; background-color: rgb(209, 250, 229); padding: 48px 24px; border-radius: 12px;">
+            <div class="mb-20"
+                style="margin-bottom: 80px; background-color: #dcfce7 !important; padding: 48px 24px; border-radius: 12px;">
                 <h3 class="text-3xl font-bold mb-6"
-                    style="font-size: 30px; font-weight: 700; color: rgb(17, 24, 39); margin-bottom: 24px; text-align: center;">
+                    style="font-size: 30px; font-weight: 700; color: #064e3b; margin-bottom: 24px; text-align: center; font-family: 'Georgia', 'Times New Roman', Times, serif;">
                     Coopération Régionale
                 </h3>
                 <p class="text-gray-700 mb-4"
-                    style="font-size: 18px; color: rgb(55, 65, 81); line-height: 29.25px; margin-bottom: 16px; text-align: center;">
+                    style="font-size: 16px; color: #1f2937; line-height: 1.6; margin-bottom: 16px; text-align: center; font-family: 'Georgia', 'Times New Roman', Times, serif;">
                     Au niveau régional, sur le volet des évaluations environnementales, le CEGME travaille en symbiose
-                    avec le <span>Bureau d'Étude Solution Environnementale Viable & Entrepreneuriat (Seve-Consulting)
-                        Sarl., installé à Lomé au</span><br>TOGO en Afrique de l'Ouest.
+                    avec le Bureau d'Étude Solution Environnementale Viable & Entrepreneuriat (Seve-Consulting) Sarl.,
+                    installé à Lomé au<br>TOGO en Afrique de l'Ouest.
                 </p>
                 <p class="text-gray-700"
-                    style="font-size: 18px; color: rgb(55, 65, 81); line-height: 29.25px; margin-bottom: 0px; text-align: center;">
+                    style="font-size: 16px; color: #1f2937; line-height: 1.6; margin-bottom: 0px; text-align: center; font-family: 'Georgia', 'Times New Roman', Times, serif;">
                     Cette coopération sud-sud renforce notre capacité à appréhender les enjeux des projets de
                     développement en<br>Afrique.
                 </p>
-            </section>
+            </div>
         </div>
     </section>
 

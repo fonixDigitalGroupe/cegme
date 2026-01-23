@@ -7,7 +7,7 @@
 
     <title>Contact - {{ config('app.name', 'Laravel') }}</title>
 
-    <link rel="icon" href="{{ asset('Image/CEGME Logo.png') }}" type="image/png">
+    <link rel="icon" href="{{ asset('Image/CEGME favicon.JPG') }}" type="image/png">
 
     <!-- Critical CSS to prevent white flash -->
     <style>

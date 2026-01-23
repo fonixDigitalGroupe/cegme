@@ -8,6 +8,7 @@
         content="{{ $post->excerpt ?? \Illuminate\Support\Str::limit(strip_tags($post->content), 160) }}">
 
     <title>{{ $post->title }} - {{ config('app.name', 'Laravel') }}</title>
+    <link rel="icon" href="{{ asset('Image/CEGME favicon.JPG') }}" type="image/png">
 
     <!-- Critical CSS to prevent white flash -->
     <style>
@@ -151,7 +152,18 @@
 
                 <div class="article-content"
                     style="font-family: 'Georgia', 'Times New Roman', 'Times', serif; font-size: 22px; line-height: 1.8; color: #1a1a1a; letter-spacing: -0.01em; font-weight: 400;">
-                    {!! $post->content !!}
+                    @php
+                        $content = $post->content;
+                        // Case 1: Replace hardcoded localhost/127.0.0.1 (http and https) with relative paths
+                        // This handles images saved with absolute local URLs when viewing from another device
+                        $content = str_replace(['http://localhost:8000/', 'http://127.0.0.1:8000/'], '/', $content);
+                        $content = str_replace(['https://localhost:8000/', 'https://127.0.0.1:8000/'], '/', $content);
+
+                        // Case 2: Fix relative storage paths missing leading slash (e.g. src="storage/...")
+                        // We use preg_replace to target src attributes starting specifically with "storage/"
+                        $content = preg_replace('/src=["\'](storage\/[^"\']+)["\']/', 'src="/$1"', $content);
+                    @endphp
+                    {!! $content !!}
                 </div>
 
                 <!-- Tags -->
@@ -854,8 +866,51 @@
                 font-size: 28px !important;
                 margin-top: 40px !important;
             }
+
+            /* Fix image display on mobile */
+            .article-content img,
+            .article-content img[style] {
+                width: 100% !important;
+                height: auto !important;
+                max-height: none !important;
+                margin: 32px auto !important;
+                display: block !important;
+                float: none !important;
+            }
         }
     </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Fix relative image paths and localhost/IP mismatches in article content
+            const articleImages = document.querySelectorAll('.article-content img');
+            const currentHost = window.location.hostname;
+            const currentOrigin = window.location.origin;
+
+            articleImages.forEach(img => {
+                let src = img.getAttribute('src');
+                if (!src) return;
+
+                // Case 1: Relative path without leading slash (e.g. "storage/...")
+                if (!src.startsWith('http') && !src.startsWith('/')) {
+                    img.src = '/' + src;
+                }
+                // Case 2: Absolute path causing localhost vs IP issue (e.g. "http://127.0.0.1:8000/..." on mobile)
+                else if (src.startsWith('http')) {
+                    try {
+                        const url = new URL(src);
+                        // If image points to localhost/127.0.0.1 but we are not on localhost/127.0.0.1
+                        if ((url.hostname === 'localhost' || url.hostname === '127.0.0.1') &&
+                            (currentHost !== 'localhost' && currentHost !== '127.0.0.1')) {
+                            // Replace origin with current device's origin
+                            img.src = currentOrigin + url.pathname + url.search;
+                        }
+                    } catch (e) {
+                        console.error('Invalid URL in image src:', src);
+                    }
+                }
+            });
+        });
+    </script>
     @include('partials.site-scripts')
 </body>
 

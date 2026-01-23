@@ -20,7 +20,13 @@ class OffreController extends Controller
         $keyword = $request->get('keyword');
 
         // Récupérer toutes les offres sauf DGMarket
-        $query = Offre::query()->where('source', '!=', 'DGMarket');
+        $query = Offre::query()
+            ->where('source', '!=', 'DGMarket')
+            ->where(function ($q) {
+                // Règle: Date limite >= Aujourd'hui OU Date limite est NULL
+                $q->whereDate('date_limite_soumission', '>=', now()->toDateString())
+                    ->orWhereNull('date_limite_soumission');
+            });
 
         // Appliquer les filtres
         if ($marketType) {
@@ -73,42 +79,51 @@ class OffreController extends Controller
 
         // Règle métier: inclure TOUTES les World Bank, même si elles ne matchent pas les règles
         $wbOffres = $allOffres->filter(function ($o) {
-            return $o->source === 'World Bank'; });
+            return $o->source === 'World Bank';
+        });
         $filteredOffres = $filteredOffres->merge($wbOffres)->unique('id');
 
         // Compter avant le filtre de date
         $countBeforeDateFilter = $filteredOffres->count();
 
         // Filtres demandés par l'utilisateur: pays non nul et date non expirée
+        // OPTIMISATION SQL: Filtrer directement dans la requête
         $filteredOffres = $filteredOffres->filter(function ($offre) {
             // 1. Pays ne doit pas être null ou vide
             if (empty($offre->pays)) {
                 return false;
             }
+            return true;
+        });
 
-            // 2. La date limite ne doit pas être expirée
-            if (!empty($offre->date_limite_soumission)) {
-                try {
-                    $dateLimite = null;
-                    if (is_object($offre->date_limite_soumission) && method_exists($offre->date_limite_soumission, 'isPast')) {
-                        $dateLimite = $offre->date_limite_soumission;
-                    } else {
-                        $dateLimite = \Carbon\Carbon::parse($offre->date_limite_soumission);
-                    }
+        // Appliquer le filtre de date au niveau de la collection (car filtrage hybride avec services)
+        // Note: Idéalement, ceci devrait être dans la requête SQL initiale, mais à cause du mixage 
+        // avec FilteringService qui peut retourner une Collection, on garde le filtre ici mais optimisé.
 
-                    if ($dateLimite->isPast() && !$dateLimite->isToday()) {
-                        return false;
-                    }
-                } catch (\Exception $e) {
-                    // Si la date est malformée, on peut choisir de la garder ou non. 
-                    // Pour plus de sécurité, on la garde si elle n'est pas explicitement expirée.
-                }
-            } else {
-                // Si pas de date limite, on garde l'offre pour l'instant (ex: World Bank sans date)
-                // Sauf si l'utilisateur veut AUSSI exclure les dates vides. 
-                // "don't show the data whose deadline date is expired" implique que si elle n'est pas expirée (pas de date), on peut l'afficher.
+        $now = now();
+        $filteredOffres = $filteredOffres->filter(function ($offre) use ($now) {
+            // Si pas de date limite (ex: WB), on garde
+            if (empty($offre->date_limite_soumission)) {
+                return true;
             }
 
+            try {
+                $dateLimite = null;
+                if (is_object($offre->date_limite_soumission)) {
+                    $dateLimite = $offre->date_limite_soumission;
+                } else {
+                    $dateLimite = \Carbon\Carbon::parse($offre->date_limite_soumission);
+                }
+
+                // Garder si la date est >= aujourd'hui (inclut aujourd'hui)
+                // isPast() renvoie true si < maintenant. 
+                // On veut garder si c'est FUTUR ou AUJOURD'HUI.
+                if ($dateLimite->isPast() && !$dateLimite->isToday()) {
+                    return false;
+                }
+            } catch (\Exception $e) {
+                return true; // En cas de doute, on garde
+            }
             return true;
         });
 
@@ -127,7 +142,7 @@ class OffreController extends Controller
         // Trier par date limite (les plus proches en premier), puis mettre les WB sans date après
         $filteredOffres = $filteredOffres->sortBy(function ($offre) {
             try {
-                if (!is_null($offre->date_limite_soumission)) {
+                if (!empty($offre->date_limite_soumission)) {
                     if (is_object($offre->date_limite_soumission) && method_exists($offre->date_limite_soumission, 'format')) {
                         return '0-' . $offre->date_limite_soumission->format('Y-m-d'); // groupe 0 = datés
                     }

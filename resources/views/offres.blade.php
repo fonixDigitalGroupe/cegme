@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Appels d'offres - {{ config('app.name', 'Laravel') }}</title>
+    <link rel="icon" href="{{ asset('Image/CEGME favicon.JPG') }}" type="image/png">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

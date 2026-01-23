@@ -7,7 +7,7 @@
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
-    <link rel="icon" href="{{ asset('Image/CEGME Logo.png') }}" type="image/png">
+    <link rel="icon" href="{{ asset('Image/CEGME favicon.JPG') }}" type="image/png">
 
     <!-- Critical CSS to prevent white flash -->
     <style>
@@ -277,7 +277,7 @@
                             <div class="relative overflow-hidden w-full h-full"
                                 style="position: relative; overflow: hidden; border-radius: 12px; width: 100%; height: 100%;">
                                 <img src="{{ asset('Image/Personnel.jpg') }}" alt="Équipe CEGME"
-                                    class="w-full h-full object-cover expertise-image-img"
+                                    class="w-full h-full object-cover expertise-image-img" loading="lazy"
                                     style="width: 100%; height: 100%; object-fit: cover; display: block;">
                             </div>
                         </div>
@@ -1115,6 +1115,7 @@
                     style="background-color: #ffffff; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; lg:min-height: 140px; lg:min-width: 0;">
                     <img src="{{ asset('Image/Wordbank.png') }}" alt="Banque Mondiale"
                         class="max-w-full max-h-full object-contain lg:filter lg:grayscale lg:hover:grayscale-0 transition-all duration-300"
+                        loading="lazy"
                         style="max-width: 100%; max-height: 70px; lg:max-height: 80px; object-fit: contain;">
                 </div>
 
@@ -1123,6 +1124,7 @@
                     style="background-color: #ffffff; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; lg:min-height: 140px; lg:min-width: 0;">
                     <img src="{{ asset('Image/Usaid.png') }}" alt="USAID"
                         class="max-w-full max-h-full object-contain lg:filter lg:grayscale lg:hover:grayscale-0 transition-all duration-300"
+                        loading="lazy"
                         style="max-width: 100%; max-height: 70px; lg:max-height: 80px; object-fit: contain;">
                 </div>
 
@@ -1131,6 +1133,7 @@
                     style="background-color: #ffffff; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; lg:min-height: 140px; lg:min-width: 0;">
                     <img src="{{ asset('Image/BAD.png') }}" alt="BAD"
                         class="max-w-full max-h-full object-contain lg:filter lg:grayscale lg:hover:grayscale-0 transition-all duration-300"
+                        loading="lazy"
                         style="max-width: 100%; max-height: 70px; lg:max-height: 80px; object-fit: contain;">
                 </div>
 
@@ -1139,6 +1142,7 @@
                     style="background-color: #ffffff; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; lg:min-height: 140px; lg:min-width: 0;">
                     <img src="{{ asset('Image/BDEAC.png') }}" alt="BDEAC"
                         class="max-w-full max-h-full object-contain lg:filter lg:grayscale lg:hover:grayscale-0 transition-all duration-300"
+                        loading="lazy"
                         style="max-width: 100%; max-height: 70px; lg:max-height: 80px; object-fit: contain;">
                 </div>
 
@@ -1147,6 +1151,7 @@
                     style="background-color: #ffffff; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; lg:min-height: 140px; lg:min-width: 0;">
                     <img src="{{ asset('Image/FIDA.png') }}" alt="FIDA"
                         class="max-w-full max-h-full object-contain lg:filter lg:grayscale lg:hover:grayscale-0 transition-all duration-300"
+                        loading="lazy"
                         style="max-width: 100%; max-height: 70px; lg:max-height: 80px; object-fit: contain;">
                 </div>
 
@@ -1155,6 +1160,7 @@
                     style="background-color: #ffffff; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; lg:min-height: 140px; lg:min-width: 0;">
                     <img src="{{ asset('Image/unicef.png') }}" alt="UNICEF"
                         class="max-w-full max-h-full object-contain lg:filter lg:grayscale lg:hover:grayscale-0 transition-all duration-300"
+                        loading="lazy"
                         style="max-width: 100%; max-height: 70px; lg:max-height: 80px; object-fit: contain;">
                 </div>
 
@@ -1163,6 +1169,7 @@
                     style="background-color: #ffffff; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; lg:min-height: 140px; lg:min-width: 0;">
                     <img src="{{ asset('Image/oxfam.png') }}" alt="OXFAM"
                         class="max-w-full max-h-full object-contain lg:filter lg:grayscale lg:hover:grayscale-0 transition-all duration-300"
+                        loading="lazy"
                         style="max-width: 100%; max-height: 70px; lg:max-height: 80px; object-fit: contain;">
                 </div>
 
@@ -1171,6 +1178,7 @@
                     style="background-color: #ffffff; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; lg:min-height: 140px; lg:min-width: 0;">
                     <img src="{{ asset('Image/FAO.png') }}" alt="FAO"
                         class="max-w-full max-h-full object-contain lg:filter lg:grayscale lg:hover:grayscale-0 transition-all duration-300"
+                        loading="lazy"
                         style="max-width: 100%; max-height: 70px; lg:max-height: 80px; object-fit: contain;">
                 </div>
 
@@ -1179,6 +1187,7 @@
                     style="background-color: #ffffff; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; lg:min-height: 140px; lg:min-width: 0;">
                     <img src="{{ asset('Image/Africain park.png') }}" alt="African Parks"
                         class="max-w-full max-h-full object-contain lg:filter lg:grayscale lg:hover:grayscale-0 transition-all duration-300"
+                        loading="lazy"
                         style="max-width: 100%; max-height: 70px; lg:max-height: 80px; object-fit: contain;">
                 </div>
             </div>
@@ -1307,6 +1316,7 @@
                         <img src="{{ asset('Image/Complexe Immobilier.jpg') }}"
                             alt="Études hydrogéologiques OXFAM & UNICEF"
                             class="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                            loading="lazy"
                             style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; display: block;">
                         <div class="absolute top-4 right-4 bg-white text-gray-800 px-4 py-1.5 rounded-full text-sm font-semibold shadow-lg"
                             style="position: absolute; top: 16px; right: 16px; background-color: rgb(255, 255, 255); color: rgb(31, 41, 55); padding: 6px 16px; border-radius: 9999px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);">
@@ -1348,6 +1358,7 @@
                         <img src="{{ asset('Image/City Apartment Bangui..jpg') }}"
                             alt="CGES & PGES - Aire de Conservation de Chinko"
                             class="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                            loading="lazy"
                             style="width: 100%; height: 100%; object-fit: cover; object-position: center; transition: transform 0.3s ease; display: block;">
                         <div class="absolute top-4 right-4 bg-white text-gray-800 px-4 py-1.5 rounded-full text-sm font-semibold shadow-lg"
                             style="position: absolute; top: 16px; right: 16px; background-color: rgb(255, 255, 255); color: rgb(31, 41, 55); padding: 6px 16px; border-radius: 9999px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);">
@@ -1389,6 +1400,7 @@
                         <img src="{{ asset('Image/Exploitation Rivière Sangha.jpg') }}"
                             alt="EIES - Projet de Réduction de la Vulnérabilité Climatique"
                             class="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                            loading="lazy"
                             style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; display: block;">
                         <div class="absolute top-4 right-4 bg-white text-gray-800 px-4 py-1.5 rounded-full text-sm font-semibold shadow-lg"
                             style="position: absolute; top: 16px; right: 16px; background-color: rgb(255, 255, 255); color: rgb(31, 41, 55); padding: 6px 16px; border-radius: 9999px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);">
@@ -1594,6 +1606,6 @@
                     loader.remove();
                 }, 500);
             }
-        }, 1000);
+        }, 500);
     });
 </script>
