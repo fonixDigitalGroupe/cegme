@@ -103,6 +103,11 @@
             </div>
 
             <div class="mt-4 text-center">
+                <span class="text-sm text-gray-600">{{ __("Pas encore de compte ?") }}</span>
+                <a href="{{ route('register') }}"
+                    class="text-sm font-semibold text-green-600 hover:text-green-500 ml-1">
+                    {{ __("S'inscrire") }}
+                </a>
             </div>
         </div>
     </form>

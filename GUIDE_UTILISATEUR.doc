@@ -1,0 +1,96 @@
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head>
+    <meta charset="utf-8">
+    <title>Guide d'Utilisation CEGME</title>
+    <!--[if gte mso 9]>
+    <xml>
+        <w:WordDocument>
+            <w:View>Print</w:View>
+            <w:Zoom>100</w:Zoom>
+            <w:DoNotOptimizeForBrowser/>
+        </w:WordDocument>
+    </xml>
+    <![endif]-->
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333; margin: 40px; }
+        h1 { color: #039477; border-bottom: 2px solid #039477; padding-bottom: 10px; }
+        h2 { color: #026b56; margin-top: 30px; border-bottom: 1px solid #eee; }
+        h3 { color: #444; margin-top: 20px; }
+        p { margin-bottom: 15px; }
+        ul { margin-bottom: 15px; }
+        li { margin-bottom: 5px; }
+        hr { border: 0; border-top: 1px solid #ccc; margin: 30px 0; }
+        .highlight { font-weight: bold; color: #039477; }
+        .admin-note { font-style: italic; color: #666; background: #f9f9f9; padding: 10px; border-left: 5px solid #039477; }
+    </style>
+</head>
+<body>
+    <h1>Guide d'Utilisation Complet - Plateforme CEGME</h1>
+    
+    <p>Bienvenue dans le guide d'utilisation de la plateforme <strong>CEGME</strong> (Cabinet d'Expertise en Géosciences, Mines et Environnement). Ce document vous aidera à naviguer sur le site et à gérer les contenus via l'interface d'administration.</p>
+
+    <hr/>
+
+    <h2>1. Présentation de la Plateforme</h2>
+    <p>CEGME est une plateforme dédiée à l'expertise technique dans les domaines des mines, de l'environnement et de la géologie. Elle intègre un système robuste de veille sur les <strong>appels d'offres</strong> internationaux et une section <strong>blog/actualités</strong>.</p>
+
+    <hr/>
+
+    <h2>2. Guide du Site Public</h2>
+    <h3>Navigation Principale</h3>
+    <ul>
+        <li><strong>Accueil</strong> : Présentation générale de l'entreprise et de ses pôles d'expertise.</li>
+        <li><strong>À Propos</strong> : Histoire, mission et équipe du cabinet CEGME.</li>
+        <li><strong>Services</strong> : Détail des prestations proposées (Études d'impact, Exploration minière, etc.).</li>
+        <li><strong>Réalisations</strong> : Galerie des projets et contrats déjà réalisés.</li>
+        <li><strong>Actualités / Blog</strong> : Articles de fond sur le secteur et actualités de l'entreprise.</li>
+        <li><strong>Appels d'offres</strong> : Liste des opportunités d'affaires scrapées et filtrées automatiquement.</li>
+        <li><strong>Contact</strong> : Formulaire pour solliciter les services du cabinet.</li>
+    </ul>
+
+    <h3>Recherche d'Appels d'offres</h3>
+    <p>Vous pouvez consulter les dernières offres provenant de sources majeures (Banque Mondiale, BAD, AFD, etc.). Les offres sont filtrées pour ne montrer que celles pertinentes pour vos secteurs d'activité.</p>
+
+    <hr/>
+
+    <h2>3. Guide de l'Espace Administration</h2>
+    <p class="admin-note">L'accès se fait via le bouton "Se connecter" avec un compte Admin ou Éditeur.</p>
+
+    <h3>Gestion du Contenu (CMS)</h3>
+    <ul>
+        <li><strong>Articles (Posts)</strong> : Créez, modifiez ou supprimez des articles de blog. Vous pouvez utiliser l'éditeur visuel pour mettre en forme vos textes et uploader des images.</li>
+        <li><strong>Catégories & Tags</strong> : Organisez vos articles pour faciliter la navigation des utilisateurs.</li>
+    </ul>
+
+    <h3>Gestion des Appels d'offres (Scraping)</h3>
+    <p>C'est le cœur technique de la plateforme.</p>
+    <ol>
+        <li><strong>Pôles d'activité</strong> : Définissez vos domaines d'expertise (ex: Environnement, Mines). Associez des <strong>mots-clés</strong> à chaque pôle pour que le système sache quelles offres vous intéressent.</li>
+        <li><strong>Règles de filtrage</strong> : Configurez les sources à surveiller et les pays autorisés.</li>
+        <li><strong>Lancement du Scraping</strong> :
+            <ul>
+                <li>Allez dans <code>Admin > Scraping</code>.</li>
+                <li>Cliquez sur <strong>Lancer le scraping</strong> pour mettre à jour la liste des offres en temps réel.</li>
+                <li>Le système passera en revue les sources (World Bank, AfDB, etc.) et ne conservera que les offres correspondant à vos mots-clés et pays.</li>
+            </ul>
+        </li>
+        <li><strong>Scraping Programmé</strong> : Le système est configuré pour s'exécuter automatiquement à intervalles réguliers pour garantir que vous ne manquiez aucune opportunité.</li>
+    </ol>
+
+    <h3>Gestion des Utilisateurs (Admin uniquement)</h3>
+    <p>Permet de créer des comptes pour d'autres membres de l'équipe et de leur attribuer des rôles (Admin ou Éditeur).</p>
+
+    <hr/>
+
+    <h2>4. Fonctionnalités Spéciales</h2>
+    <ul>
+        <li><strong>Authentification Google</strong> : Connectez-vous rapidement en utilisant votre compte professionnel Google.</li>
+        <li><strong>Filtrage Intelligent</strong> : Les offres sont analysées automatiquement dès leur récupération pour détecter les pays et les domaines d'activité, même si l'orthographe varie légèrement (grâce à notre moteur de correspondance).</li>
+    </ul>
+
+    <hr/>
+
+    <h2>5. Support Technique</h2>
+    <p>Pour toute question technique ou demande de modification majeure, veuillez contacter l'administrateur système ou l'équipe de développement.</p>
+</body>
+</html>
