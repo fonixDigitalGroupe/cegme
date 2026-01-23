@@ -98,8 +98,10 @@
 
                 @foreach($navLinks as $link)
                     @php
-                        $isActive = ($link['url'] == '/' && request()->is('/')) ||
-                            ($link['url'] != '/' && (request()->is(trim($link['url'], '/')) || request()->is(trim($link['url'], '/') . '/*')));
+                        $path = parse_url($link['url'], PHP_URL_PATH) ?: '/';
+                        $trimmedPath = trim($path, '/');
+                        $isActive = ($path == '/' && request()->is('/')) ||
+                            ($path != '/' && (request()->is($trimmedPath) || request()->is($trimmedPath . '/*')));
 
                         $baseStyle = "color: #1b1b18; padding: 0 10px; font-size: 14px; font-weight: 500; text-decoration: none; display: flex; align-items: center; justify-content: center; height: 36px; white-space: nowrap; line-height: 1; margin: 0 !important;";
                         if ($isActive) {

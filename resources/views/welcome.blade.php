@@ -29,6 +29,45 @@
         * {
             box-sizing: border-box;
         }
+
+        /* Page Loader Styles */
+        #page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .loader-circle {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #10b981;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loader-hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
     </style>
 
     <!-- Fonts -->
@@ -81,6 +120,10 @@
 </head>
 
 <body class="bg-white text-[#1b1b18] min-h-screen" style="background-color: #ffffff !important;">
+    <!-- Page Loader -->
+    <div id="page-loader">
+        <div class="loader-circle"></div>
+    </div>
     <!-- Header from Contact/Services/Realisations Page -->
     <x-site-header />
     <!-- Hero Section - Exact Reproduction from Site -->
@@ -1540,3 +1583,17 @@
 </body>
 
 </html>
+<script>
+    window.addEventListener("load", function () {
+        // Ensure the loader stays for at least 1 second for better UX
+        setTimeout(function () {
+            const loader = document.getElementById("page-loader");
+            if (loader) {
+                loader.classList.add("loader-hidden");
+                setTimeout(() => {
+                    loader.remove();
+                }, 500);
+            }
+        }, 1000);
+    });
+</script>
