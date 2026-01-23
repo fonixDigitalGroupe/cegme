@@ -5,7 +5,17 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>À Propos - {{ config('app.name', 'Laravel') }}</title>
+    <title>À Propos de Nous - Expertise et Valeurs | CEGME</title>
+    <meta name="description"
+        content="Découvrez l'histoire et les valeurs du CEGME. Un puzzle de spécialistes au service de l'émergence en RCA dans les domaines des mines et de l'environnement.">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:title" content="À Propos de Nous - Expertise et Valeurs | CEGME">
+    <meta property="og:description"
+        content="Découvrez l'histoire et les valeurs du CEGME. Un puzzle de spécialistes au service de l'émergence en RCA.">
+    <meta property="og:image" content="{{ asset('Image/Cabinet d\'Études Géologiques.jpg') }}">
 
     <link rel="icon" href="{{ asset('Image/CEGME favicon.JPG') }}" type="image/png">
 

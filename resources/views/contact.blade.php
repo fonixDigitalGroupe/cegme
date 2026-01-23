@@ -5,7 +5,17 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Contact - {{ config('app.name', 'Laravel') }}</title>
+    <title>Contactez-nous - Bureau d'études CEGME à Bangui</title>
+    <meta name="description"
+        content="Besoin d'expertise en géosciences ou environnement ? Contactez le bureau d'études CEGME à Bangui. Email : cabinet.rca@cegme.net | Tél : (+236) 72 50 51 31.">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:title" content="Contactez-nous - Bureau d'études CEGME à Bangui">
+    <meta property="og:description"
+        content="Notre équipe est à votre disposition à Bangui pour répondre à toutes vos questions techniques.">
+    <meta property="og:image" content="{{ asset('Image/CEGME Logo.png') }}">
 
     <link rel="icon" href="{{ asset('Image/CEGME favicon.JPG') }}" type="image/png">
 

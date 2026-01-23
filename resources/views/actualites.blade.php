@@ -5,7 +5,17 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Actualités - {{ config('app.name', 'Laravel') }}</title>
+    <title>Actualités et Réseaux Sociaux | CEGME</title>
+    <meta name="description"
+        content="Suivez l'actualité du CEGME sur Facebook et LinkedIn. Restez informés de nos derniers projets, actualités environnementales et événements en République Centrafricaine.">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:title" content="Actualités et Réseaux Sociaux | CEGME">
+    <meta property="og:description"
+        content="Suivez nos dernières actualités, projets et événements sur Facebook et LinkedIn.">
+    <meta property="og:image" content="{{ asset('Image/CEGME Logo.png') }}">
 
     <link rel="icon" href="{{ asset('Image/CEGME favicon.JPG') }}" type="image/png">
 

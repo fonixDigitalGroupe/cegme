@@ -5,7 +5,17 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Blog - {{ config('app.name', 'Laravel') }}</title>
+    <title>Blog et Actualités | CEGME</title>
+    <meta name="description"
+        content="Découvrez nos derniers articles, analyses techniques et actualités sur les mines, l'environnement et les géosciences en République Centrafricaine.">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:title" content="Blog et Actualités | CEGME">
+    <meta property="og:description"
+        content="Découvrez nos derniers articles, analyses techniques et actualités sur les mines et l'environnement.">
+    <meta property="og:image" content="{{ asset('Image/CEGME Logo.png') }}">
 
     <link rel="icon" href="{{ asset('Image/CEGME favicon.JPG') }}" type="image/png">
 

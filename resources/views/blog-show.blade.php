@@ -8,6 +8,18 @@
         content="{{ $post->excerpt ?? \Illuminate\Support\Str::limit(strip_tags($post->content), 160) }}">
 
     <title>{{ $post->title }} - {{ config('app.name', 'Laravel') }}</title>
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:title" content="{{ $post->title }} - CEGME">
+    <meta property="og:description"
+        content="{{ $post->excerpt ?? \Illuminate\Support\Str::limit(strip_tags($post->content), 160) }}">
+    <meta property="og:image"
+        content="{{ $post->featured_image ? asset('storage/' . $post->featured_image) : asset('Image/CEGME Logo.png') }}">
+    <meta property="article:published_time"
+        content="{{ $post->published_at ? $post->published_at->toIso8601String() : $post->created_at->toIso8601String() }}">
+
     <link rel="icon" href="{{ asset('Image/CEGME favicon.JPG') }}" type="image/png">
 
     <!-- Critical CSS to prevent white flash -->

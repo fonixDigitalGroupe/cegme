@@ -4,7 +4,18 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Appels d'offres - {{ config('app.name', 'Laravel') }}</title>
+    <title>Appels d'Offres et Opportunités | CEGME</title>
+    <meta name="description"
+        content="Consultez les derniers appels d'offres sélectionnés par le CEGME dans les secteurs mines, géosciences et environnement. Saisissez les opportunités en RCA.">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:title" content="Appels d'Offres et Opportunités | CEGME">
+    <meta property="og:description"
+        content="Consultez les derniers appels d'offres et opportunités dans les secteurs mines et environnement.">
+    <meta property="og:image" content="{{ asset('Image/CEGME Logo.png') }}">
+
     <link rel="icon" href="{{ asset('Image/CEGME favicon.JPG') }}" type="image/png">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -261,9 +272,11 @@
                             style="width: 100%; padding: 0.625rem 0.75rem; border: 1px solid #dee2e6; border-radius: 4px; font-size: 0.875rem; color: #495057; background-color: #ffffff;">
                             <option value="">Tous</option>
                             @foreach($activityPoles ?? [] as $pole)
-                                <option value="{{ $pole->id }}" {{ request('activity_pole_id') == $pole->id ? 'selected' : '' }}>
-                                    {{ $pole->name }}
-                                </option>
+                                @if(is_object($pole))
+                                    <option value="{{ $pole->id }}" {{ request('activity_pole_id') == $pole->id ? 'selected' : '' }}>
+                                        {{ $pole->name }}
+                                    </option>
+                                @endif
                             @endforeach
                         </select>
                     </div>

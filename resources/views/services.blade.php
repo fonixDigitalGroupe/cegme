@@ -5,7 +5,18 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Services - {{ config('app.name', 'Laravel') }}</title>
+    <title>Nos Services : Environnement, Géologie & Géo-ingénierie | CEGME</title>
+    <meta name="description"
+        content="Découvrez les pôles d'expertise du CEGME : Études d'impact environnemental (EIES), exploration minière, hydrogéologie, accès à l'eau et conseil stratégique en RCA.">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:title" content="Nos Services : Environnement, Géologie & Géo-ingénierie | CEGME">
+    <meta property="og:description"
+        content="Découvrez les pôles d'expertise du CEGME : Environnement, Géologie, Géo-ingénierie et Conseil en RCA.">
+    <meta property="og:image" content="{{ asset('Image/CEGME Logo.png') }}">
+
     <link rel="icon" href="{{ asset('Image/CEGME favicon.JPG') }}" type="image/png">
 
     <!-- Styles / Scripts -->

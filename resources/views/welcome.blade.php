@@ -5,7 +5,25 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>CEGME - Bureau d'Études en Géosciences, Mines et Environnement en RCA</title>
+    <meta name="description"
+        content="CEGME est le cabinet leader en République Centrafricaine pour l'expertise technique en géosciences, mines et environnement. Bureau d'études et de consultation à Bangui.">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:title" content="CEGME - Bureau d'Études en Géosciences, Mines et Environnement en RCA">
+    <meta property="og:description"
+        content="CEGME est le cabinet leader en République Centrafricaine pour l'expertise technique en géosciences, mines et environnement.">
+    <meta property="og:image" content="{{ asset('Image/CEGME Logo.png') }}">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ url()->current() }}">
+    <meta property="twitter:title" content="CEGME - Bureau d'Études en Géosciences, Mines et Environnement en RCA">
+    <meta property="twitter:description"
+        content="CEGME est le cabinet leader en République Centrafricaine pour l'expertise technique en géosciences, mines et environnement.">
+    <meta property="twitter:image" content="{{ asset('Image/CEGME Logo.png') }}">
 
     <link rel="icon" href="{{ asset('Image/CEGME favicon.JPG') }}" type="image/png">
 

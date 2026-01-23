@@ -4,7 +4,17 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ $offre->titre }} - Appels d'offres - {{ config('app.name', 'Laravel') }}</title>
+    <title>{{ $offre->titre }} - Opportunité | CEGME</title>
+    <meta name="description"
+        content="Consultez les détails de cet appel d'offres : {{ $offre->titre }}. Opportunité identifiée par le cabinet CEGME en RCA.">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:title" content="{{ $offre->titre }} - Opportunité | CEGME">
+    <meta property="og:description"
+        content="Consultez les détails de cet appel d'offres identifié par le cabinet CEGME.">
+    <meta property="og:image" content="{{ asset('Image/CEGME Logo.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

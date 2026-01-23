@@ -5,7 +5,18 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Réalisations - {{ config('app.name', 'Laravel') }}</title>
+    <title>Nos Réalisations - Projets et Études Stratégiques | CEGME</title>
+    <meta name="description"
+        content="Consultez nos réalisations : plus de 70 missions stratégiques en Afrique. Audits E&S, études géologiques et projets d'adduction d'eau en République Centrafricaine.">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:title" content="Nos Réalisations - Projets et Études Stratégiques | CEGME">
+    <meta property="og:description"
+        content="Plus de 70 missions stratégiques réalisées à travers l'Afrique depuis 2011 par le cabinet CEGME.">
+    <meta property="og:image" content="{{ asset('Image/CEGME Logo.png') }}">
+
     <link rel="icon" href="{{ asset('Image/CEGME favicon.JPG') }}" type="image/png">
 
     <!-- Critical CSS to prevent white flash -->
