@@ -38,7 +38,7 @@ Route::post('/contact', [ContactController::class, 'send'])->name('contact.send'
 Route::get('/dashboard', function () {
     // Rediriger les admins et éditeurs vers l'admin
     if (auth()->check() && auth()->user()->isAdminOrEditor()) {
-        return redirect()->route('admin.dashboard');
+        return redirect()->route('admin.posts.index');
     }
     // Pour les autres utilisateurs, afficher le dashboard normal
     return view('dashboard');

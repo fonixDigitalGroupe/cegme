@@ -1,6 +1,6 @@
 <header class="w-full sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm"
     style="background-color: white !important;">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:pl-8 lg:pr-0">
 
         <!-- ==========================================
              MOBILE HEADER (STRICTLY UNTOUCHED)
@@ -72,17 +72,17 @@
                         style="height: 64px; width: auto;">
                     <div class="flex flex-col" style="display: flex; flex-direction: column;">
                         <span
-                            style="color: #039477; font-size: 18px; font-weight: 800; line-height: 1.2; font-family: sans-serif; display: block;">CEGME</span>
+                            style="color: #039477; font-size: 18px; font-weight: 800; line-height: 1.2; display: block;">CEGME</span>
                         <span
-                            style="color: #4b5563; font-size: 12px; font-weight: 500; white-space: nowrap; font-family: sans-serif; display: block;">Géosciences
+                            style="color: #4b5563; font-size: 12px; font-weight: 500; white-space: nowrap; display: block;">Géosciences
                             • Mines • Environnement</span>
                     </div>
                 </a>
             </div>
 
             <!-- Center: Navigation -->
-            <div class="flex items-center justify-center gap-0.5"
-                style="display: flex; align-items: center; justify-content: center; gap: 2px;">
+            <div class="flex items-center ml-auto mr-4"
+                style="display: flex; align-items: center; gap: 2px; margin-left: auto; margin-right: 16px;">
                 @php
                     $navLinks = [
                         ['url' => '/', 'label' => 'Accueil'],

@@ -84,7 +84,7 @@
     <!-- Header from Contact/Services/Realisations Page -->
     <x-site-header />
     <!-- Hero Section - Exact Reproduction from Site -->
-    <section class="hero-section relative w-full flex items-center justify-center overflow-hidden"
+    <section class="hero-section relative w-full flex items-center lg:items-start justify-center overflow-hidden"
         style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; min-height: 100vh; padding: 0;">
         <!-- Background Image with Greenish-Blue Overlay -->
         <div class="absolute inset-0"
@@ -99,7 +99,7 @@
         </div>
 
         <!-- Content Container - Centered Aligned for Hero Desktop -->
-        <div class="hero-content-container relative z-10 w-full max-w-7xl mx-auto px-4 flex flex-col items-center justify-start text-center"
+        <div class="hero-content-container relative z-10 w-full max-w-7xl mx-auto px-4 flex flex-col items-center justify-start text-center lg:pt-[120px]"
             style="min-height: 100vh; position: relative; z-index: 10;">
 
             <!-- Badge -->
@@ -146,7 +146,7 @@
     </section>
 
     <section class="w-full"
-        style="padding: 100px 0 !important; margin-top: 100px !important; position: relative; z-index: 5; background: linear-gradient(to bottom, rgb(248, 250, 252), rgb(255, 255, 255));">
+        style="padding: 80px 0 !important; margin-top: 0 !important; position: relative; z-index: 5; background: linear-gradient(to bottom, rgb(248, 250, 252), rgb(255, 255, 255));">
         <style>
             /* Responsive Hero Positioning */
             .hero-content-container {
@@ -155,7 +155,7 @@
 
             @media (min-width: 1024px) {
                 .hero-content-container {
-                    padding-top: 140px !important;
+                    padding-top: 60px !important;
                 }
             }
 

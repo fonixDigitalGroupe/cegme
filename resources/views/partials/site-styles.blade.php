@@ -1,4 +1,15 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+    header,
+    .desktop-menu a,
+    .desktop-menu span,
+    .mobile-header span,
+    .mobile-menu a {
+        font-family: 'Inter', sans-serif !important;
+    }
+
     .why-choose-grid {
         display: grid;
         grid-template-columns: repeat(3, 389px);
