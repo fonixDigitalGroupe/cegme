@@ -134,7 +134,7 @@
                                 <span style="font-size: 14px; font-weight: 600; color: #ffffff;">Registre du
                                     Commerce</span>
                                 <span
-                                    style="font-size: 14px; color: #d1d5db; font-family: monospace;">CA/BG/2015B514</span>
+                                    style="font-size: 14px; color: #d1d5db; font-family: monospace;">CA/BG/2015B541</span>
                             </div>
                         </div>
                     </div>
@@ -271,7 +271,7 @@
                                 du Commerce</span>
                             <p
                                 style="color: rgb(209, 213, 219); font-size: 14px; margin: 0; line-height: 22px; font-family: monospace;">
-                                CA/BG/2015B514</p>
+                                CA/BG/2015B541</p>
                         </li>
                     </ul>
                 </div>

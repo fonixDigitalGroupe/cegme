@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Cache;
 class ScrapingProgressService
 {
     private const CACHE_PREFIX = 'scraping_progress_';
+    private const CURRENT_JOB_KEY = 'scraping_current_job_id';
     private const CACHE_DURATION = 3600; // 1 heure
 
     /**
@@ -18,6 +19,8 @@ class ScrapingProgressService
      */
     public function initialize(string $jobId, int $totalSources): void
     {
+        Cache::put(self::CURRENT_JOB_KEY, $jobId, self::CACHE_DURATION);
+
         Cache::put(self::CACHE_PREFIX . $jobId, [
             'status' => 'running',
             'current' => 0,
@@ -280,6 +283,26 @@ class ScrapingProgressService
     public static function generateJobId(): string
     {
         return uniqid('scraping_', true);
+    }
+
+    /**
+     * Récupère l'ID du job en cours
+     *
+     * @return string|null
+     */
+    public function getCurrentJobId(): ?string
+    {
+        return Cache::get(self::CURRENT_JOB_KEY);
+    }
+
+    /**
+     * Supprime l'ID du job en cours
+     *
+     * @return void
+     */
+    public function clearCurrentJobId(): void
+    {
+        Cache::forget(self::CURRENT_JOB_KEY);
     }
 }
 

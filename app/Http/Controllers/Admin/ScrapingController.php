@@ -192,7 +192,7 @@ class ScrapingController extends Controller
                     'message' => $message,
                 ]);
             }
-            return redirect()->back()->with('success', $message);
+            return redirect()->back()->with('status', 'offers-truncated');
         } catch (\Exception $e) {
             $errorMessage = 'Erreur lors du vidage: ' . $e->getMessage();
             if ($request->wantsJson() || $request->ajax()) {
@@ -252,11 +252,14 @@ class ScrapingController extends Controller
                 $scraper->initialize();
 
                 $hasMore = true;
-                $sourceCount = 0;
+                $sourceCount = 0; // Offres "traitées" (selon scraper)
+                $foundCount = 0; // Offres REELLEMENT trouvées (ajoutées ou mises à jour)
                 $lotCount = 0;
-                $maxLots = 5; // Limite à 50 offres au maximum (5 lots de 10) par source
+                $maxLots = 50; // Sécurité: max 50 lots (env. 500 items checkés) pour éviter boucle infinie
+                $targetOffers = 50; // Objectif: récupérer environ 50 offres validées
 
-                while ($hasMore && $lotCount < $maxLots) {
+                // Boucle: Tant qu'il y a des pages ET qu'on n'a pas atteint l'objectif ET qu'on n'a pas dépassé la sécurité
+                while ($hasMore && $foundCount < $targetOffers && $lotCount < $maxLots) {
                     // Vérifier si annulé
                     if ($progressService->isCancelled($jobId)) {
                         Log::info("Scraping annulé pour le job {$jobId}");
@@ -264,12 +267,18 @@ class ScrapingController extends Controller
                     }
 
                     try {
-                        // On utilise un timeout large (5 min) pour chaque lot de 10
+                        // On réduit la taille du lot pour donner un feedback plus rapide à l'utilisateur
+                        // (surtout si le scraping est lent comme avec Browsershot)
+                        $batchSize = 2;
                         $lotCount++;
-                        $result = $scraper->scrapeBatch(10);
+                        $result = $scraper->scrapeBatch($batchSize);
                         $hasMore = $result['has_more'];
-                        $sourceCount += $result['count'];
-                        $totalFound += $result['count'];
+
+                        // Compter les vraies trouvailles (findings contient les offres créées ou mises à jour)
+                        $batchFindingsCount = isset($result['findings']) ? count($result['findings']) : 0;
+                        $foundCount += $batchFindingsCount;
+                        $sourceCount += $result['count']; // Keep track of processed items for logs
+                        $totalFound += $batchFindingsCount;
 
                         // Mettre à jour les trouvailles en temps réel dans l'UI
                         if (!empty($result['findings'])) {
@@ -277,24 +286,32 @@ class ScrapingController extends Controller
                         }
 
                         // Mettre à jour le message de progression
+                        // On affiche "X offres pertinentes trouvées" au lieu de "traitées"
                         $progressService->updateProgress($jobId, [
-                            'message' => "Scraping de {$source}... {$sourceCount} offres trouvées",
-                            'source_progress' => $sourceCount
+                            'message' => "Scraping de {$source}... {$foundCount} offres pertinentes trouvées (Lot {$lotCount})",
+                            'source_progress' => $foundCount
                         ]);
 
                         Log::info("Séquentiel: {$source} lot {$lotCount} traité", [
-                            'count' => $result['count'],
+                            'processed' => $result['count'],
+                            'found_in_batch' => $batchFindingsCount,
+                            'total_found' => $foundCount,
                             'has_more' => $hasMore
                         ]);
 
                     } catch (\Exception $e) {
                         Log::error("Erreur durant le scraping de {$source}", ['error' => $e->getMessage()]);
-                        $progressService->markSourceFailed($jobId, $source, $e->getMessage());
-                        $hasMore = false; // Passer à la source suivante en cas d'erreur fatale sur celle-ci
+                        // Ne pas marquer failed immédiatement, juste logger. Si erreur fatale, hasMore sera false ou exception propagée.
+                        // $progressService->markSourceFailed($jobId, $source, $e->getMessage());
+                        // $hasMore = false; 
+                        // On continue pour voir si le prochain lot passe (parfois timeout temporaire)
+                        if ($lotCount >= $maxLots) {
+                            $progressService->markSourceFailed($jobId, $source, "Erreurs multiples ou timeout: " . $e->getMessage());
+                        }
                     }
                 }
 
-                $progressService->markSourceCompleted($jobId, $source, $sourceCount);
+                $progressService->markSourceCompleted($jobId, $source, $foundCount);
             }
 
             $progressService->complete($jobId);
@@ -648,6 +665,27 @@ class ScrapingController extends Controller
             'success' => true,
             'findings' => $findings,
             'total_offres' => $progress['total_offres'] ?? 0,
+        ]);
+    }
+    /**
+     * Récupère l'ID du job en cours
+     */
+    public function getCurrentJobId(ScrapingProgressService $progressService)
+    {
+        $jobId = $progressService->getCurrentJobId();
+
+        if ($jobId) {
+            $progress = $progressService->getProgress($jobId);
+            // Si le job est terminé ou échoué, on ne le considère plus comme "en cours"
+            if ($progress && in_array($progress['status'], ['completed', 'failed', 'cancelled'])) {
+                $progressService->clearCurrentJobId();
+                $jobId = null;
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'job_id' => $jobId,
         ]);
     }
 }

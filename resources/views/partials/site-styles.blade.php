@@ -425,8 +425,8 @@
 
         /* Description Hero mobile - Pixel perfect site de référence */
         .hero-description {
-            font-size: 18px !important;
-            line-height: 28px !important;
+            font-size: 24px !important;
+            line-height: 34px !important;
             padding: 0 !important;
             margin-bottom: 40px !important;
             margin-top: 0 !important;

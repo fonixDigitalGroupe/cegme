@@ -345,9 +345,9 @@
                     }
 
                     .expertise-image-container {
-                        height: 600px !important;
-                        /* Reduced from 800px */
-                        min-height: 600px !important;
+                        height: 500px !important;
+                        /* Reduced from 600px */
+                        min-height: 500px !important;
                     }
 
                     .expertise-image-img {

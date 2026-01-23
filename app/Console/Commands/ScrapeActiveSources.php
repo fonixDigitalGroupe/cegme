@@ -6,145 +6,204 @@ use App\Models\FilteringRule;
 use App\Services\OfferFilteringService;
 use App\Services\ScraperHelper;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+use App\Services\AFDScraperService;
+use App\Services\AfDBScraperService;
+use App\Services\WorldBankScraperService;
+use App\Services\DGMarketScraperService;
+use App\Services\BDEACScraperService;
+use App\Services\IFADScraperService;
+use App\Services\IterativeScraperInterface;
 
 class ScrapeActiveSources extends Command
 {
     protected $signature = 'app:scrape-active-sources 
                             {--no-truncate : Ne pas vider la table avant le scraping}
                             {--apply-filters : Appliquer le filtrage après le scraping (supprimer les offres non conformes)}
-                            {--show-filters : Afficher les détails des filtres appliqués}';
-    protected $description = 'Lancer le scraping uniquement pour les sources avec des règles actives (vide la table avant)';
-
-    /**
-     * Mapping des sources vers leurs commandes de scraping
-     */
-    private $sourceCommands = [
-        'AFD' => 'scrape:afd',
-        'African Development Bank' => 'app:scrape-afdb',
-        'World Bank' => 'app:scrape-world-bank',
-        'DGMarket' => 'app:scrape-dgmarket',
-        'BDEAC' => 'app:scrape-bdeac',
-        'IFAD' => 'app:scrape-ifad',
-    ];
+                            {--show-filters : Afficher les détails des filtres appliqués}
+                            {--job-id= : ID du job pour le suivi de progression}';
+    protected $description = 'Lancer le scraping intelligent pour les sources actives (cible ~50 offres par source)';
 
     public function handle()
     {
-        $this->info('=== SCRAPING DES SOURCES ACTIVES ===');
+        $this->info('=== SCRAPING INTELLIGENT DES SOURCES ACTIVES ===');
         $this->newLine();
 
-        // Récupérer les sources actives et leurs règles
+        // Initialiser le suivi de progression
+        $progressService = app(\App\Services\ScrapingProgressService::class);
+        $jobId = $this->option('job-id') ?? \App\Services\ScrapingProgressService::generateJobId();
+
+        // Récupérer les sources actives
         $activeSources = ScraperHelper::getActiveSources();
 
-        // Si aucune règle active, scraper TOUTES les sources par défaut
         if (empty($activeSources)) {
             $this->warn('⚠ Aucune règle de filtrage active trouvée.');
             $this->info('💡 Scraping de TOUTES les sources par défaut...');
-            $activeSources = array_keys($this->sourceCommands);
+            $activeSources = [
+                'AFD',
+                'African Development Bank',
+                'World Bank',
+                'DGMarket',
+                'BDEAC',
+                'IFAD'
+            ];
         }
 
-        // Afficher les filtres si demandé
+        // Initialiser la progression si pas déjà fait
+        $progressService->initialize($jobId, count($activeSources));
+
         if ($this->option('show-filters')) {
             $this->displayFilters($activeSources);
             $this->newLine();
         }
 
-        // Vider la table avant le scraping (sauf si --no-truncate est spécifié)
+        // Vider la table par défaut (sauf si --no-truncate est spécifié)
         if (!$this->option('no-truncate')) {
-            $this->info('Vidage de la table offres...');
-            $countBefore = DB::table('offres')->count();
-
-            // Vider dans toutes les connexions possibles
-            try {
-                DB::statement('DELETE FROM offres');
-                $this->info("✓ {$countBefore} offres supprimées de la table");
-            } catch (\Exception $e) {
-                $this->warn('⚠ Erreur lors du vidage: ' . $e->getMessage());
-            }
-
-            // Si SQLite, réinitialiser le compteur auto
-            $driver = DB::connection()->getDriverName();
-            if ($driver === 'sqlite') {
-                try {
-                    DB::statement('DELETE FROM sqlite_sequence WHERE name="offres"');
-                } catch (\Exception $e) {
-                    // Ignorer si la table n'existe pas
-                }
-            }
-
-            // Vider aussi dans MySQL si disponible
-            try {
-                DB::connection('mysql')->statement('TRUNCATE TABLE offres');
-            } catch (\Exception $e) {
-                // MySQL non disponible ou déjà vidé, ignorer
-            }
-
+            $this->info('🗑️  Vidage de la table offres...');
+            $progressService->updateSource($jobId, 'Vidage de la base', 0);
+            DB::table('offres')->delete();
+            $this->info("✓ Table vidée avec succès");
             $this->newLine();
         } else {
-            $this->info('⚠ Mode --no-truncate : la table ne sera pas vidée');
+            $this->info('⚠ Mode --no-truncate : conservation des données existantes');
             $this->newLine();
         }
 
-        $this->info('Sources actives détectées: ' . implode(', ', $activeSources));
+        $this->info('Sources à traiter: ' . implode(', ', $activeSources));
         $this->newLine();
 
-        $successCount = 0;
-        $failCount = 0;
+        $totalFoundGlobal = 0;
 
-        foreach ($activeSources as $source) {
-            if (!isset($this->sourceCommands[$source])) {
-                $this->warn("⚠ Aucune commande de scraping trouvée pour la source: {$source}");
-                continue;
-            }
+        foreach ($activeSources as $index => $source) {
+            $currentSourceNum = $index + 1;
+            $this->info("--- Démarrage: {$source} ({$currentSourceNum}/" . count($activeSources) . ") ---");
 
-            $command = $this->sourceCommands[$source];
-            $this->info("--- Scraping de: {$source} ---");
-            $this->line("Commande: php artisan {$command}");
-            $this->newLine();
+            // Mettre à jour la progression UI
+            $progressService->updateSource($jobId, $source, $currentSourceNum);
 
             try {
-                // Utiliser --force car on a déjà vérifié que la source est active
-                $exitCode = Artisan::call($command, ['--force' => true]);
+                $scraper = $this->getScraperForSource($source);
 
-                if ($exitCode === 0) {
-                    $this->info("✓ Scraping de {$source} terminé avec succès");
-                    $successCount++;
+                if (!$scraper) {
+                    $this->warn("⚠ Aucun scraper disponible pour {$source}");
+                    $progressService->markSourceFailed($jobId, $source, "Scraper non trouvé");
+                    continue;
+                }
+
+                if (!($scraper instanceof IterativeScraperInterface)) {
+                    // Fallback pour les scrapers non itératifs (s'il y en a)
+                    $this->warn("⚠ {$source} ne supporte pas le mode itératif strict. Exécution standard...");
+                    $result = $scraper->scrape();
+                    $count = $result['count'] ?? 0;
+                    $this->info("✓ Terminé: {$count} offres traitées (Standard)");
+                    $totalFoundGlobal += $count;
+                    $progressService->markSourceCompleted($jobId, $source, $count);
+                    continue;
+                }
+
+                // Initialisation
+                $scraper->setJobId($jobId);
+                $scraper->initialize();
+
+                $foundCount = 0;
+                $lotCount = 0;
+                $maxLots = 50; // Sécurité ~500 items
+                $targetOffers = 50; // Objectif Cible
+                $hasMore = true;
+
+                $bar = $this->output->createProgressBar($targetOffers);
+                $bar->setFormatDefinition('custom', ' %current%/%max% [%bar%] %message%');
+                $bar->setFormat('custom');
+                $bar->setMessage("Recherche d'offres...");
+                $bar->start();
+
+                $emptyBatchCount = 0; // Compteur de lots vides consécutifs
+                $maxEmptyBatches = 5; // Si 5 lots consécutifs sans résultat, on passe à la source suivante
+
+                while ($hasMore && $foundCount < $targetOffers && $lotCount < $maxLots) {
+                    // Vérifier si annulé via UI
+                    if ($progressService->isCancelled($jobId)) {
+                        $this->warn('❌ Scraping annulé par l\'utilisateur.');
+                        $bar->finish();
+                        return Command::SUCCESS;
+                    }
+
+                    $lotCount++;
+                    // Batch size réduit pour feedback rapide
+                    $result = $scraper->scrapeBatch(2);
+
+                    $hasMore = $result['has_more'];
+                    $batchFindingsCount = isset($result['findings']) ? count($result['findings']) : 0;
+                    $foundCount += $batchFindingsCount;
+
+                    // Mettre à jour les trouvailles en temps réel dans l'UI
+                    if (!empty($result['findings'])) {
+                        $progressService->addFindings($jobId, $result['findings']);
+                    }
+
+                    // Mettre à jour le message de progression UI
+                    $progressService->updateProgress($jobId, [
+                        'message' => "Scraping de {$source}... {$foundCount} offres trouvées (Lot {$lotCount})",
+                        'source_progress' => $foundCount
+                    ]);
+
+                    // Vérifier si le lot est vide pour skip si trop long
+                    if ($batchFindingsCount === 0) {
+                        $emptyBatchCount++;
+                        if ($emptyBatchCount >= $maxEmptyBatches) {
+                            $this->warn("  ⚠ Aucun résultat après {$emptyBatchCount} tentatives, passage à la source suivante...");
+                            break;
+                        }
+                    } else {
+                        $emptyBatchCount = 0;
+                    }
+
+                    $bar->advance($batchFindingsCount);
+                    $bar->setMessage("Lot {$lotCount}: +{$batchFindingsCount} offres");
+                }
+
+                $bar->finish();
+                $this->newLine();
+
+                if ($foundCount >= $targetOffers) {
+                    $this->info("✓ Objectif atteint ({$foundCount} offres) pour {$source}");
+                } elseif (!$hasMore) {
+                    $this->info("✓ Source épuisée ({$foundCount} offres trouvées) pour {$source}");
                 } else {
-                    $this->warn("⚠ Scraping de {$source} terminé avec des erreurs (code: {$exitCode})");
-                    $failCount++;
+                    $this->warn("⚠ Arrêt sécurité après {$lotCount} lots ({$foundCount} offres) pour {$source}");
                 }
+
+                $totalFoundGlobal += $foundCount;
+                $progressService->markSourceCompleted($jobId, $source, $foundCount);
+
             } catch (\Exception $e) {
-                $this->error("✗ Erreur lors du scraping de {$source}: " . $e->getMessage());
-                $failCount++;
+                $this->error("✗ Erreur sur {$source}: " . $e->getMessage());
+                $progressService->markSourceFailed($jobId, $source, $e->getMessage());
             }
 
             $this->newLine();
         }
 
-        // Résumé du scraping
-        $this->info('=== RÉSUMÉ DU SCRAPING ===');
-        $this->info("Sources scrapées avec succès: {$successCount}");
-        if ($failCount > 0) {
-            $this->warn("Sources en erreur: {$failCount}");
-        }
+        // Marquer comme terminé dans l'UI
+        $progressService->complete($jobId);
 
-        $totalOffres = DB::table('offres')->count();
-        $this->info("Total d'offres scrapées: {$totalOffres}");
-        $this->newLine();
+        $this->info('=== TERMINÉ ===');
+        $this->info("Total offres récupérées: {$totalFoundGlobal}");
 
-        // Appliquer le filtrage si demandé
-        if ($this->option('apply-filters')) {
-            $this->info('=== APPLICATION DES FILTRES ===');
-            $this->applyFiltering();
-            $this->newLine();
-        } else {
-            $this->comment('💡 Astuce: Utilisez --apply-filters pour supprimer automatiquement les offres non conformes aux filtres.');
-            $this->comment('💡 Note: Le filtrage est appliqué automatiquement à l\'affichage, même sans cette option.');
-            $this->newLine();
-        }
+        return Command::SUCCESS;
+    }
 
-        return $failCount === 0 ? Command::SUCCESS : Command::FAILURE;
+    private function getScraperForSource(string $source)
+    {
+        return match ($source) {
+            'AFD' => app(AFDScraperService::class),
+            'African Development Bank' => app(AfDBScraperService::class),
+            'World Bank' => app(WorldBankScraperService::class),
+            'DGMarket' => app(DGMarketScraperService::class),
+            'BDEAC' => app(BDEACScraperService::class),
+            'IFAD' => app(IFADScraperService::class),
+            default => null,
+        };
     }
 
     /**
@@ -239,4 +298,5 @@ class ScrapeActiveSources extends Command
         }
     }
 }
+
 

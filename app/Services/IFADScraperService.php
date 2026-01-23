@@ -48,6 +48,7 @@ class IFADScraperService implements IterativeScraperInterface
                 return [
                     'count' => 0,
                     'has_more' => false,
+                    'findings' => [], // Aucune nouvelle offre
                 ];
             }
 
@@ -76,6 +77,7 @@ class IFADScraperService implements IterativeScraperInterface
             return [
                 'count' => 1,
                 'has_more' => false,
+                'findings' => [$offreData], // Ajouter l'offre créée
             ];
 
         } catch (\Exception $e) {

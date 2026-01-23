@@ -73,7 +73,7 @@ class FilteringRuleController extends Controller
         // Filtrer les pays vides avant la validation
         if ($request->has('countries')) {
             $request->merge([
-                'countries' => array_filter($request->input('countries', []), function($country) {
+                'countries' => array_filter($request->input('countries', []), function ($country) {
                     return !empty(trim($country ?? ''));
                 })
             ]);
@@ -157,7 +157,7 @@ class FilteringRuleController extends Controller
         // Filtrer les pays vides avant la validation
         if ($request->has('countries')) {
             $request->merge([
-                'countries' => array_filter($request->input('countries', []), function($country) {
+                'countries' => array_filter($request->input('countries', []), function ($country) {
                     return !empty(trim($country ?? ''));
                 })
             ]);
@@ -199,7 +199,7 @@ class FilteringRuleController extends Controller
         });
 
         return redirect()->route('admin.filtering-rules.index')
-            ->with('success', 'Règle de filtrage mise à jour avec succès.');
+            ->with('status', 'filtering-rule-updated');
     }
 
     /**

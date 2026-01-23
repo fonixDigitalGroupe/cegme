@@ -27,10 +27,26 @@ class ScraperHelper
      */
     public static function getActiveSources(): array
     {
-        return FilteringRule::where('is_active', true)
+        $sources = FilteringRule::where('is_active', true)
             ->pluck('source')
             ->unique()
             ->toArray();
+
+        // Prioriser World Bank (API rapide) avant AfDB (Browsershot lent)
+        $priority = ['World Bank', 'AFD', 'IFAD', 'DGMarket', 'BDEAC', 'African Development Bank'];
+
+        usort($sources, function ($a, $b) use ($priority) {
+            $posA = array_search($a, $priority);
+            $posB = array_search($b, $priority);
+
+            // Si non trouvé dans priority, mettre à la fin
+            $posA = $posA === false ? 999 : $posA;
+            $posB = $posB === false ? 999 : $posB;
+
+            return $posA - $posB;
+        });
+
+        return $sources;
     }
 
     /**

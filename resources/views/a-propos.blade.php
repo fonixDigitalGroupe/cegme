@@ -73,7 +73,7 @@
                 <!-- Image -->
                 <div class="w-full lg:w-[110%]">
                     <img src="{{ asset('Image/Cabinet d\'Études Géologiques.jpg') }}" alt="Cabinet d'Études Géologiques"
-                        class="w-full h-[300px] lg:h-[650px] object-cover"
+                        class="w-full h-[300px] lg:h-[500px] object-cover"
                         style="width: 100%; object-fit: cover; border-radius: 0px;">
                 </div>
                 <!-- Text Content -->
@@ -167,7 +167,7 @@
                         </h3>
                         <p class="text-green-600 text-2xl font-bold mb-2"
                             style="font-size: 24px; font-weight: 800; color: rgb(5, 150, 105); margin-bottom: 12px; text-align: center;">
-                            CA/BG/2015B514
+                            CA/BG/2015B541
                         </p>
                         <p class="text-gray-600"
                             style="font-size: 16px; color: rgb(75, 85, 99); line-height: 24px; margin-bottom: 0px; text-align: center;">

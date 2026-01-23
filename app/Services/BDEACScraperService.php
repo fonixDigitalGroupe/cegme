@@ -81,15 +81,18 @@ class BDEACScraperService implements IterativeScraperInterface
 
             // Servir le premier lot
             $batch = array_splice($this->pendingOffers, 0, $limit);
+            $findings = []; // Track findings for progress display
             foreach ($batch as $offre) {
                 if ($this->saveOffre($offre)) {
                     $insertedCount++;
                 }
+                $findings[] = $offre; // Add to findings regardless of insert status
             }
 
             return [
                 'count' => $insertedCount,
-                'has_more' => !empty($this->pendingOffers) || !$this->isExhausted
+                'has_more' => !empty($this->pendingOffers) || !$this->isExhausted,
+                'findings' => $findings,
             ];
 
         } catch (\Exception $e) {
@@ -457,6 +460,9 @@ class BDEACScraperService implements IterativeScraperInterface
             $datePublication = $this->extractPublicationDate($item, $xpath);
             $dateLimite = $this->extractDeadline($item, $xpath);
 
+            // Nettoyer et tronquer le titre (max 250 caractères pour éviter erreur SQL)
+            $titre = $this->cleanTitle($titre);
+
             return [
                 'titre' => $titre,
                 'acheteur' => 'Banque de Développement des États de l\'Afrique Centrale (BDEAC)',
@@ -624,6 +630,23 @@ class BDEACScraperService implements IterativeScraperInterface
         $normalized = preg_replace('/\s+/', ' ', $normalized);
         $normalized = preg_replace('/[^\w\s]/', '', $normalized);
         return $normalized;
+    }
+
+    /**
+     * Nettoie un titre (supprime espaces excessifs, tronque)
+     */
+    private function cleanTitle(string $titre): string
+    {
+        // Supprimer les tabulations et espaces multiples
+        $cleaned = preg_replace('/\s+/', ' ', $titre);
+        $cleaned = trim($cleaned);
+
+        // Tronquer à 250 caractères max (sécurité pour VARCHAR(255))
+        if (strlen($cleaned) > 250) {
+            $cleaned = substr($cleaned, 0, 247) . '...';
+        }
+
+        return $cleaned;
     }
 
     /**

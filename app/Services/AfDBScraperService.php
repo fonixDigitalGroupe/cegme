@@ -350,7 +350,7 @@ class AfDBScraperService implements IterativeScraperInterface
 
                 $html = Browsershot::url($url)
                     ->waitUntilNetworkIdle()
-                    ->timeout(90) // Réduit de 120s à 90s pour plus de réactivité
+                    ->timeout(30) // Réduit à 30s pour plus de réactivité
                     ->setOption('args', [
                         '--no-sandbox',
                         '--disable-setuid-sandbox',

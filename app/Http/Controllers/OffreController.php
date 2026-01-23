@@ -19,14 +19,9 @@ class OffreController extends Controller
         $activityPoleId = $request->get('activity_pole_id');
         $keyword = $request->get('keyword');
 
-        // Récupérer toutes les offres sauf DGMarket
+        // Récupérer TOUTES les offres sauf DGMarket (même les offres expirées)
         $query = Offre::query()
-            ->where('source', '!=', 'DGMarket')
-            ->where(function ($q) {
-                // Règle: Date limite >= Aujourd'hui OU Date limite est NULL
-                $q->whereDate('date_limite_soumission', '>=', now()->toDateString())
-                    ->orWhereNull('date_limite_soumission');
-            });
+            ->where('source', '!=', 'DGMarket');
 
         // Appliquer les filtres
         if ($marketType) {
@@ -86,43 +81,11 @@ class OffreController extends Controller
         // Compter avant le filtre de date
         $countBeforeDateFilter = $filteredOffres->count();
 
-        // Filtres demandés par l'utilisateur: pays non nul et date non expirée
-        // OPTIMISATION SQL: Filtrer directement dans la requête
+        // Filtrer uniquement par pays non nul (afficher TOUTES les offres, même expirées)
         $filteredOffres = $filteredOffres->filter(function ($offre) {
-            // 1. Pays ne doit pas être null ou vide
+            // Pays ne doit pas être null ou vide
             if (empty($offre->pays)) {
                 return false;
-            }
-            return true;
-        });
-
-        // Appliquer le filtre de date au niveau de la collection (car filtrage hybride avec services)
-        // Note: Idéalement, ceci devrait être dans la requête SQL initiale, mais à cause du mixage 
-        // avec FilteringService qui peut retourner une Collection, on garde le filtre ici mais optimisé.
-
-        $now = now();
-        $filteredOffres = $filteredOffres->filter(function ($offre) use ($now) {
-            // Si pas de date limite (ex: WB), on garde
-            if (empty($offre->date_limite_soumission)) {
-                return true;
-            }
-
-            try {
-                $dateLimite = null;
-                if (is_object($offre->date_limite_soumission)) {
-                    $dateLimite = $offre->date_limite_soumission;
-                } else {
-                    $dateLimite = \Carbon\Carbon::parse($offre->date_limite_soumission);
-                }
-
-                // Garder si la date est >= aujourd'hui (inclut aujourd'hui)
-                // isPast() renvoie true si < maintenant. 
-                // On veut garder si c'est FUTUR ou AUJOURD'HUI.
-                if ($dateLimite->isPast() && !$dateLimite->isToday()) {
-                    return false;
-                }
-            } catch (\Exception $e) {
-                return true; // En cas de doute, on garde
             }
             return true;
         });
@@ -139,19 +102,21 @@ class OffreController extends Controller
             ]);
         }
 
-        // Trier par date limite (les plus proches en premier), puis mettre les WB sans date après
-        $filteredOffres = $filteredOffres->sortBy(function ($offre) {
+        // Trier par date limite de soumission (du plus récent au plus ancien)
+        // Les offres sans date sont placées à la fin
+        $filteredOffres = $filteredOffres->sortByDesc(function ($offre) {
             try {
                 if (!empty($offre->date_limite_soumission)) {
                     if (is_object($offre->date_limite_soumission) && method_exists($offre->date_limite_soumission, 'format')) {
-                        return '0-' . $offre->date_limite_soumission->format('Y-m-d'); // groupe 0 = datés
+                        return $offre->date_limite_soumission->format('Y-m-d');
                     }
-                    return '0-' . (string) $offre->date_limite_soumission;
+                    return \Carbon\Carbon::parse($offre->date_limite_soumission)->format('Y-m-d');
                 }
             } catch (\Exception $e) {
+                // En cas d'erreur de parsing, placer à la fin
             }
-            // Groupe 1 = WB sans date, Groupe 2 = autres sans date (devraient déjà être filtrées)
-            return ($offre->source === 'World Bank') ? '1-9999-12-31' : '2-9999-12-31';
+            // Les offres sans date sont placées à la fin (date très ancienne)
+            return '1900-01-01';
         });
 
         // Paginer les résultats filtrés

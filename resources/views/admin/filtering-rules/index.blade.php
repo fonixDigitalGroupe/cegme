@@ -3,6 +3,45 @@
 @section('title', 'Règles de filtrage des offres')
 
 @section('content')
+    <!-- Configuration du scraping automatique -->
+    <div
+        style="padding: 1.5rem; margin-bottom: 2rem; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);">
+        <h2
+            style="font-size: 1.125rem; font-weight: 600; color: #1a1a1a; margin-bottom: 1.25rem;">
+            Scraping Automatique
+        </h2>
+        <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <label style="font-size: 0.875rem; font-weight: 500; color: #374151;">Fréquence:</label>
+                <select id="scraping-frequency"
+                    style="padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 4px; font-size: 0.875rem; color: #374151; background-color: #ffffff; cursor: pointer;">
+                    <option value="1min">Toutes les 1 minute</option>
+                    <option value="30min">Toutes les 30 minutes</option>
+                    <option value="1hour">Toutes les 1 heure</option>
+                    <option value="24hours" selected>Toutes les 24 heures</option>
+                </select>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <label style="font-size: 0.875rem; font-weight: 500; color: #374151;">Statut:</label>
+                <label style="display: inline-flex; align-items: center; cursor: pointer;">
+                    <input type="checkbox" id="scraping-active"
+                        style="width: 18px; height: 18px; cursor: pointer; margin-right: 0.5rem;">
+                    <span id="scraping-status-text" style="font-size: 0.875rem; color: #6b7280;">Inactif</span>
+                </label>
+            </div>
+
+            <button id="save-schedule" type="button"
+                style="background-color: #10b981; color: white; border: none; padding: 0.5rem 1rem; font-weight: 500; font-size: 0.875rem; border-radius: 4px; cursor: pointer;">
+                Enregistrer
+            </button>
+
+            <div id="schedule-info" style="font-size: 0.8125rem; color: #6b7280; margin-left: auto;">
+                <span id="next-run-text"></span>
+            </div>
+        </div>
+    </div>
+
     <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
         <h1 style="font-size: 1.5rem; font-weight: 600; color: #1a1a1a; margin: 0;">Règles de filtrage des offres</h1>
         <div style="display: flex; gap: 0.5rem;">
@@ -10,21 +49,13 @@
                 style="background-color: #3b82f6; color: white; border: none; padding: 0.625rem 1.25rem; font-weight: 500; font-size: 0.875rem; border-radius: 4px; cursor: pointer;">
                 Lancer le scraping
             </button>
-            <form id="truncate-offres-form" method="POST" action="{{ route('admin.scraping.truncate') }}"
-                style="display: inline;"
-                onsubmit="return confirm('Cette action va supprimer toutes les offres. Continuer ?');">
-                @csrf
-                <button type="submit"
-                    style="background-color: #ef4444; color: white; border: none; padding: 0.625rem 1.25rem; font-weight: 500; font-size: 0.875rem; border-radius: 4px; cursor: pointer;">
-                    Vider la table offres
-                </button>
-            </form>
             <a href="{{ route('admin.filtering-rules.create') }}" class="btn"
                 style="background-color: #00C853; color: white; border: none; padding: 0.625rem 1.25rem; font-weight: 500; font-size: 0.875rem; border-radius: 4px; text-decoration: none; display: inline-flex; align-items: center;">
                 + Nouvelle règle
             </a>
         </div>
     </div>
+
 
     @if(session('success'))
         <div
@@ -145,9 +176,9 @@
         </table>
     </div>
 
-    <!-- Barre de progression -->
+    <!-- Barre de progression (déplacée après le tableau) -->
     <div id="scraping-progress-container"
-        style="display: none; margin-bottom: 1.5rem; background-color: #ffffff; border: 1px solid #d1d5db; border-radius: 8px; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        style="display: none; margin-top: 1.5rem; background-color: #ffffff; border: 1px solid #d1d5db; border-radius: 8px; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
             <span id="scraping-status-label"
                 style="font-weight: 600; color: #374151; font-size: 0.9375rem;">Initialisation...</span>
@@ -169,10 +200,6 @@
                 <!-- Rempli en JS -->
             </ul>
         </div>
-    </div>
-
-    <div style="overflow-x: auto; background-color: #ffffff; border: 1px solid #d1d5db; border-radius: 4px;">
-        <!-- ... table content ... -->
     </div>
 
     <script>
@@ -214,9 +241,60 @@
                 }
             }
 
+            function startPolling(id) {
+                jobId = id;
+                stopPolling();
+                setRunningState(true);
+
+                polling = setInterval(() => {
+                    fetch('{{ route("admin.scraping.progress") }}?job_id=' + encodeURIComponent(jobId))
+                        .then(r => r.json())
+                        .then(p => {
+                            if (p && p.success && p.progress) {
+                                const progress = p.progress;
+
+                                // Mise à jour visuelle
+                                const pct = progress.percentage || 0;
+                                progBar.style.width = pct + '%';
+                                progPercentage.textContent = pct + '%';
+                                progLabel.textContent = progress.current_source ? 'Source : ' + progress.current_source : 'Initialisation...';
+                                progDetails.textContent = progress.message;
+
+                                // Afficher les trouvailles
+                                if (progress.recent_findings && progress.recent_findings.length > 0) {
+                                    findingsContainer.style.display = 'block';
+                                    findingsList.innerHTML = progress.recent_findings.map(f => `
+                                                <li style="font-size: 0.8125rem; color: #4b5563; padding: 0.25rem 0; border-bottom: 1px solid #f9fafb;">
+                                                    <span style="font-weight: 500; color: #111827;">[${f.found_at}]</span> 
+                                                    <span style="color: #3b82f6;">${f.source}</span>: ${f.titre.substring(0, 80)}${f.titre.length > 80 ? '...' : ''} 
+                                                    <span style="color: #6b7280;">(${f.pays})</span>
+                                                </li>
+                                            `).join('');
+                                }
+
+                                if (progress.status === 'completed' || progress.status === 'failed' || progress.status === 'cancelled') {
+                                    stopPolling();
+                                    setRunningState(false);
+                                    if (progress.status === 'completed') {
+                                        progLabel.textContent = 'Terminé !';
+                                        progBar.style.width = '100%';
+                                        progBar.style.backgroundColor = '#10b981';
+                                        // On ne met pas d'alert si c'était déjà en cours au chargement
+                                    } else {
+                                        progLabel.textContent = 'Échec ou annulation';
+                                        progBar.style.backgroundColor = '#ef4444';
+                                    }
+                                }
+                            }
+                        })
+                        .catch(() => { });
+                }, 1500);
+            }
+
             btn.addEventListener('click', function () {
                 // Réinitialiser UI
                 progBar.style.width = '0%';
+                progBar.style.backgroundColor = '#3b82f6';
                 progPercentage.textContent = '0%';
                 progLabel.textContent = 'Lancement...';
                 progDetails.textContent = '';
@@ -241,51 +319,7 @@
                             setRunningState(false);
                             return;
                         }
-                        jobId = data.job_id;
-
-                        polling = setInterval(() => {
-                            fetch('{{ route("admin.scraping.progress") }}?job_id=' + encodeURIComponent(jobId))
-                                .then(r => r.json())
-                                .then(p => {
-                                    if (p && p.success && p.progress) {
-                                        const progress = p.progress;
-
-                                        // Mise à jour visuelle
-                                        const pct = progress.percentage || 0;
-                                        progBar.style.width = pct + '%';
-                                        progPercentage.textContent = pct + '%';
-                                        progLabel.textContent = progress.current_source ? 'Source : ' + progress.current_source : 'Initialisation...';
-                                        progDetails.textContent = progress.message;
-
-                                        // Afficher les trouvailles
-                                        if (progress.recent_findings && progress.recent_findings.length > 0) {
-                                            findingsContainer.style.display = 'block';
-                                            findingsList.innerHTML = progress.recent_findings.map(f => `
-                                    <li style="font-size: 0.8125rem; color: #4b5563; padding: 0.25rem 0; border-bottom: 1px solid #f9fafb;">
-                                        <span style="font-weight: 500; color: #111827;">[${f.found_at}]</span> 
-                                        <span style="color: #3b82f6;">${f.source}</span>: ${f.titre.substring(0, 80)}${f.titre.length > 80 ? '...' : ''} 
-                                        <span style="color: #6b7280;">(${f.pays})</span>
-                                    </li>
-                                `).join('');
-                                        }
-
-                                        if (progress.status === 'completed' || progress.status === 'failed' || progress.status === 'cancelled') {
-                                            stopPolling();
-                                            setRunningState(false);
-                                            if (progress.status === 'completed') {
-                                                progLabel.textContent = 'Terminé !';
-                                                progBar.style.backgroundColor = '#10b981';
-                                                alert('Scraping terminé avec succès.');
-                                            } else {
-                                                progLabel.textContent = 'Échec ou annulation';
-                                                progBar.style.backgroundColor = '#ef4444';
-                                                alert('Le scraping s\'est arrêté : ' + (progress.message || 'Erreur inconnue'));
-                                            }
-                                        }
-                                    }
-                                })
-                                .catch(() => { });
-                        }, 1500);
+                        startPolling(data.job_id);
                     })
                     .catch(err => {
                         console.error(err);
@@ -293,6 +327,105 @@
                         setRunningState(false);
                     });
             });
+
+            // Vérifier s'il y a un job en cours au chargement
+            function checkCurrentJob() {
+                fetch('{{ route("admin.scraping.current-job-id") }}')
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success && data.job_id) {
+                            startPolling(data.job_id);
+                        }
+                    })
+                    .catch(e => console.error("Erreur checkCurrentJob:", e));
+            }
+
+            checkCurrentJob();
+
+            // === GESTION DU SCRAPING AUTOMATIQUE ===
+            const frequencySelect = document.getElementById('scraping-frequency');
+            const activeCheckbox = document.getElementById('scraping-active');
+            const statusText = document.getElementById('scraping-status-text');
+            const nextRunText = document.getElementById('next-run-text');
+            const saveScheduleBtn = document.getElementById('save-schedule');
+
+            // Charger la configuration actuelle
+            function loadSchedule() {
+                fetch('{{ route("admin.scraping.schedule.get") }}')
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success && data.schedule) {
+                            frequencySelect.value = data.schedule.frequency;
+                            activeCheckbox.checked = data.schedule.is_active;
+                            updateStatusText(data.schedule.is_active);
+                            updateNextRunText(data.schedule.next_run_at, data.schedule.is_active);
+                        }
+                    })
+                    .catch(err => console.error('Erreur lors du chargement de la configuration:', err));
+            }
+
+            // Mettre à jour le texte du statut
+            function updateStatusText(isActive) {
+                if (isActive) {
+                    statusText.textContent = 'Actif';
+                    statusText.style.color = '#10b981';
+                    statusText.style.fontWeight = '600';
+                } else {
+                    statusText.textContent = 'Inactif';
+                    statusText.style.color = '#6b7280';
+                    statusText.style.fontWeight = '400';
+                }
+            }
+
+            // Mettre à jour le texte de la prochaine exécution
+            function updateNextRunText(nextRunAt, isActive) {
+                if (!isActive || !nextRunAt) {
+                    nextRunText.textContent = '';
+                    return;
+                }
+                const date = new Date(nextRunAt);
+                nextRunText.textContent = 'Prochaine exécution: ' + date.toLocaleString('fr-FR');
+            }
+
+            // Événement checkbox
+            activeCheckbox.addEventListener('change', function () {
+                updateStatusText(this.checked);
+            });
+
+            // Sauvegarder la configuration
+            saveScheduleBtn.addEventListener('click', function () {
+                const frequency = frequencySelect.value;
+                const isActive = activeCheckbox.checked;
+
+                fetch('{{ route("admin.scraping.schedule.update") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        frequency: frequency,
+                        is_active: isActive
+                    })
+                })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('✓ Configuration enregistrée avec succès!');
+                            updateNextRunText(data.schedule.next_run_at, data.schedule.is_active);
+                        } else {
+                            alert('Erreur: ' + (data.message || 'Impossible d\'enregistrer'));
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert('Erreur lors de la sauvegarde');
+                    });
+            });
+
+            // Charger la configuration au chargement de la page
+            loadSchedule();
         });
     </script>
 @endsection

@@ -126,6 +126,13 @@
             color: #1a1a1a;
             line-height: 1.4;
             max-width: 400px;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        a.offre-title:hover {
+            color: #2563eb;
+            text-decoration: underline;
         }
 
 
@@ -309,7 +316,12 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <div class="offre-title" style="color: #1a1a1a;">{{ $offre->titre }}</div>
+                                        @if($offre->lien_source)
+                                            <a href="{{ $offre->lien_source }}" target="_blank" rel="noopener noreferrer"
+                                                class="offre-title">{{ $offre->titre }}</a>
+                                        @else
+                                            <div class="offre-title">{{ $offre->titre }}</div>
+                                        @endif
                                     </td>
                                     <td>
                                         @php
