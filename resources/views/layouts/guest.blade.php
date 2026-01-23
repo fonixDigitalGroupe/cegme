@@ -24,9 +24,10 @@
 <body class="font-sans text-gray-900 antialiased flex flex-col min-h-screen">
     <x-site-header />
 
-    <main class="flex-grow flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-white sm:bg-gray-100"
+    <main class="flex-grow flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-50"
         style="padding-top: 80px; padding-bottom: 40px; min-height: calc(100vh - 80px);">
-        <div class="w-full sm:max-w-md px-6 py-4 sm:bg-white sm:shadow-md overflow-hidden sm:rounded-lg">
+        <div
+            class="w-full sm:max-w-md px-8 py-10 bg-white shadow-lg overflow-hidden rounded-2xl border border-gray-100">
             {{ $slot }}
         </div>
     </main>

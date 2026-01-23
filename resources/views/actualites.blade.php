@@ -51,9 +51,9 @@
 
     <!-- Hero Section - Page Header -->
     <section class="relative w-full flex items-center justify-center overflow-hidden actualites-hero-section"
-        style="min-height: 45vh; padding: 60px 0; background: linear-gradient(to right bottom, rgb(6, 78, 59), rgb(17, 94, 89), rgb(15, 23, 42));">
+        style="min-height: 30vh; padding: 40px 0; background: linear-gradient(to right bottom, rgb(6, 78, 59), rgb(17, 94, 89), rgb(15, 23, 42));">
         <div class="relative z-10 w-full max-w-4xl mx-auto px-4 text-center actualites-hero-content"
-            style="margin-top: 100px;">
+            style="margin-top: 60px;">
             <h1 class="mb-6"
                 style="font-size: 60px; font-weight: 700; color: rgb(255, 255, 255); margin-bottom: 24px; text-align: center; line-height: 72px;">
                 Réseaux Sociaux
@@ -70,15 +70,16 @@
         <div class="max-w-7xl mx-auto">
             <div class="flex flex-col md:flex-row gap-8 items-start justify-between actualites-main-row"
                 style="display: flex; gap: 32px; align-items: flex-start; justify-content: space-between;">
-                <!-- Left Column - Two separate blocks -->
+                <!-- Left Column - Content -->
                 <div class="actualites-left-column"
-                    style="max-width: 400px; width: 100%; flex-shrink: 0; display: flex; flex-direction: column; gap: 24px;">
-                    <!-- Block 1: Follow Us Widget -->
-                    <div class="p-0" style="padding: 0;">
+                    style="width: 100%; max-width: 450px; display: flex; flex-direction: column; gap: 32px;">
+                    <!-- Block 1: Facebook Card -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8"
+                        style="background-color: #ffffff; border-radius: 20px; padding: 32px; border: 1px solid #f3f4f6; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
                         <!-- Facebook Icon -->
                         <div
-                            style="width: 64px; height: 64px; background-color: #1877F2; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px;">
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="white"
+                            style="width: 56px; height: 56px; background-color: #1877F2; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px;">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="white"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <path
                                     d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
@@ -90,35 +91,29 @@
                             Suivez-nous sur Facebook
                         </h2>
                         <!-- Description -->
-                        <p style="font-size: 16px; color: rgb(75, 85, 99); line-height: 1.6; margin-bottom: 24px;">
+                        <p style="font-size: 16px; color: rgb(75, 85, 99); line-height: 1.6; margin-bottom: 28px;">
                             Restez informés de nos derniers projets, actualités environnementales et événements en
                             République Centrafricaine.
                         </p>
                         <!-- Button -->
                         <a href="https://www.facebook.com/CEGME.BG" target="_blank" rel="noopener noreferrer"
-                            style="display: inline-flex; align-items: center; gap: 10px; background-color: #1877F2; color: white; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px; transition: background-color 0.2s;">
+                            style="display: inline-flex; align-items: center; gap: 10px; background-color: #1877F2; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px; transition: all 0.2s; box-shadow: 0 4px 6px rgba(24, 119, 242, 0.2);">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="white"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <path
                                     d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                             </svg>
                             <span>Visiter notre page Facebook</span>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                style="width: 16px; height: 16px;">
-                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                                <polyline points="15 3 21 3 21 9"></polyline>
-                                <line x1="10" y1="14" x2="21" y2="3"></line>
-                            </svg>
                         </a>
                     </div>
 
-                    <!-- Block 1b: LinkedIn Follow Widget -->
-                    <div class="p-0" style="padding: 0;">
+                    <!-- Block 2: LinkedIn Card -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8"
+                        style="background-color: #ffffff; border-radius: 20px; padding: 32px; border: 1px solid #f3f4f6; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
                         <!-- LinkedIn Icon -->
                         <div
-                            style="width: 64px; height: 64px; background-color: #0A66C2; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px;">
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="white"
+                            style="width: 56px; height: 56px; background-color: #0A66C2; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px;">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="white"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <path
                                     d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
@@ -130,13 +125,13 @@
                             Suivez-nous sur LinkedIn
                         </h2>
                         <!-- Description -->
-                        <p style="font-size: 16px; color: rgb(75, 85, 99); line-height: 1.6; margin-bottom: 24px;">
+                        <p style="font-size: 16px; color: rgb(75, 85, 99); line-height: 1.6; margin-bottom: 28px;">
                             Découvrez notre expertise professionnelle, nos offres d'emploi et nos réalisations majeures
                             au niveau national et international.
                         </p>
                         <!-- Button -->
                         <a href="https://cf.linkedin.com/company/cegme" target="_blank" rel="noopener noreferrer"
-                            style="display: inline-flex; align-items: center; gap: 10px; background-color: #0A66C2; color: white; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px; transition: background-color 0.2s;">
+                            style="display: inline-flex; align-items: center; gap: 10px; background-color: #0A66C2; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px; transition: all 0.2s; box-shadow: 0 4px 6px rgba(10, 102, 194, 0.2);">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="white"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <path
@@ -146,82 +141,88 @@
                         </a>
                     </div>
 
-                    <!-- Block 2: Join Our Community -->
-                    <div class="p-0" style="padding: 0;">
+                    <!-- Block 3: Community Card -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8"
+                        style="background-color: #ffffff; border-radius: 20px; padding: 32px; border: 1px solid #f3f4f6; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
                         <h3
-                            style="font-size: 20px; font-weight: 700; color: rgb(17, 24, 39); margin-bottom: 20px; line-height: 1.3;">
+                            style="font-size: 20px; font-weight: 700; color: rgb(17, 24, 39); margin-bottom: 24px; line-height: 1.3;">
                             Rejoignez notre communauté
                         </h3>
 
-                        <!-- Like our page -->
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-                            <div
-                                style="width: 48px; height: 48px; background-color: #FCE7F3; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#EC4899"
-                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path
-                                        d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
-                                    </path>
-                                </svg>
-                            </div>
-                            <div style="flex: 1;">
+                        <div style="display: flex; flex-direction: column; gap: 20px;">
+                            <!-- Like our page -->
+                            <div style="display: flex; align-items: center; gap: 16px;">
                                 <div
-                                    style="font-size: 16px; font-weight: 700; color: rgb(17, 24, 39); margin-bottom: 4px;">
-                                    Aimez notre page
+                                    style="width: 48px; height: 48px; background-color: #FCE7F3; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#EC4899"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path
+                                            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+                                        </path>
+                                    </svg>
                                 </div>
-                                <div style="font-size: 14px; color: rgb(107, 114, 128);">
-                                    Restez connectés
+                                <div style="flex: 1;">
+                                    <div
+                                        style="font-size: 16px; font-weight: 700; color: rgb(17, 24, 39); margin-bottom: 4px;">
+                                        Aimez notre page
+                                    </div>
+                                    <div style="font-size: 14px; color: rgb(107, 114, 128);">
+                                        Restez connectés
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Share our posts -->
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-                            <div
-                                style="width: 48px; height: 48px; background-color: #DBEAFE; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6"
-                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <circle cx="18" cy="5" r="3"></circle>
-                                    <circle cx="6" cy="12" r="3"></circle>
-                                    <circle cx="18" cy="19" r="3"></circle>
-                                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
-                                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
-                                </svg>
-                            </div>
-                            <div style="flex: 1;">
+                            <!-- Share our posts -->
+                            <div style="display: flex; align-items: center; gap: 16px;">
                                 <div
-                                    style="font-size: 16px; font-weight: 700; color: rgb(17, 24, 39); margin-bottom: 4px;">
-                                    Partagez nos posts
+                                    style="width: 48px; height: 48px; background-color: #DBEAFE; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="18" cy="5" r="3"></circle>
+                                        <circle cx="6" cy="12" r="3"></circle>
+                                        <circle cx="18" cy="19" r="3"></circle>
+                                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                                    </svg>
                                 </div>
-                                <div style="font-size: 14px; color: rgb(107, 114, 128);">
-                                    Diffusez l'information
+                                <div style="flex: 1;">
+                                    <div
+                                        style="font-size: 16px; font-weight: 700; color: rgb(17, 24, 39); margin-bottom: 4px;">
+                                        Partagez nos posts
+                                    </div>
+                                    <div style="font-size: 14px; color: rgb(107, 114, 128);">
+                                        Diffusez l'information
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Comment -->
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <div
-                                style="width: 48px; height: 48px; background-color: #D1FAE5; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10B981"
-                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                                </svg>
-                            </div>
-                            <div style="flex: 1;">
+                            <!-- Comment -->
+                            <div style="display: flex; align-items: center; gap: 16px;">
                                 <div
-                                    style="font-size: 16px; font-weight: 700; color: rgb(17, 24, 39); margin-bottom: 4px;">
-                                    Commentez
+                                    style="width: 48px; height: 48px; background-color: #D1FAE5; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10B981"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                    </svg>
                                 </div>
-                                <div style="font-size: 14px; color: rgb(107, 114, 128);">
-                                    Engagez la conversation
+                                <div style="flex: 1;">
+                                    <div
+                                        style="font-size: 16px; font-weight: 700; color: rgb(17, 24, 39); margin-bottom: 4px;">
+                                        Commentez
+                                    </div>
+                                    <div style="font-size: 14px; color: rgb(107, 114, 128);">
+                                        Engagez la conversation
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Facebook Widget -->
-                    <div class="actualites-facebook-widget" style="max-width: 750px; width: 100%; margin-left: auto;">
+                <!-- Right Column - Sidebar with Interactive Widgets -->
+                <div class="actualites-right-column"
+                    style="width: 100%; max-width: 700px; flex-shrink: 0; display: flex; flex-direction: column; gap: 32px;">
+                    <div class="actualites-facebook-widget" style="width: 100%;">
                         <!-- Facebook Widget -->
                         <div class="bg-white rounded-lg shadow-md overflow-hidden"
                             style="background-color: rgb(255, 255, 255); border-radius: 8px; box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.1) 0px 4px 6px -4px;">
@@ -244,9 +245,9 @@
                             <div
                                 style="display: flex; justify-content: center; align-items: center; width: 100%; padding: 0;">
                                 <iframe
-                                    src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2FCEGME.BG%2F&tabs=timeline&width=550&height=600&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId"
-                                    width="550" height="600" class="facebook-iframe"
-                                    style="border:none;overflow:hidden;width:100%;max-width:550px;height:600px;margin:0 auto;display:block;"
+                                    src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2FCEGME.BG%2F&tabs=timeline&width=700&height=600&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId"
+                                    width="700" height="600" class="facebook-iframe"
+                                    style="border:none;overflow:hidden;width:100%;max-width:700px;height:600px;margin:0 auto;display:block;"
                                     scrolling="no" frameborder="0" allowfullscreen="true"
                                     allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>
                             </div>

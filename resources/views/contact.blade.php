@@ -49,9 +49,9 @@
 
     <!-- Hero Section - Page Header -->
     <section class="relative w-full flex items-center justify-center overflow-hidden contact-hero-section"
-        style="min-height: 45vh; padding: 60px 0; background: linear-gradient(to right bottom, rgb(6, 78, 59), rgb(17, 94, 89), rgb(15, 23, 42));">
+        style="min-height: 30vh; padding: 40px 0; background: linear-gradient(to right bottom, rgb(6, 78, 59), rgb(17, 94, 89), rgb(15, 23, 42));">
         <div class="relative z-10 w-full max-w-4xl mx-auto px-4 text-center contact-hero-content"
-            style="margin-top: 100px;">
+            style="margin-top: 60px;">
             <h1 class="mb-6"
                 style="font-size: 60px; font-weight: 700; color: rgb(255, 255, 255); margin-bottom: 24px; text-align: center; line-height: 72px;">
                 Contactez-Nous
@@ -137,7 +137,7 @@
             </div>
 
             <!-- Contact Form Section -->
-            <div class="max-w-3xl mx-auto contact-form-wrapper">
+            <div class="max-w-2xl mx-auto contact-form-wrapper">
                 <div class="text-center mb-8" style="margin-bottom: 32px; text-align: center;">
                     <h2 class="text-4xl font-bold mb-4"
                         style="font-size: 36px; font-weight: 700; color: rgb(17, 24, 39); margin-bottom: 16px;">
@@ -179,8 +179,8 @@
                     class="bg-white rounded-lg shadow-md p-8 contact-form"
                     style="background-color: rgb(255, 255, 255); border-radius: 8px; box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.1) 0px 4px 6px -4px; padding: 32px;">
                     @csrf
-                    <div class="grid grid-cols-1 gap-6 mb-6"
-                        style="display: grid; grid-template-columns: 1fr; gap: 24px; margin-bottom: 24px;">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6"
+                        style="display: grid; gap: 24px; margin-bottom: 24px;">
                         <!-- Nom complet -->
                         <div>
                             <label for="name" class="block text-sm font-medium text-gray-700 mb-2"
@@ -189,7 +189,7 @@
                             </label>
                             <input type="text" id="name" name="name" required placeholder="Votre nom"
                                 class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 contact-input"
-                                style="width: 100%; padding: 12px 16px; border: 1.5px solid #94a3b8; border-radius: 8px; font-size: 16px;"
+                                style="width: 100%; padding: 12px 16px; border: 1px solid #94a3b8; border-radius: 8px; font-size: 16px;"
                                 value="{{ old('name') }}">
                         </div>
 
@@ -201,13 +201,13 @@
                             </label>
                             <input type="email" id="email" name="email" required placeholder="votre@email.com"
                                 class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 contact-input"
-                                style="width: 100%; padding: 12px 16px; border: 1.5px solid #94a3b8; border-radius: 8px; font-size: 16px;"
+                                style="width: 100%; padding: 12px 16px; border: 1px solid #94a3b8; border-radius: 8px; font-size: 16px;"
                                 value="{{ old('email') }}">
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 gap-6 mb-6"
-                        style="display: grid; grid-template-columns: 1fr; gap: 24px; margin-bottom: 24px;">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6"
+                        style="display: grid; gap: 24px; margin-bottom: 24px;">
                         <!-- Téléphone -->
                         <div>
                             <label for="phone" class="block text-sm font-medium text-gray-700 mb-2"
@@ -216,7 +216,7 @@
                             </label>
                             <input type="tel" id="phone" name="phone" placeholder="(+236) 72 50 51 31 ,"
                                 class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 contact-input"
-                                style="width: 100%; padding: 12px 16px; border: 1.5px solid #94a3b8; border-radius: 8px; font-size: 16px;"
+                                style="width: 100%; padding: 12px 16px; border: 1px solid #94a3b8; border-radius: 8px; font-size: 16px;"
                                 value="{{ old('phone') }}">
                         </div>
 
@@ -228,7 +228,7 @@
                             </label>
                             <input type="text" id="subject" name="subject" required placeholder="Sujet de votre mess"
                                 class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 contact-input"
-                                style="width: 100%; padding: 12px 16px; border: 1.5px solid #94a3b8; border-radius: 8px; font-size: 16px;"
+                                style="width: 100%; padding: 12px 16px; border: 1px solid #94a3b8; border-radius: 8px; font-size: 16px;"
                                 value="{{ old('subject') }}">
                         </div>
                     </div>
@@ -242,7 +242,7 @@
                         <textarea id="message" name="message" required rows="6"
                             placeholder="Décrivez votre projet ou votre demande..."
                             class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 resize-none contact-input"
-                            style="width: 100%; padding: 12px 16px; border: 1.5px solid #94a3b8; border-radius: 8px; font-size: 16px; resize: none; min-height: 150px;">{{ old('message') }}</textarea>
+                            style="width: 100%; padding: 12px 16px; border: 1px solid #94a3b8; border-radius: 8px; font-size: 16px; resize: none; min-height: 150px;">{{ old('message') }}</textarea>
                     </div>
 
                     <!-- Submit Button -->

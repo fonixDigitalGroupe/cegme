@@ -31,9 +31,6 @@
         background-color: #ffffff !important;
     }
 
-    * {
-        border-color: transparent !important;
-    }
 
     .step-connector {
         position: absolute;
@@ -1040,6 +1037,7 @@
 
     /* FIX: Layout Overrides */
     @media (max-width: 1023px) {
+
         .stats-grid-container,
         .identity-grid-container,
         .approach-grid-container,
@@ -1051,7 +1049,7 @@
             gap: 32px !important;
         }
 
-        .identity-grid-container > div {
+        .identity-grid-container>div {
             min-height: auto !important;
             height: auto !important;
         }
@@ -1064,12 +1062,13 @@
             gap: 48px !important;
             align-items: stretch !important;
         }
-        
+
         .desktop-menu {
             display: flex !important;
         }
-        
-        .mobile-header, .mobile-menu-button {
+
+        .mobile-header,
+        .mobile-menu-button {
             display: none !important;
         }
     }

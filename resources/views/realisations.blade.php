@@ -112,9 +112,9 @@
 
     <!-- Hero Section - Page Header -->
     <section class="relative w-full flex items-center justify-center overflow-hidden realisations-hero-section"
-        style="min-height: 45vh; padding: 60px 0; background: linear-gradient(to right bottom, rgb(6, 78, 59), rgb(17, 94, 89), rgb(15, 23, 42));">
+        style="min-height: 30vh; padding: 40px 0; background: linear-gradient(to right bottom, rgb(6, 78, 59), rgb(17, 94, 89), rgb(15, 23, 42));">
         <div class="relative z-10 w-full max-w-4xl mx-auto px-4 text-center realisations-hero-content"
-            style="margin-top: 100px;">
+            style="margin-top: 60px;">
             <h1 class="mb-6"
                 style="font-size: 60px; font-weight: 700; color: rgb(255, 255, 255); margin-bottom: 24px; text-align: center; line-height: 72px;">
                 Nos Réalisations
@@ -191,97 +191,68 @@
         style="padding: 48px 0 96px 0; background-color: rgb(249, 250, 251);">
         <div class="max-w-7xl mx-auto">
             <!-- Filtres -->
-            <div class="mb-8" style="margin-bottom: 32px;">
-                <div class="flex flex-col md:flex-row md:items-center gap-4 justify-start realisations-filters-row"
-                    style="display: flex; gap: 16px; justify-content: flex-start;">
-                    <div class="flex items-center gap-2" style="display: flex; align-items: center; gap: 8px;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            style="width: 20px; height: 20px; color: rgb(75, 85, 99);">
-                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-                        </svg>
-                        <span style="font-size: 16px; font-weight: 600; color: rgb(55, 65, 81);">Filtrer secteur
-                            :</span>
+            <div class="mb-8" style="margin-bottom: 32px; padding: 0;">
+                <div class="flex flex-col gap-8">
+                    <!-- Row 1: Secteurs -->
+                    <div class="flex flex-col md:flex-row md:items-center gap-6">
+                        <div class="flex items-center gap-3 min-w-[180px]">
+                            <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="none" stroke="rgb(5, 150, 105)" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                                </svg>
+                            </div>
+                            <span style="font-size: 16px; font-weight: 700; color: #1f2937;">Filtrer par secteur
+                                :</span>
+                        </div>
+                        <select x-model="activeSector"
+                            class="w-full md:w-auto px-4 py-2 rounded-lg font-medium transition-all duration-200 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500"
+                            style="padding: 12px 20px; border-radius: 8px; font-size: 15px; font-weight: 500; background-color: rgb(255, 255, 255); color: rgb(55, 65, 81); border: 1.5px solid #e5e7eb; cursor: pointer; min-width: 300px;">
+                            <option value="all">Tous les secteurs d'activité</option>
+                            <option value="eau-humanitaire">Eau, Humanitaire et Développement Rural</option>
+                            <option value="conservation-environnement">Conservation et Environnement</option>
+                            <option value="infrastructures-urbanisme-btp">Infrastructures, Urbanisme et BTP</option>
+                            <option value="mines-energie-hydrocarbures">Mines, Énergie et Hydrocarbures</option>
+                            <option value="agro-industrie-services">Agro-Industrie et Services</option>
+                        </select>
                     </div>
-                    <select x-model="activeSector"
-                        class="w-full md:w-auto px-4 py-2 rounded-lg font-medium transition-colors border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
-                        style="padding: 12px 20px; border-radius: 6px; font-size: 16px; font-weight: 600; background-color: rgb(255, 255, 255); color: rgb(55, 65, 81); border: 1px solid rgb(209, 213, 219); cursor: pointer; min-width: 180px;">
-                        <option value="all">Tous les secteurs</option>
-                        <option value="eau-humanitaire">Eau, Humanitaire et Développement Rural</option>
-                        <option value="conservation-environnement">Conservation et Environnement</option>
-                        <option value="infrastructures-urbanisme-btp">Infrastructures, Urbanisme et BTP</option>
-                        <option value="mines-energie-hydrocarbures">Mines, Énergie et Hydrocarbures</option>
-                        <option value="agro-industrie-services">Agro-Industrie et Services</option>
-                    </select>
-                    <!-- Filtre par date - Boutons horizontaux -->
-                    <div class="flex items-center gap-2 realisations-year-filter"
-                        style="display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; overflow-x: auto; margin-left: 24px;">
-                        <button @click="activeYear = 'all'"
-                            :class="activeYear === 'all' ? 'bg-gradient-to-r from-green-600 to-green-500 text-white' : 'bg-gray-100 text-gray-700'"
-                            class="px-4 py-2 rounded-lg font-bold transition-all duration-200 shadow-sm hover:shadow-md flex-shrink-0"
-                            style="padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; white-space: nowrap;">
-                            Tous
-                        </button>
-                        <button @click="activeYear = '2025'"
-                            :class="activeYear === '2025' ? 'bg-gradient-to-r from-green-600 to-green-500 text-white' : 'bg-gray-100 text-gray-700'"
-                            class="px-4 py-2 rounded-lg font-bold transition-all duration-200 shadow-sm hover:shadow-md flex-shrink-0"
-                            style="padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; white-space: nowrap;">
-                            2025
-                        </button>
-                        <button @click="activeYear = '2024'"
-                            :class="activeYear === '2024' ? 'bg-gradient-to-r from-green-600 to-green-500 text-white' : 'bg-gray-100 text-gray-700'"
-                            class="px-4 py-2 rounded-lg font-bold transition-all duration-200 shadow-sm hover:shadow-md flex-shrink-0"
-                            style="padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; white-space: nowrap;">
-                            2024
-                        </button>
-                        <button @click="activeYear = '2022'"
-                            :class="activeYear === '2022' ? 'bg-gradient-to-r from-green-600 to-green-500 text-white' : 'bg-gray-100 text-gray-700'"
-                            class="px-4 py-2 rounded-lg font-bold transition-all duration-200 shadow-sm hover:shadow-md flex-shrink-0"
-                            style="padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; white-space: nowrap;">
-                            2022
-                        </button>
-                        <button @click="activeYear = '2021'"
-                            :class="activeYear === '2021' ? 'bg-gradient-to-r from-green-600 to-green-500 text-white' : 'bg-gray-100 text-gray-700'"
-                            class="px-4 py-2 rounded-lg font-bold transition-all duration-200 shadow-sm hover:shadow-md flex-shrink-0"
-                            style="padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; white-space: nowrap;">
-                            2021
-                        </button>
-                        <button @click="activeYear = '2020'"
-                            :class="activeYear === '2020' ? 'bg-gradient-to-r from-green-600 to-green-500 text-white' : 'bg-gray-100 text-gray-700'"
-                            class="px-4 py-2 rounded-lg font-bold transition-all duration-200 shadow-sm hover:shadow-md flex-shrink-0"
-                            style="padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; white-space: nowrap;">
-                            2020
-                        </button>
-                        <button @click="activeYear = '2019'"
-                            :class="activeYear === '2019' ? 'bg-gradient-to-r from-green-600 to-green-500 text-white' : 'bg-gray-100 text-gray-700'"
-                            class="px-4 py-2 rounded-lg font-bold transition-all duration-200 shadow-sm hover:shadow-md flex-shrink-0"
-                            style="padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; white-space: nowrap;">
-                            2019
-                        </button>
-                        <button @click="activeYear = '2018'"
-                            :class="activeYear === '2018' ? 'bg-gradient-to-r from-green-600 to-green-500 text-white' : 'bg-gray-100 text-gray-700'"
-                            class="px-4 py-2 rounded-lg font-bold transition-all duration-200 shadow-sm hover:shadow-md flex-shrink-0"
-                            style="padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; white-space: nowrap;">
-                            2018
-                        </button>
-                        <button @click="activeYear = '2017'"
-                            :class="activeYear === '2017' ? 'bg-gradient-to-r from-green-600 to-green-500 text-white' : 'bg-gray-100 text-gray-700'"
-                            class="px-4 py-2 rounded-lg font-bold transition-all duration-200 shadow-sm hover:shadow-md flex-shrink-0"
-                            style="padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; white-space: nowrap;">
-                            2017
-                        </button>
-                        <button @click="activeYear = '2016'"
-                            :class="activeYear === '2016' ? 'bg-gradient-to-r from-green-600 to-green-500 text-white' : 'bg-gray-100 text-gray-700'"
-                            class="px-4 py-2 rounded-lg font-bold transition-all duration-200 shadow-sm hover:shadow-md flex-shrink-0"
-                            style="padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; white-space: nowrap;">
-                            2016
-                        </button>
-                        <button @click="activeYear = '2011'"
-                            :class="activeYear === '2011' ? 'bg-gradient-to-r from-green-600 to-green-500 text-white' : 'bg-gray-100 text-gray-700'"
-                            class="px-4 py-2 rounded-lg font-bold transition-all duration-200 shadow-sm hover:shadow-md flex-shrink-0"
-                            style="padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; white-space: nowrap;">
-                            2011
-                        </button>
+
+                    <!-- Separator line for desktop -->
+                    <div class="hidden md:block h-px bg-gray-100" style="height: 1px; background-color: #f3f4f6;"></div>
+
+                    <!-- Row 2: Années -->
+                    <div class="flex flex-col md:flex-row md:items-center gap-6">
+                        <div class="flex items-center gap-3 min-w-[180px]">
+                            <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="none" stroke="rgb(5, 150, 105)" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                            </div>
+                            <span style="font-size: 16px; font-weight: 700; color: #1f2937;">Filtrer par année :</span>
+                        </div>
+                        <div class="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide"
+                            style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                            <button @click="activeYear = 'all'"
+                                :class="activeYear === 'all' ? 'bg-green-600 text-white shadow-lg shadow-green-900/20' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+                                class="px-5 py-2.5 rounded-lg font-bold transition-all duration-200 flex-shrink-0"
+                                style="padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; white-space: nowrap;">
+                                Tous
+                            </button>
+                            @foreach(['2025', '2024', '2022', '2021', '2020', '2019', '2018', '2017', '2016', '2011'] as $year)
+                                <button @click="activeYear = '{{ $year }}'"
+                                    :class="activeYear === '{{ $year }}' ? 'bg-green-600 text-white shadow-lg shadow-green-900/20' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+                                    class="px-5 py-2.5 rounded-lg font-bold transition-all duration-200 flex-shrink-0"
+                                    style="padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; white-space: nowrap;">
+                                    {{ $year }}
+                                </button>
+                            @endforeach
+                        </div>
                     </div>
                 </div>
             </div>
@@ -359,8 +330,8 @@
                 </div>
 
                 <!-- Project 2: Stratégie nationale filière manioc -->
-                <div x-show="matchesFilter('agro-industrie-services')" style="position: relative;"
-                    data-sector="agro-industrie-services">
+                <div x-show="matchesFilter('agro-industrie-services', '2025')" style="position: relative;"
+                    data-sector="agro-industrie-services" data-year="2025">
                     <div class="project-card bg-white rounded-2xl shadow-md overflow-hidden"
                         style="background-color: rgb(255, 255, 255); border-radius: 16px; padding: 24px; box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -1px; position: relative; width: 100%;">
                         <!-- Icône à gauche -->
@@ -426,8 +397,8 @@
                 </div>
 
                 <!-- Project 3: EIESC - Unités de transformation alimentaire -->
-                <div x-show="matchesFilter('agro-industrie-services')" style="position: relative;"
-                    data-sector="agro-industrie-services">
+                <div x-show="matchesFilter('agro-industrie-services', '2025')" style="position: relative;"
+                    data-sector="agro-industrie-services" data-year="2025">
                     <div class="project-card bg-white rounded-2xl shadow-md overflow-hidden"
                         style="background-color: rgb(255, 255, 255); border-radius: 16px; padding: 24px; box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -1px; position: relative; width: 100%;">
                         <!-- Icône à gauche -->
@@ -1375,8 +1346,8 @@
                 </div>
 
                 <!-- Project: Dépotoir privé Samba 1 (2020, Février) -->
-                <div x-show="matchesFilter('conservation-environnement')" style="position: relative;"
-                    data-sector="conservation-environnement">
+                <div x-show="matchesFilter('conservation-environnement', '2020')" style="position: relative;"
+                    data-sector="conservation-environnement" data-year="2020">
                     <div class="project-card bg-white rounded-2xl shadow-md overflow-hidden"
                         style="background-color: rgb(255, 255, 255); border-radius: 16px; padding: 24px; box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -1px; position: relative; width: 100%;">
                         <!-- Icône à gauche -->
@@ -1436,7 +1407,7 @@
                 </div>
 
                 <!-- Project: City Apartment Bangui (2020, Mai) -->
-                <div x-show="matchesFilter('infrastructures-urbanisme-btp')" style="position: relative;"
+                <div x-show="matchesFilter('infrastructures-urbanisme-btp', '2020')" style="position: relative;"
                     data-sector="infrastructures-urbanisme-btp">
                     <div class="project-card bg-white rounded-2xl shadow-md overflow-hidden"
                         style="background-color: rgb(255, 255, 255); border-radius: 16px; padding: 24px; box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -1px; position: relative; width: 100%;">

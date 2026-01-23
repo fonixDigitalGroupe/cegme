@@ -103,9 +103,9 @@
 
     <!-- Hero Section - Page Header -->
     <section class="relative w-full flex items-center justify-center overflow-hidden blog-hero-section"
-        style="min-height: 45vh; padding: 60px 0; background: linear-gradient(to right bottom, rgb(6, 78, 59), rgb(17, 94, 89), rgb(15, 23, 42));">
+        style="min-height: 30vh; padding: 40px 0; background: linear-gradient(to right bottom, rgb(6, 78, 59), rgb(17, 94, 89), rgb(15, 23, 42));">
         <div class="relative z-10 w-full max-w-4xl mx-auto px-4 text-center blog-hero-content"
-            style="margin-top: 100px;">
+            style="margin-top: 60px;">
             <h1 class="mb-6"
                 style="font-size: 60px; font-weight: 700; color: rgb(255, 255, 255); margin-bottom: 24px; text-align: center; line-height: 72px;">
                 Blog & Actualités
