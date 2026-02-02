@@ -5,19 +5,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Actualités et Réseaux Sociaux | CEGME</title>
+    <title>Actualités et réseaux sociaux | CEGME</title>
     <meta name="description"
         content="Suivez l'actualité du CEGME sur Facebook et LinkedIn. Restez informés de nos derniers projets, actualités environnementales et événements en République Centrafricaine.">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:title" content="Actualités et Réseaux Sociaux | CEGME">
+    <meta property="og:title" content="Actualités et réseaux sociaux | CEGME">
     <meta property="og:description"
         content="Suivez nos dernières actualités, projets et événements sur Facebook et LinkedIn.">
     <meta property="og:image" content="{{ asset('Image/CEGME Logo.png') }}">
 
     <link rel="icon" href="{{ asset('Image/CEGME favicon.JPG') }}" type="image/png">
+
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://www.facebook.com">
+    <link rel="preconnect" href="https://connect.facebook.net">
 
     <!-- Critical CSS to prevent white flash -->
     <style>
@@ -66,7 +70,7 @@
             style="margin-top: 60px;">
             <h1 class="mb-6"
                 style="font-size: 60px; font-weight: 700; color: rgb(255, 255, 255); margin-bottom: 24px; text-align: center; line-height: 72px;">
-                Réseaux Sociaux
+                Réseaux sociaux
             </h1>
             <p class="mx-auto max-w-3xl"
                 style="font-size: 20px; color: rgb(229, 231, 235); text-align: center; line-height: 32.5px;">
@@ -255,10 +259,10 @@
                             <div
                                 style="display: flex; justify-content: center; align-items: center; width: 100%; padding: 0;">
                                 <iframe
-                                    src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2FCEGME.BG%2F&tabs=timeline&width=700&height=600&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId"
+                                    src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2FCEGME.BG%2F&tabs=timeline&width=700&height=600&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true"
                                     width="700" height="600" class="facebook-iframe"
                                     style="border:none;overflow:hidden;width:100%;max-width:700px;height:600px;margin:0 auto;display:block;"
-                                    scrolling="no" frameborder="0" allowfullscreen="true"
+                                    scrolling="no" frameborder="0" allowfullscreen="true" loading="eager"
                                     allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>
                             </div>
 

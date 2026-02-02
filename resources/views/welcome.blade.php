@@ -309,7 +309,7 @@
                         <div>
                             <h2 class="text-4xl font-bold mb-6 leading-tight mobile-hero-title"
                                 style="font-size: 42px; font-weight: 800; color: #111827; margin-bottom: 16px; line-height: 1.2; letter-spacing: -0.5px;">
-                                L'Expertise au Service de l'Émergence
+                                L'expertise au service de l'émergence
                             </h2>
                             <div class="w-16 h-1 bg-[#16a34a] rounded-full mobile-hero-decor"
                                 style="width: 80px; height: 4px; background-color: #16a34a; border-radius: 2px; margin-bottom: 24px;">
@@ -520,14 +520,14 @@
         </div>
     </section>
 
-    <!-- Identité et Synergies Scientifiques Section -->
+    <!-- Identité et synergies scientifiques Section -->
     <section class="w-full bg-gray-100" style="padding: 100px 0; margin: 0; background-color: #f3f4f6 !important;">
         <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 identity-section-container">
             <!-- Titre avec ligne décorative -->
             <div class="text-center mb-16" style="text-align: center; margin-bottom: 64px;">
                 <h2 class="text-4xl font-bold mb-4"
                     style="font-size: 40px; font-weight: 800; color: rgb(17, 24, 39); text-align: center; margin-bottom: 16px; line-height: 48px; letter-spacing: -0.5px;">
-                    Identité et Synergies Scientifiques
+                    Identité et synergies scientifiques
                 </h2>
                 <div class="w-24 h-1 bg-gradient-to-r from-green-500 to-green-600 rounded-full mx-auto"
                     style="width: 96px; height: 4px; background: linear-gradient(90deg, rgb(5, 150, 105) 0%, rgb(16, 185, 129) 100%); border-radius: 9999px; margin: 0 auto;">
@@ -536,7 +536,7 @@
 
             <!-- Deux colonnes -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 identity-grid-container items-stretch">
-                <!-- Colonne gauche: Une Résilience Entrepreneuriale -->
+                <!-- Colonne gauche: Une résilience entrepreneuriale -->
                 <div class="bg-white rounded-2xl p-10 shadow-xl border border-gray-100 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 h-full"
                     style="background-color: #ffffff; border-radius: 16px; padding: 32px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); border: 1px solid rgb(243, 244, 246); transition: all 0.3s ease; cursor: default; position: relative; overflow: hidden; height: 100%;">
                     <!-- Effet de fond décoratif -->
@@ -561,7 +561,7 @@
                             <div class="flex-grow" style="flex-grow: 1;">
                                 <h3 class="text-2xl font-bold mb-5"
                                     style="font-size: 26px; font-weight: 800; color: rgb(17, 24, 39); margin-bottom: 20px; line-height: 34px;">
-                                    Une Résilience Entrepreneuriale
+                                    Une résilience entrepreneuriale
                                 </h3>
                                 <p class="text-gray-700 leading-relaxed"
                                     style="font-size: 18px; color: rgb(55, 65, 81); line-height: 32px; margin: 0; text-align: justify;">
@@ -576,7 +576,7 @@
                     </div>
                 </div>
 
-                <!-- Colonne droite: Un Socle Académique et International -->
+                <!-- Colonne droite: Un socle académique et international -->
                 <div class="bg-white rounded-2xl p-10 shadow-xl border border-gray-100 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 h-full"
                     style="background-color: #ffffff; border-radius: 16px; padding: 32px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); border: 1px solid rgb(243, 244, 246); transition: all 0.3s ease; cursor: default; position: relative; overflow: hidden; height: 100%;">
                     <!-- Effet de fond décoratif -->
@@ -603,7 +603,7 @@
                             <div class="flex-grow" style="flex-grow: 1;">
                                 <h3 class="text-2xl font-bold mb-5"
                                     style="font-size: 26px; font-weight: 800; color: rgb(17, 24, 39); margin-bottom: 20px; line-height: 34px;">
-                                    Un Socle Académique et International
+                                    Un socle académique et international
                                 </h3>
                                 <p class="text-gray-700 leading-relaxed mb-6"
                                     style="font-size: 18px; color: rgb(55, 65, 81); line-height: 32px; margin: 0 0 24px 0; text-align: justify;">
@@ -690,7 +690,7 @@
             <div class="text-center mb-16" style="text-align: center; margin-bottom: 64px;">
                 <h2 class="text-4xl font-bold text-black mb-4"
                     style="font-size: 40px; font-weight: 800; color: rgb(17, 24, 39); margin-bottom: 16px; text-align: center; line-height: 48px; letter-spacing: -0.5px;">
-                    Pourquoi Choisir CEGME ?
+                    Pourquoi choisir CEGME ?
                 </h2>
                 <div class="w-24 h-1 bg-gradient-to-r from-green-500 to-green-600 rounded-full mx-auto mb-6"
                     style="width: 96px; height: 4px; background: linear-gradient(90deg, rgb(5, 150, 105) 0%, rgb(16, 185, 129) 100%); border-radius: 9999px; margin: 0 auto 24px;">
@@ -704,7 +704,7 @@
             <!-- Cards Grid - 3 cards per row -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 benefits-grid-container"
                 style="max-width: 100%; margin: 0;">
-                <!-- Card 1: Expertise Locale -->
+                <!-- Card 1: Expertise locale -->
                 <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:-translate-y-2"
                     style="border-radius: 16px; padding: 32px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); transition: all 0.3s ease; border: 1px solid rgba(229, 231, 235, 0.8); position: relative; overflow: hidden; cursor: default;">
                     <!-- Effet de fond décoratif -->
@@ -726,7 +726,7 @@
                         <!-- Title -->
                         <h3 class="text-xl font-bold mb-4 text-center"
                             style="font-size: 22px; font-weight: 800; color: rgb(17, 24, 39); margin-bottom: 16px; line-height: 30px; text-align: center; letter-spacing: -0.3px;">
-                            Expertise Locale
+                            Expertise locale
                         </h3>
                         <!-- Description -->
                         <p class="text-gray-600 leading-relaxed text-center"
@@ -736,7 +736,7 @@
                     </div>
                 </div>
 
-                <!-- Card 2: Agrément Officiel -->
+                <!-- Card 2: Agrément officiel -->
                 <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:-translate-y-2"
                     style="border-radius: 16px; padding: 32px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); transition: all 0.3s ease; border: 1px solid rgba(229, 231, 235, 0.8); position: relative; overflow: hidden; cursor: default;">
                     <!-- Effet de fond décoratif -->
@@ -758,7 +758,7 @@
                         <!-- Title -->
                         <h3 class="text-xl font-bold mb-4 text-center"
                             style="font-size: 22px; font-weight: 800; color: rgb(17, 24, 39); margin-bottom: 16px; line-height: 30px; text-align: center; letter-spacing: -0.3px;">
-                            Agrément Officiel
+                            Agrément officiel
                         </h3>
                         <!-- Description -->
                         <p class="text-gray-600 leading-relaxed text-center"
@@ -768,7 +768,7 @@
                     </div>
                 </div>
 
-                <!-- Card 3: Réseau de Spécialistes -->
+                <!-- Card 3: Réseau de spécialistes -->
                 <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:-translate-y-2"
                     style="border-radius: 16px; padding: 32px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); transition: all 0.3s ease; border: 1px solid rgba(229, 231, 235, 0.8); position: relative; overflow: hidden; cursor: default;">
                     <!-- Effet de fond décoratif -->
@@ -791,7 +791,7 @@
                         <!-- Title -->
                         <h3 class="text-xl font-bold mb-4 text-center"
                             style="font-size: 22px; font-weight: 800; color: rgb(17, 24, 39); margin-bottom: 16px; line-height: 30px; text-align: center; letter-spacing: -0.3px;">
-                            Réseau de Spécialistes
+                            Réseau de spécialistes
                         </h3>
                         <!-- Description -->
                         <p class="text-gray-600 leading-relaxed text-center"
@@ -831,7 +831,7 @@
                     </div>
                 </div>
 
-                <!-- Card 5: Conformité Garantie -->
+                <!-- Card 5: Conformité garantie -->
                 <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:-translate-y-2"
                     style="border-radius: 16px; padding: 32px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); transition: all 0.3s ease; border: 1px solid rgba(229, 231, 235, 0.8); position: relative; overflow: hidden; cursor: default;">
                     <!-- Effet de fond décoratif -->
@@ -852,7 +852,7 @@
                         <!-- Title -->
                         <h3 class="text-xl font-bold mb-4 text-center"
                             style="font-size: 22px; font-weight: 800; color: rgb(17, 24, 39); margin-bottom: 16px; line-height: 30px; text-align: center; letter-spacing: -0.3px;">
-                            Conformité Garantie
+                            Conformité garantie
                         </h3>
                         <!-- Description -->
                         <p class="text-gray-600 leading-relaxed text-center"
@@ -862,7 +862,7 @@
                     </div>
                 </div>
 
-                <!-- Card 6: Approche Innovante -->
+                <!-- Card 6: Approche innovante -->
                 <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:-translate-y-2"
                     style="border-radius: 16px; padding: 32px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); transition: all 0.3s ease; border: 1px solid rgba(229, 231, 235, 0.8); position: relative; overflow: hidden; cursor: default;">
                     <!-- Effet de fond décoratif -->
@@ -890,7 +890,7 @@
                         <!-- Title -->
                         <h3 class="text-xl font-bold mb-4 text-center"
                             style="font-size: 22px; font-weight: 800; color: rgb(17, 24, 39); margin-bottom: 16px; line-height: 30px; text-align: center; letter-spacing: -0.3px;">
-                            Approche Innovante
+                            Approche innovante
                         </h3>
                         <!-- Description -->
                         <p class="text-gray-600 leading-relaxed text-center"

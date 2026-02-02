@@ -7,6 +7,12 @@ Bienvenue dans le guide d'utilisation de la plateforme **CEGME** (Cabinet d'Expe
 ## 1. Présentation de la Plateforme
 CEGME est une plateforme dédiée à l'expertise technique dans les domaines des mines, de l'environnement et de la géologie. Elle intègre un système robuste de veille sur les **appels d'offres** internationaux et une section **blog/actualités**.
 
+### Architecture Technique
+- **Framework** : Laravel 12 (PHP 8.2+)
+- **Base de données** : MySQL / MariaDB
+- **Moteur de Recherche** : Filtrage intelligent par mots-clés
+- **Scraping** : Spatie Browsershot (headless Chrome)
+
 ---
 
 ## 2. Guide du Site Public
@@ -20,6 +26,8 @@ CEGME est une plateforme dédiée à l'expertise technique dans les domaines des
 - **Appels d'offres** : Liste des opportunités d'affaires scrapées et filtrées automatiquement.
 - **Contact** : Formulaire pour solliciter les services du cabinet.
 
+![Aperçu des Offres](/public/manuel/offres%202.png)
+
 ### Recherche d'Appels d'offres
 Vous pouvez consulter les dernières offres provenant de sources majeures (Banque Mondiale, BAD, AFD, etc.). Les offres sont filtrées pour ne montrer que celles pertinentes pour vos secteurs d'activité.
 
@@ -28,30 +36,49 @@ Vous pouvez consulter les dernières offres provenant de sources majeures (Banqu
 ## 3. Guide de l'Espace Administration
 *L'accès se fait via le bouton "Se connecter" avec un compte Admin ou Éditeur.*
 
+![Formulaire de Connexion](/public/manuel/CAPTURE%20FORMULAIRE%20CONNEC+XION.png)
+
 ### Gestion du Contenu (CMS)
-- **Articles (Posts)** : Créez, modifiez ou supprimez des articles de blog. Vous pouvez utiliser l'éditeur visuel pour mettre en forme vos textes et uploader des images.
-- **Catégories & Tags** : Organisez vos articles pour faciliter la navigation des utilisateurs.
+- **Articles (Posts)** : Créez, modifiez ou supprimez des articles de blog.
+- **Éditeur** : Utilisez l'interface pour mettre en forme vos articles.
+
+![Gestion des Articles](/public/manuel/ARTICLE1.png)
+![Formulaire Article](/public/manuel/Formulaire%20A1.png)
 
 ### Gestion des Appels d'offres (Scraping)
 C'est le cœur technique de la plateforme. 
-1. **Pôles d'activité** : Définissez vos domaines d'expertise (ex: Environnement, Mines). Associez des **mots-clés** à chaque pôle pour que le système sache quelles offres vous intéressent.
-2. **Règles de filtrage** : Configurez les sources à surveiller et les pays autorisés.
-3. **Lancement du Scraping** :
-    - Allez dans `Admin > Scraping`.
-    - Cliquez sur **Lancer le scraping** pour mettre à jour la liste des offres en temps réel.
-    - Le système passera en revue les sources (World Bank, AfDB, etc.) et ne conservera que les offres correspondant à vos mots-clés et pays.
-4. **Scraping Programmé** : Le système est configuré pour s'exécuter automatiquement à intervalles réguliers pour garantir que vous ne manquiez aucune opportunité.
+
+#### A. Configuration des Pôles d'activité
+Définissez vos domaines d'expertise (ex: Environnement, Mines).
+![Gestion des pôles](/public/manuel/Gestion%20des%20poles.png)
+![Ajout d'un pôle](/public/manuel/Ajouter%20des%20poles.paint)
+
+#### B. Règles de filtrage
+Configurez les sources à surveiller et les pays autorisés. Le système utilise ces règles pour trier les offres récupérées.
+![Règles de filtrage](/public/manuel/REGLE%20DE%20FILTRAGE.png)
+
+#### C. Lancement du Scraping
+1. Allez dans `Admin > Paramètres de Scraping`.
+2. Cliquez sur **Lancer le scraping** pour mettre à jour la liste des offres.
+![Paramètres de Scraping](/public/manuel/PARAMETRE%20DE%20SCRAPING.png)
+
+#### D. Paramètres du Système
+Configurez les clés API et les réglages globaux dans les paramètres.
+![Paramètre 1](/public/manuel/Parametre1.png)
+![Paramètre 2](/public/manuel/Paramztre2.png)
 
 ### Gestion des Utilisateurs (Admin uniquement)
-Permet de créer des comptes pour d'autres membres de l'équipe et de leur attribuer des rôles (Admin ou Éditeur).
+Permet de créer des comptes pour d'autres membres de l'équipe et de leur attribuer des rôles.
+![Gestion Utilisateurs](/public/manuel/Gestion%20USER.png)
+![Création Utilisateur](/public/manuel/USER%20Cread.png)
 
 ---
 
-## 4. Fonctionnalités Spéciales
-- **Authentification Google** : Connectez-vous rapidement en utilisant votre compte professionnel Google.
-- **Filtrage Intelligent** : Les offres sont analysées automatiquement dès leur récupération pour détecter les pays et les domaines d'activité, même si l'orthographe varie légèrement (grâce à notre moteur de correspondance).
+## 4. Fonctionnalités Avancées
+- **Authentification Google** : Connexion simplifiée via Socialite.
+- **Filtrage Intelligent** : Analyse sémantique des offres pour détecter les correspondances avec les mots-clés des pôles d'activité.
 
 ---
 
-## 5. Support Technique
-Pour toute question technique ou demande de modification majeure, veuillez contacter l'administrateur système ou l'équipe de développement.
+## 5. Maintenance et Support
+Pour toute question technique, contactez l'administrateur système.
