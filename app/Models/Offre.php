@@ -17,10 +17,12 @@ class Offre extends Model
         'detail_url',
         'project_id',
         'notice_type',
+        'date_publication',
     ];
 
     protected $casts = [
         'date_limite_soumission' => 'date',
+        'date_publication' => 'date',
     ];
 
     /**

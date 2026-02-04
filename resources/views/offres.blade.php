@@ -4,14 +4,14 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Appels d'Offres et Opportunités | CEGME</title>
+    <title>Appels d'offres et opportunités | CEGME</title>
     <meta name="description"
         content="Consultez les derniers appels d'offres sélectionnés par le CEGME dans les secteurs mines, géosciences et environnement. Saisissez les opportunités en RCA.">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:title" content="Appels d'Offres et Opportunités | CEGME">
+    <meta property="og:title" content="Appels d'offres et opportunités | CEGME">
     <meta property="og:description"
         content="Consultez les derniers appels d'offres et opportunités dans les secteurs mines et environnement.">
     <meta property="og:image" content="{{ asset('Image/CEGME Logo.png') }}">
@@ -232,7 +232,7 @@
             style="margin-top: 40px;">
             <h1 class="mb-6"
                 style="font-size: 60px; font-weight: 700; color: rgb(255, 255, 255); margin-bottom: 24px; text-align: center; line-height: 72px;">
-                Appels d'Offres
+                Appels d'offres
             </h1>
             <p class="mx-auto max-w-3xl"
                 style="font-size: 20px; color: rgb(229, 231, 235); text-align: center; line-height: 32.5px;">
@@ -307,13 +307,14 @@
             <!-- Offres Table -->
             @if($offres->count() > 0)
                 <div class="offres-table-container">
-                    <h2 class="table-title">Tableau de Veille Stratégique : Appels d'Offres & AMI</h2>
+                    <h2 class="table-title">Tableau de veille stratégique : Appels d'offres & AMI</h2>
                     <table class="offres-table">
                         <thead>
                             <tr>
                                 <th>Source</th>
                                 <th>Intitulé de la Mission</th>
                                 <th>Zone Géographique</th>
+                                <th>Date de publication</th>
                                 <th>Date limite</th>
                                 <th>Lien</th>
                             </tr>
@@ -348,6 +349,15 @@
                                         @endif
                                     </td>
                                     <td>
+                                        @if($offre->date_publication)
+                                            <span style="color: #1a1a1a; font-size: 0.875rem;">
+                                                {{ $offre->date_publication->format('d/m/Y') }}
+                                            </span>
+                                        @else
+                                            <span style="color: #9ca3af;">-</span>
+                                        @endif
+                                    </td>
+                                    <td>
                                         @if($offre->date_limite_soumission)
                                             <span style="color: #1a1a1a; font-size: 0.875rem;">
                                                 @if(is_string($offre->date_limite_soumission))
@@ -357,11 +367,7 @@
                                                 @endif
                                             </span>
                                         @else
-                                            @if(($offre->source ?? '') === 'World Bank')
-                                                <span style="color: #9ca3af;">Date limite : À confirmer (World Bank)</span>
-                                            @else
-                                                <span style="color: #9ca3af;">-</span>
-                                            @endif
+                                            <span style="color: #9ca3af;">-</span>
                                         @endif
                                     </td>
                                     <td>
@@ -440,7 +446,7 @@
                             d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
                 </div>
-                <h2 style="font-size: 24px; font-weight: 700; color: #111827; margin-bottom: 1rem;">Accès Restreint</h2>
+                <h2 style="font-size: 24px; font-weight: 700; color: #111827; margin-bottom: 1rem;">Accès restreint</h2>
                 <p style="font-size: 16px; color: #4b5563; margin-bottom: 2rem; line-height: 1.5;">
                     Veuillez vous connecter pour accéder aux appels d'offres et aux opportunités stratégiques de CEGME.
                 </p>
