@@ -5,14 +5,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Nos Réalisations - Projets et Études Stratégiques | CEGME</title>
+    <title>Nos réalisations - Projets et Études Stratégiques | CEGME</title>
     <meta name="description"
         content="Consultez nos réalisations : plus de 70 missions stratégiques en Afrique. Audits E&S, études géologiques et projets d'adduction d'eau en République Centrafricaine.">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:title" content="Nos Réalisations - Projets et Études Stratégiques | CEGME">
+    <meta property="og:title" content="Nos réalisations - Projets et Études Stratégiques | CEGME">
     <meta property="og:description"
         content="Plus de 70 missions stratégiques réalisées à travers l'Afrique depuis 2011 par le cabinet CEGME.">
     <meta property="og:image" content="{{ asset('Image/CEGME Logo.png') }}">
@@ -129,7 +129,7 @@
             style="margin-top: 60px;">
             <h1 class="mb-6"
                 style="font-size: 60px; font-weight: 700; color: rgb(255, 255, 255); margin-bottom: 24px; text-align: center; line-height: 72px;">
-                Nos Réalisations
+                Nos réalisations
             </h1>
             <p class="mx-auto max-w-3xl"
                 style="font-size: 20px; color: rgb(229, 231, 235); text-align: center; line-height: 32.5px;">
@@ -602,7 +602,7 @@
                     </div>
                 </div>
 
-                <!-- Project 3: Audit E&S et EIES - Complexe industriel Palme d'OR -->
+                <!-- Project 3: Audit E&S et EIES - Complexe industriel Palme d'or -->
                 <div x-show="matchesFilter('agro-industrie-services', '2024')" style="position: relative;"
                     data-sector="agro-industrie-services" data-year="2024">
                     <div class="project-card bg-white rounded-2xl shadow-md overflow-hidden"
@@ -629,7 +629,7 @@
                         <div class="project-card-content" style="padding-top: 60px;">
                             <h3 class="text-xl font-bold mb-2"
                                 style="font-size: 20px; font-weight: 700; color: rgb(17, 24, 39); margin-bottom: 8px; line-height: 28px; margin-top: 0;">
-                                Audit E&S et EIES - Complexe industriel Palme d'OR
+                                Audit E&S et EIES - Complexe industriel Palme d'or
                             </h3>
                             <p
                                 style="font-size: 14px; color: rgb(107, 114, 128); line-height: 20px; margin-bottom: 12px;">
@@ -668,7 +668,7 @@
                 </div>
 
                 <!-- 2022 Projects -->
-                <!-- Project 1: EIES - Projet de Réduction de la Vulnérabilité Climatique -->
+                <!-- Project 1: EIES - Projet de réduction de la vulnérabilité climatique -->
                 <div x-show="matchesFilter('mines-energie-hydrocarbures', '2022')" style="position: relative;"
                     data-sector="mines-energie-hydrocarbures" data-year="2022">
                     <div class="project-card bg-white rounded-2xl shadow-md overflow-hidden"
@@ -695,7 +695,7 @@
                         <div class="project-card-content" style="padding-top: 60px;">
                             <h3 class="text-xl font-bold mb-2"
                                 style="font-size: 20px; font-weight: 700; color: rgb(17, 24, 39); margin-bottom: 8px; line-height: 28px; margin-top: 0;">
-                                EIES - Projet de Réduction de la Vulnérabilité Climatique
+                                EIES - Projet de réduction de la vulnérabilité climatique
                             </h3>
                             <p
                                 style="font-size: 14px; color: rgb(107, 114, 128); line-height: 20px; margin-bottom: 12px;">
@@ -1014,7 +1014,7 @@
                             </h3>
                             <p
                                 style="font-size: 14px; color: rgb(107, 114, 128); line-height: 20px; margin-bottom: 12px;">
-                                PGRN / Banque Mondiale
+                                PGRN / Banque mondiale
                             </p>
                             <div
                                 style="display: inline-flex; align-items: center; gap: 6px; background-color: rgb(249, 250, 251); padding: 6px 12px; border-radius: 6px; margin-bottom: 12px;">
@@ -1042,7 +1042,7 @@
                                     capacités</span>
                             </div>
                             <p style="font-size: 14px; color: rgb(107, 114, 128); line-height: 20px; margin: 0;">
-                                Financement : Banque Mondiale
+                                Financement : Banque mondiale
                             </p>
                         </div>
                     </div>
@@ -1786,7 +1786,7 @@
                     </div>
                 </div>
 
-                <!-- Project: Plan de Réinstallation Lobaye (2017, Novembre) -->
+                <!-- Project: Plan de réinstallation Lobaye (2017, Novembre) -->
                 <div x-show="matchesFilter('eau-humanitaire', '2017')" style="position: relative;"
                     data-sector="eau-humanitaire" data-year="2017">
                     <div class="project-card bg-white rounded-2xl shadow-md overflow-hidden"
@@ -1812,7 +1812,7 @@
                         <div class="project-card-content" style="padding-top: 60px;">
                             <h3 class="text-xl font-bold mb-2"
                                 style="font-size: 20px; font-weight: 700; color: rgb(17, 24, 39); margin-bottom: 8px; line-height: 28px; margin-top: 0;">
-                                Plan de Réinstallation Lobaye
+                                Plan de réinstallation Lobaye
                             </h3>
                             <p
                                 style="font-size: 14px; color: rgb(107, 114, 128); line-height: 20px; margin-bottom: 12px;">

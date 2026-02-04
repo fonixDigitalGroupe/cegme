@@ -1153,6 +1153,9 @@ class AFDScraperService implements IterativeScraperInterface
             // Essayer d'abord avec Browsershot pour les pages JavaScript
             try {
                 $html = \Spatie\Browsershot\Browsershot::url($url)
+                    ->setChromePath('/usr/bin/google-chrome')
+                    ->setNodeBinary('/usr/bin/node')
+                    ->ignoreHttpsErrors()
                     ->waitUntilNetworkIdle()
                     ->timeout(30)
                     ->setOption('args', [
@@ -1161,6 +1164,7 @@ class AFDScraperService implements IterativeScraperInterface
                         '--disable-dev-shm-usage',
                         '--disable-accelerated-2d-canvas',
                         '--disable-gpu',
+                        '--ignore-certificate-errors',
                     ])
                     ->userAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
                     ->bodyHtml();

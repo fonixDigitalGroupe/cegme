@@ -28,7 +28,7 @@
             <div class="mobile-menu" id="mobileMenu">
                 <a href="/" class="{{ request()->is('/') ? 'active' : '' }}">Accueil</a>
                 <a href="/a-propos"
-                    class="{{ request()->is('a-propos') || request()->is('a-propos/*') ? 'active' : '' }}">À Propos</a>
+                    class="{{ request()->is('a-propos') || request()->is('a-propos/*') ? 'active' : '' }}">À propos</a>
                 <a href="/services"
                     class="{{ request()->is('services') || request()->is('services/*') ? 'active' : '' }}">Services</a>
                 <a href="/realisations"
@@ -86,7 +86,7 @@
                 @php
                     $navLinks = [
                         ['url' => '/', 'label' => 'Accueil'],
-                        ['url' => '/a-propos', 'label' => 'À Propos'],
+                        ['url' => '/a-propos', 'label' => 'À propos'],
                         ['url' => '/services', 'label' => 'Services'],
                         ['url' => '/realisations', 'label' => 'Réalisations'],
                         ['url' => '/actualites', 'label' => 'Actualités'],

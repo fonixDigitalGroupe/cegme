@@ -73,8 +73,9 @@ class OffreController extends Controller
         $filteredOffres = $filteringService->filterOffers($allOffres);
 
         // Règle métier: inclure TOUTES les World Bank, même si elles ne matchent pas les règles
+        // Règle métier: inclure TOUTES les World Bank et IFAD, même si elles ne matchent pas les règles
         $wbOffres = $allOffres->filter(function ($o) {
-            return $o->source === 'World Bank';
+            return in_array($o->source, ['World Bank', 'IFAD']);
         });
         $filteredOffres = $filteredOffres->merge($wbOffres)->unique('id');
 

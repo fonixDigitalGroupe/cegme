@@ -15,25 +15,25 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         @if(auth()->user()->isAdminOrEditor())
                         <a href="{{ route('admin.dashboard') }}" class="block bg-green-600 text-white px-6 py-4 rounded-lg hover:bg-green-700 transition-colors text-center font-semibold">
-                            📊 Tableau de bord Admin
+                            📊 Tableau de bord admin
                         </a>
                         @endif
                         
                         @if(auth()->user()->isAdmin())
                         <a href="{{ route('admin.users.index') }}" class="block bg-indigo-600 text-white px-6 py-4 rounded-lg hover:bg-indigo-700 transition-colors text-center font-semibold">
-                            👥 Gestion des Utilisateurs
+                            👥 Gestion des utilisateurs
                         </a>
                         @endif
                         
                         @if(auth()->user()->isAdminOrEditor())
                         <a href="{{ route('admin.posts.index') }}" class="block bg-blue-600 text-white px-6 py-4 rounded-lg hover:bg-blue-700 transition-colors text-center font-semibold">
-                            📝 Gestion des Articles/Blog
+                            📝 Gestion des articles/blog
                         </a>
                         @endif
                         
                         @if(auth()->user()->isAdminOrEditor())
                         <a href="{{ route('admin.categories.index') }}" class="block bg-purple-600 text-white px-6 py-4 rounded-lg hover:bg-purple-700 transition-colors text-center font-semibold">
-                            🏷️ Gestion des Catégories
+                            🏷️ Gestion des catégories
                         </a>
                         @endif
                     </div>

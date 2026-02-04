@@ -33,21 +33,21 @@
                     </p>
                 </div>
 
-                <!-- Column 2: Liens Rapides -->
+                <!-- Column 2: Liens rapides -->
                 <div>
-                    <h3 style="font-size: 20px; font-weight: 700; color: #ffffff; margin-bottom: 32px;">Liens Rapides
+                    <h3 style="font-size: 20px; font-weight: 700; color: #ffffff; margin-bottom: 32px;">Liens rapides
                     </h3>
                     <ul
                         style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 14px;">
                         @php
                             $links = [
                                 ['url' => '/', 'label' => 'Accueil'],
-                                ['url' => '/a-propos', 'label' => 'À Propos'],
+                                ['url' => '/a-propos', 'label' => 'À propos'],
                                 ['url' => '/services', 'label' => 'Services'],
                                 ['url' => '/realisations', 'label' => 'Réalisations'],
                                 ['url' => '/actualites', 'label' => 'Actualités'],
                                 ['url' => '/blog', 'label' => 'Blog'],
-                                ['url' => route('appels-offres.index'), 'label' => "Appels d'Offres"],
+                                ['url' => route('appels-offres.index'), 'label' => "Appels d'offres"],
                                 ['url' => '/contact', 'label' => 'Contact'],
                             ];
                         @endphp
@@ -209,11 +209,11 @@
                     </p>
                 </div>
 
-                <!-- Liens Rapides Mobile -->
+                <!-- Liens rapides Mobile -->
                 <div>
                     <h3 class="text-xl font-bold mb-6"
                         style="font-size: 20px; font-weight: 800; margin-bottom: 24px; color: rgb(255, 255, 255); letter-spacing: -0.3px;">
-                        Liens Rapides
+                        Liens rapides
                     </h3>
                     <ul class="space-y-3" style="list-style: none; padding: 0; margin: 0;">
                         <li><a href="/"
@@ -236,7 +236,7 @@
                         </li>
                         <li><a href="{{ route('appels-offres.index') }}"
                                 style="color: rgb(229, 231, 235); text-decoration: none; font-size: 15px; display: block; padding: 6px 0;">Appels
-                                d'Offres</a></li>
+                                d'offres</a></li>
                         <li><a href="/contact"
                                 style="color: rgb(229, 231, 235); text-decoration: none; font-size: 15px; display: block; padding: 6px 0;">Contact</a>
                         </li>

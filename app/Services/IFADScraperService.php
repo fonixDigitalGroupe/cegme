@@ -10,7 +10,7 @@ use Spatie\Browsershot\Browsershot;
 
 class IFADScraperService implements IterativeScraperInterface
 {
-    private const BASE_URL = 'https://www.ifad.org/fr/liste-des-projets';
+    private const BASE_URL = 'https://www.ifad.org/fr/appels-a-proposition';
 
     private ?string $jobId = null;
     private bool $isExhausted = false;
@@ -30,61 +30,38 @@ class IFADScraperService implements IterativeScraperInterface
         $this->isExhausted = false;
     }
 
-    public function scrapeBatch(int $limit = 10): array
+    public function scrapeBatch(int $limit = 50): array
     {
         if ($this->isExhausted) {
             return ['count' => 0, 'has_more' => false, 'findings' => []];
         }
 
-        Log::info('IFAD Scraper: Début du scraping via Browsershot');
+        Log::info('IFAD Scraper: Début du scraping complet avec pagination');
 
         $findings = [];
         $insertedCount = 0;
 
         try {
-            // Using Browsershot to bypass Cloudflare and render JS
+            Log::info('IFAD Scraper: Fetching Page 1');
             $html = Browsershot::url(self::BASE_URL)
                 ->setChromePath('/usr/bin/google-chrome')
+                ->setNodeBinary('/usr/bin/node')
                 ->ignoreHttpsErrors()
                 ->noSandbox()
                 ->waitUntilNetworkIdle()
-                ->timeout(120)
+                ->waitForSelector('.general-feature-card') 
+                ->timeout(240)
                 ->userAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
                 ->bodyHtml();
-
-            // Check if we are blocked
-            if (strpos($html, 'Just a moment') !== false || strpos($html, '_cf_chl_opt') !== false) {
-                Log::error('IFAD Scraper: Cloudflare challenge detected.');
-                $this->isExhausted = true;
-                return ['count' => 0, 'has_more' => false, 'findings' => []];
-            }
 
             $dom = new DOMDocument();
             libxml_use_internal_errors(true);
             @$dom->loadHTML('<?xml encoding="UTF-8">' . $html);
             libxml_clear_errors();
             $xpath = new DOMXPath($dom);
-
-            // Target the "Ongoing" tab (En cours) -> tabPanel4-shsf
-            // Or just the active tab
-            $activeTab = $xpath->query("//div[@role='tabpanel' and @id='tabPanel4-shsf']")->item(0);
-
-            if (!$activeTab) {
-                // Fallback: try to find any active tab
-                 $activeTab = $xpath->query("//div[@role='tabpanel' and not(contains(@class, 'd-none'))]")->item(0);
-            }
-
-            if (!$activeTab) {
-                Log::warning('IFAD Scraper: No active tab found.');
-                $this->isExhausted = true;
-                return ['count' => 0, 'has_more' => false, 'findings' => []];
-            }
-
-            // Find rows containing a project link
-            // Structure: Row -> Col-6 (Link/Title) + Col-2 (Num) + Col-2 (Country) + Col-2 (Date)
-            $rows = $xpath->query(".//div[contains(@class, 'row')][.//a[contains(@href, '/projects/')]]", $activeTab);
             
-            Log::info('IFAD Scraper: Rows found', ['count' => $rows->length]);
+            $rows = $xpath->query("//div[contains(@class, 'general-feature-card')]");
+            Log::info("IFAD Scraper: Cards found on Page 1: " . $rows->length);
 
             foreach ($rows as $row) {
                 try {
@@ -93,7 +70,6 @@ class IFADScraperService implements IterativeScraperInterface
                     if (!$offre || empty($offre['titre']) || empty($offre['lien_source']))
                         continue;
 
-                    // Ensure unique constraint validation
                     if ($this->saveOffre($offre)) {
                         $insertedCount++;
                     }
@@ -106,8 +82,6 @@ class IFADScraperService implements IterativeScraperInterface
                 }
             }
 
-            // With Browsershot and no easy pagination URL, we just scrape the first page (top 20)
-            // effective for daily updates.
             $this->isExhausted = true;
 
             return [
@@ -150,50 +124,66 @@ class IFADScraperService implements IterativeScraperInterface
 
     private function extractOffreData(\DOMNode $row, DOMXPath $xpath): ?array
     {
-        // 1. Link and Title (Col-6)
-        $linkNode = $xpath->query(".//div[contains(@class, 'col') and contains(@class, 'col-lg-6')]//a", $row)->item(0);
-        if (!$linkNode) return null;
+        // TITRE & LIEN
+        // Essayer d'abord la structure "general-feature-card" (Appels à propositions)
+        // .article-content .title
+        $titre = null;
+        $link = null;
 
-        $link = $linkNode->getAttribute('href');
-        $titre = trim($linkNode->textContent);
-
-        // 2. Country (Col-2, usually the 3rd column in the layout: Title | Num | Country | Date)
-        // Let's verify columns by text content or position
+        $titleNode = $xpath->query(".//p[contains(@class, 'title')]", $row)->item(0);
+        if (!$titleNode) {
+            $titleNode = $xpath->query(".//a", $row)->item(0);
+        }
         
-        $pays = null;
-        $date = null;
-
-        // Get all col-lg-2 strings
-        $cols = $xpath->query(".//div[contains(@class, 'col') and contains(@class, 'col-lg-2')]", $row);
-        
-        // Assuming:
-        // Item 0: Project Number (e.g. 2000005031)
-        // Item 1: Country (e.g. Inde)
-        // Item 2: Date (e.g. 29 décembre 2021)
-
-        if ($cols->length >= 2) {
-             $countryNode = $cols->item(1);
-             $pays = trim($countryNode->textContent);
+        if ($titleNode) {
+            $titre = trim($titleNode->textContent);
         }
 
-        if ($cols->length >= 3) {
-             $dateNode = $cols->item(2);
-             $dateStr = trim($dateNode->textContent);
-             if (!empty($dateStr)) {
-                 $date = $this->parseDate($dateStr);
-             }
+        $linkNode = $xpath->query(".//div[contains(@class, 'article-content')]//a", $row)->item(0);
+        if (!$linkNode) {
+            $linkNode = $xpath->query(".//a", $row)->item(0);
+        }
+        
+        if ($linkNode) {
+            $link = $linkNode->getAttribute('href');
+        }
+
+        // Fallback: ancienne structure (si row générique)
+        if (!$titre || !$link) {
+            $linkNode = $xpath->query(".//a", $row)->item(0);
+            if ($linkNode) {
+                $link = $linkNode->getAttribute('href');
+                if (!$titre) {
+                    $titre = trim($linkNode->textContent);
+                }
+            }
+        }
+
+        if (!$link) return null;
+
+        // DATE
+        // Structure: .article-metadata p:last-child (ou p[2]) -> "6 mai 2024"
+        $date = null;
+        $dateNode = $xpath->query(".//div[contains(@class, 'article-metadata')]/p[last()]", $row)->item(0);
+        
+        if ($dateNode) {
+            $dateStr = trim($dateNode->textContent);
+            // Vérifier si c'est une date (contient des chiffres)
+            if (preg_match('/\d/', $dateStr)) {
+                $date = $this->parseDate($dateStr);
+            }
         }
 
         return [
-            'titre' => $this->cleanTitle($titre),
+            'titre' => $this->cleanTitle($titre ?? 'Sans titre'),
             'acheteur' => 'IFAD',
-            'pays' => $pays ?? 'International',
-            'date_limite_soumission' => $date, // Using approval date as a reference date
+            'pays' => 'International',
+            'date_limite_soumission' => $date,
             'lien_source' => $link,
             'source' => 'IFAD',
             'detail_url' => $link,
             'link_type' => 'detail',
-            'notice_type' => 'Projet',
+            'notice_type' => 'Appel à propositions',
             'created_at' => now(),
             'updated_at' => now(),
         ];
@@ -233,11 +223,103 @@ class IFADScraperService implements IterativeScraperInterface
 
     private function cleanTitle(string $titre): string
     {
+        // Nettoyage des espaces et sauts de ligne
         $clean = trim(preg_replace('/\s+/', ' ', $titre));
-        if (strlen($clean) > 250) {
-            return substr($clean, 0, 247) . '...';
+        
+        // Conversion explicite en UTF-8 pour éviter les erreurs SQL sur les caractères bizarres
+        $clean = mb_convert_encoding($clean, 'UTF-8', 'UTF-8');
+        
+        // Troncature à 250 caractères
+        if (mb_strlen($clean) > 250) {
+            return mb_substr($clean, 0, 247) . '...';
         }
         return $clean;
+    }
+
+    /**
+     * Scrape les détails d'un projet pour trouver la date de fin
+     */
+    private function scrapeProjectDetails(string $url): array
+    {
+        try {
+            // Petit délai pour éviter de surcharger
+            usleep(500000); // 0.5s
+
+            $html = Browsershot::url($url)
+                ->setChromePath('/usr/bin/google-chrome')
+                ->setNodeBinary('/usr/bin/node')
+                ->ignoreHttpsErrors()
+                ->noSandbox()
+                ->setOption('args', [
+                    '--disable-blink-features=AutomationControlled',
+                    '--no-sandbox',
+                    '--disable-setuid-sandbox',
+                ])
+                ->setExtraHttpHeaders(['Referer' => self::BASE_URL])
+                ->waitUntilNetworkIdle()
+                ->timeout(90)
+                ->bodyHtml();
+            
+            // Save debug HTML for the first one
+            if (!file_exists(storage_path('logs/debug_ifad_detail.html'))) {
+                file_put_contents(storage_path('logs/debug_ifad_detail.html'), $html);
+                Log::info('IFAD Detail Scraper: Saved debug HTML');
+            }
+
+            $dom = new DOMDocument();
+            libxml_use_internal_errors(true);
+            @$dom->loadHTML('<?xml encoding="UTF-8">' . $html);
+            libxml_clear_errors();
+            $xpath = new DOMXPath($dom);
+
+            $dateFin = null;
+
+            // Debug log
+            Log::info('IFAD Detail Scraper: Visiting ' . $url);
+
+            // Chercher "Duration" ou "Durée"
+            // Texte contenant "Duration" ou "Durée"
+            $durationNodes = $xpath->query("//*[contains(text(), 'Duration') or contains(text(), 'Durée')]");
+            
+            if ($durationNodes->length > 0) {
+                // Chercher dans le parent ou les frères
+                foreach ($durationNodes as $node) {
+                    $context = $node->parentNode->textContent;
+                    // Format: 2018 - 2025
+                    if (preg_match('/(\d{4})\s*-\s*(\d{4})/', $context, $matches)) {
+                        $endYear = $matches[2];
+                        $dateFin = "$endYear-12-31";
+                        Log::info('IFAD Detail Scraper: Found duration end year ' . $endYear);
+                        break;
+                    }
+                }
+            }
+
+            // Si pas de Duration, chercher "Approval Date" ou "Date d'approbation"
+            if (!$dateFin) {
+                // Utilisation de guillemets doubles pour le texte XPath contenant une apostrophe
+                $approvalNodes = $xpath->query('//*[contains(text(), "Approval Date") or contains(text(), "Date d\'approbation")]');
+                if ($approvalNodes && $approvalNodes->length > 0) {
+                     foreach ($approvalNodes as $node) {
+                        $context = $node->parentNode->textContent;
+                        // Extraire une date... bon c'est un peu complexe sans regex précise
+                        // On log juste pour l'instant
+                        Log::info('IFAD Detail Scraper: Found Approval Date context - ' . trim(substr($context, 0, 50)));
+                     }
+                }
+            }
+
+            // Si pas de Duration, chercher "Approval Date" + une durée par défaut ? 
+            // Pour l'instant on se contente de Duration.
+
+            return [
+                'date_fin' => $dateFin
+            ];
+
+        } catch (\Exception $e) {
+            Log::warning('IFAD Detail Scraper Error', ['url' => $url, 'error' => $e->getMessage()]);
+            return [];
+        }
     }
 
     /**

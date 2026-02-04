@@ -73,7 +73,7 @@
             style="margin-top: 60px;">
             <h1 class="mb-6"
                 style="font-size: 60px; font-weight: 700; color: rgb(255, 255, 255); margin-bottom: 24px; text-align: center; line-height: 72px;">
-                Nos Pôles d'Activités
+                Nos pôles d'activités
             </h1>
             <p class="mx-auto max-w-3xl"
                 style="font-size: 20px; color: rgb(229, 231, 235); text-align: center; line-height: 32.5px;">
@@ -164,7 +164,7 @@
                             <div style="flex: 1;">
                                 <h3 class="text-2xl font-bold text-gray-900 mb-2"
                                     style="font-size: 24px; font-weight: 700; color: rgb(17, 24, 39); margin-bottom: 8px;">
-                                    Environnement & Développement Durable
+                                    Environnement & développement durable
                                 </h3>
                                 <p class="text-gray-600"
                                     style="font-size: 16px; color: rgb(75, 85, 99); line-height: 24px;">
@@ -230,12 +230,12 @@
                                 </div>
                                 <h3 class="text-xl font-bold mb-3"
                                     style="font-size: 20px; font-weight: 700; color: rgb(17, 24, 39); margin-bottom: 12px;">
-                                    EIES - Études d'Impact Environnemental et Social
+                                    EIES - Études d'impact environnemental et social
                                 </h3>
                                 <p class="text-gray-600"
                                     style="font-size: 16px; color: rgb(75, 85, 99); line-height: 24px;">
                                     Évaluations complètes conformes aux exigences nationales et standards internationaux
-                                    (IFC, Banque Mondiale, BAD)
+                                    (IFC, Banque mondiale, BAD)
                                 </p>
                             </div>
 
@@ -369,7 +369,7 @@
                             <div style="flex: 1;">
                                 <h3 class="text-2xl font-bold text-gray-900 mb-2"
                                     style="font-size: 24px; font-weight: 700; color: rgb(17, 24, 39); margin-bottom: 8px;">
-                                    Géologie & Mines
+                                    Géologie & mines
                                 </h3>
                                 <p class="text-gray-700"
                                     style="font-size: 16px; color: rgb(55, 65, 81); line-height: 24px;">
@@ -554,7 +554,7 @@
                     </div>
                 </div>
 
-                <!-- Géo-ingénierie Appliquée Tab -->
+                <!-- Géo-ingénierie appliquée Tab -->
                 <div x-show="activeTab === 'geo-ingenierie'" x-transition role="tabpanel">
                     <!-- Carte d'en-tête avec fond bleu clair -->
                     <div class="bg-blue-50 rounded-2xl p-8 mb-8 border border-gray-100"
@@ -577,7 +577,7 @@
                             <div style="flex: 1;">
                                 <h3 class="text-2xl font-bold text-gray-900 mb-2"
                                     style="font-size: 24px; font-weight: 700; color: rgb(17, 24, 39); margin-bottom: 8px;">
-                                    Géo-ingénierie Appliquée
+                                    Géo-ingénierie appliquée
                                 </h3>
                                 <p class="text-gray-700"
                                     style="font-size: 16px; color: rgb(55, 65, 81); line-height: 24px;">
@@ -788,7 +788,7 @@
                             <div style="flex: 1;">
                                 <h3 class="text-2xl font-bold text-gray-900 mb-2"
                                     style="font-size: 24px; font-weight: 700; color: rgb(17, 24, 39); margin-bottom: 8px;">
-                                    Conseil, Investissement & RSE
+                                    Conseil, investissement & RSE
                                 </h3>
                                 <p class="text-gray-700"
                                     style="font-size: 16px; color: rgb(55, 65, 81); line-height: 24px;">
@@ -998,7 +998,7 @@
                     </p>
                 </div>
 
-                <!-- Card 3: Banque Mondiale -->
+                <!-- Card 3: Banque mondiale -->
                 <div class="bg-gray-50 rounded-lg p-4 text-center"
                     style="background-color: rgb(248, 250, 252); border-radius: 8px; padding: 20px; text-align: center;">
                     <div class="flex justify-center mb-3"
@@ -1014,7 +1014,7 @@
                     </div>
                     <h3 class="text-lg font-bold mb-2"
                         style="font-size: 18px; font-weight: 700; color: rgb(17, 24, 39); margin-bottom: 6px;">
-                        Banque Mondiale
+                        Banque mondiale
                     </h3>
                     <p class="text-gray-600" style="font-size: 16px; color: rgb(75, 85, 99);">
                         Cadres de sauvegarde

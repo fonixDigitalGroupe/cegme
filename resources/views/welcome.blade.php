@@ -903,7 +903,7 @@
         </div>
     </section>
 
-    <!-- Nos Pôles d'Activités Section - Enhanced Design -->
+    <!-- Nos pôles d'activités Section - Enhanced Design -->
     <section class="w-full bg-white px-4 sm:px-6 lg:px-8"
         style="padding: 80px 0; margin: 0; border: none !important; border-top: none !important; border-bottom: none !important; outline: none !important; background-color: #ffffff !important;">
         <div class="max-w-5xl mx-auto"
@@ -912,7 +912,7 @@
             <div class="text-center mb-16" style="text-align: center; margin-bottom: 64px;">
                 <h2 class="text-4xl font-bold text-black mb-4"
                     style="font-size: 40px; font-weight: 800; color: rgb(17, 24, 39); margin-bottom: 16px; text-align: center; line-height: 48px; letter-spacing: -0.5px;">
-                    Nos Pôles d'Activités
+                    Nos pôles d'activités
                 </h2>
                 <div class="w-24 h-1 bg-gradient-to-r from-green-500 to-green-600 rounded-full mx-auto mb-6"
                     style="width: 96px; height: 4px; background: linear-gradient(90deg, rgb(5, 150, 105) 0%, rgb(16, 185, 129) 100%); border-radius: 9999px; margin: 0 auto 24px;">
@@ -1013,7 +1013,7 @@
                     </div>
                 </div>
 
-                <!-- Card 3: Géo-ingénierie Appliquée -->
+                <!-- Card 3: Géo-ingénierie appliquée -->
                 <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:-translate-y-2"
                     style="border-radius: 16px; padding: 32px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); transition: all 0.3s ease; border: 1px solid rgba(229, 231, 235, 0.8); position: relative; overflow: hidden; cursor: default;">
                     <!-- Effet de fond décoratif -->
@@ -1036,7 +1036,7 @@
                         <!-- Title -->
                         <h3 class="text-xl font-bold mb-4"
                             style="font-size: 22px; font-weight: 800; color: rgb(17, 24, 39); margin-bottom: 16px; line-height: 30px; letter-spacing: -0.3px;">
-                            Géo-ingénierie Appliquée
+                            Géo-ingénierie appliquée
                         </h3>
                         <!-- Description -->
                         <p class="text-gray-600 mb-5"
@@ -1128,10 +1128,10 @@
             <div
                 class="logos-grid-container flex flex-wrap justify-center items-center gap-4 md:gap-6 max-w-7xl mx-auto">
 
-                <!-- Logo 1: Banque Mondiale -->
+                <!-- Logo 1: Banque mondiale -->
                 <div class="bg-white rounded-xl lg:rounded-2xl p-6 lg:p-4 shadow-md lg:shadow-[0_4px_20px_rgb(0,0,0,0.04)] border border-gray-200 lg:border-white flex items-center justify-center flex-shrink-0 lg:flex-shrink"
                     style="background-color: #ffffff; display: flex; align-items: center; justify-content: center; min-height: 120px; min-width: 140px; lg:min-height: 140px; lg:min-width: 0;">
-                    <img src="{{ asset('Image/Wordbank.png') }}" alt="Banque Mondiale"
+                    <img src="{{ asset('Image/Wordbank.png') }}" alt="Banque mondiale"
                         class="max-w-full max-h-full object-contain lg:filter lg:grayscale lg:hover:grayscale-0 transition-all duration-300"
                         loading="lazy"
                         style="max-width: 100%; max-height: 70px; lg:max-height: 80px; object-fit: contain;">
@@ -1265,7 +1265,7 @@
                             style="font-weight: 700;">"plus-value"</strong> :
                         nous offrons aux investisseurs internationaux et nationaux la rigueur des bonnes pratiques
                         (<strong class="font-extrabold text-black"
-                            style="font-weight: 700; color: rgb(17, 24, 39);">SFI, Banque Mondiale,
+                            style="font-weight: 700; color: rgb(17, 24, 39);">SFI, Banque mondiale,
                             BAD</strong>) tout en garantissant un ancrage local et une maîtrise des réalités
                         sociopolitiques de la région. En valorisant le contenu local et le capital humain centrafricain,
                         nous sécurisons vos actifs et bâtissons une prospérité durable pour la Nation. »
@@ -1303,7 +1303,7 @@
         </div>
     </section>
 
-    <!-- Projets Récents Section -->
+    <!-- Projets récents Section -->
     <section class="w-full bg-white px-4 sm:px-6 lg:px-8"
         style="padding: 80px 0; margin: 0; background-color: #ffffff !important;">
         <div class="max-w-7xl mx-auto">
@@ -1311,7 +1311,7 @@
             <div class="text-center mb-16" style="text-align: center; margin-bottom: 64px;">
                 <h2 class="text-4xl font-bold text-black mb-4"
                     style="font-size: 40px; font-weight: 800; color: rgb(17, 24, 39); margin-bottom: 16px; text-align: center; line-height: 48px; letter-spacing: -0.5px;">
-                    Projets Récents
+                    Projets récents
                 </h2>
                 <div class="w-24 h-1 bg-gradient-to-r from-green-500 to-green-600 rounded-full mx-auto mb-6"
                     style="width: 96px; height: 4px; background: linear-gradient(90deg, rgb(5, 150, 105) 0%, rgb(16, 185, 129) 100%); border-radius: 9999px; margin: 0 auto 24px;">
@@ -1416,7 +1416,7 @@
                     <div class="relative overflow-hidden"
                         style="position: relative; overflow: hidden; height: 260px; background-color: #f3f4f6;">
                         <img src="{{ asset('Image/Exploitation Rivière Sangha.jpg') }}"
-                            alt="EIES - Projet de Réduction de la Vulnérabilité Climatique"
+                            alt="EIES - Projet de réduction de la vulnérabilité climatique"
                             class="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
                             loading="lazy"
                             style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; display: block;">
@@ -1438,7 +1438,7 @@
                         </div>
                         <h3 class="text-xl font-bold mb-3"
                             style="font-size: 20px; font-weight: 800; color: rgb(17, 24, 39); margin-bottom: 12px; line-height: 28px; letter-spacing: -0.3px;">
-                            EIES - Projet de Réduction de la Vulnérabilité Climatique
+                            EIES - Projet de réduction de la vulnérabilité climatique
                         </h3>
                         <p class="text-gray-600 mb-2"
                             style="font-size: 14px; font-weight: 600; color: rgb(107, 114, 128);">
@@ -1469,7 +1469,7 @@
         </div>
     </section>
 
-    <!-- Notre Approche Section - Enhanced Design -->
+    <!-- Notre approche Section - Enhanced Design -->
     <section class="w-full bg-gray-100 px-4 sm:px-6 lg:px-8"
         style="padding: 32px 0; margin: 0; background-color: #f9fafb !important;">
         <div class="max-w-7xl mx-auto">
@@ -1477,7 +1477,7 @@
             <div class="text-center mb-8" style="text-align: center; margin-bottom: 32px;">
                 <h2 class="text-4xl font-bold text-black mb-3"
                     style="font-size: 40px; font-weight: 700; color: rgb(17, 24, 39); margin-bottom: 12px; text-align: center;">
-                    Notre Approche
+                    Notre approche
                 </h2>
                 <p class="text-lg text-gray-600 mx-auto"
                     style="font-size: 18px; color: #6b7280; max-width: 700px; margin: 0 auto; text-align: center;">
@@ -1510,7 +1510,7 @@
                     </p>
                 </div>
 
-                <!-- Step 2: Méthodologie Adaptée -->
+                <!-- Step 2: Méthodologie adaptée -->
                 <div class="text-center"
                     style="text-align: center; display: flex; flex-direction: column; align-items: center; position: relative; z-index: 2;">
                     <!-- Connecting Line -->
@@ -1523,7 +1523,7 @@
                     <!-- Title -->
                     <h3 class="text-xl font-bold mb-1.5"
                         style="font-size: 20px; font-weight: 700; color: rgb(17, 24, 39); margin: 0 auto 6px; line-height: 28px; text-align: center; width: 100%;">
-                        Méthodologie Adaptée
+                        Méthodologie adaptée
                     </h3>
                     <!-- Description -->
                     <p class="text-gray-600"
@@ -1532,7 +1532,7 @@
                     </p>
                 </div>
 
-                <!-- Step 3: Études de Terrain -->
+                <!-- Step 3: Études de terrain -->
                 <div class="text-center"
                     style="text-align: center; display: flex; flex-direction: column; align-items: center; position: relative; z-index: 2;">
                     <!-- Connecting Line -->
@@ -1545,7 +1545,7 @@
                     <!-- Title -->
                     <h3 class="text-xl font-bold mb-1.5"
                         style="font-size: 20px; font-weight: 700; color: rgb(17, 24, 39); margin: 0 auto 6px; line-height: 28px; text-align: center; width: 100%;">
-                        Études de Terrain
+                        Études de terrain
                     </h3>
                     <!-- Description -->
                     <p class="text-gray-600"
@@ -1577,13 +1577,13 @@
         </div>
     </section>
 
-    <!-- Besoin d'une Étude de Terrain ? Section -->
+    <!-- Besoin d'une étude de terrain ? Section -->
     <section class="w-full px-4 sm:px-6 lg:px-8"
         style="padding: 80px 0; margin: 0; background: linear-gradient(180deg, rgb(15, 64, 62) 0%, rgb(22, 78, 75) 50%, rgb(25, 85, 82) 100%);">
         <div class="max-w-4xl mx-auto text-center">
             <h2 class="text-4xl font-bold text-white mb-4"
                 style="font-size: 40px; font-weight: 700; color: rgb(255, 255, 255); margin-bottom: 16px; text-align: center;">
-                Besoin d'une Étude de Terrain ?
+                Besoin d'une étude de terrain ?
             </h2>
             <p class="text-xl text-white mb-8"
                 style="font-size: 20px; color: rgb(255, 255, 255); margin-bottom: 32px; text-align: center; line-height: 30px;">

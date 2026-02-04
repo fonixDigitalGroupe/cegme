@@ -5,14 +5,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>À Propos de Nous - Expertise et Valeurs | CEGME</title>
+    <title>À propos de nous - Expertise et Valeurs | CEGME</title>
     <meta name="description"
         content="Découvrez l'histoire et les valeurs du CEGME. Un puzzle de spécialistes au service de l'émergence en RCA dans les domaines des mines et de l'environnement.">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:title" content="À Propos de Nous - Expertise et Valeurs | CEGME">
+    <meta property="og:title" content="À propos de nous - Expertise et Valeurs | CEGME">
     <meta property="og:description"
         content="Découvrez l'histoire et les valeurs du CEGME. Un puzzle de spécialistes au service de l'émergence en RCA.">
     <meta property="og:image" content="{{ asset('Image/Cabinet d\'Études Géologiques.jpg') }}">
@@ -63,7 +63,7 @@
             style="margin-top: 40px;">
             <h1 class="mb-6"
                 style="font-size: 60px; font-weight: 700; color: rgb(255, 255, 255); margin-bottom: 24px; text-align: center; line-height: 72px; font-family: 'Georgia', 'Times New Roman', Times, serif;">
-                À Propos de Nous
+                À propos de nous
             </h1>
             <p class="mx-auto max-w-3xl"
                 style="font-size: 20px; color: rgb(229, 231, 235); text-align: center; line-height: 32.5px; font-family: 'Georgia', 'Times New Roman', Times, serif;">
@@ -96,7 +96,7 @@
                     </div>
                     <h2 class="text-3xl font-bold mb-6"
                         style="font-size: 32px; font-weight: 700; color: rgb(17, 24, 39); margin-bottom: 24px; line-height: 40px; font-family: 'Georgia', 'Times New Roman', Times, serif;">
-                        Cabinet d'Études Géologiques, Minières et Environnementales
+                        Cabinet d'études géologiques, minières et environnementales
                     </h2>
                     <p class="text-gray-700 mb-4"
                         style="font-size: 16px; color: rgb(55, 65, 81); line-height: 26px; margin-bottom: 16px; font-family: 'Georgia', 'Times New Roman', Times, serif;">
@@ -215,11 +215,11 @@
                 </div>
             </section>
 
-            <!-- Nos Valeurs Section -->
+            <!-- Nos valeurs Section -->
             <section class="mb-20" style="margin-bottom: 80px;">
                 <h2 class="text-4xl font-bold text-center mb-12"
                     style="font-size: 36px; font-weight: 700; color: rgb(17, 24, 39); margin-bottom: 48px; text-align: center;">
-                    Nos Valeurs
+                    Nos valeurs
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8" style="display: grid; gap: 32px;">
                     <!-- Card 1: Développement Durable -->

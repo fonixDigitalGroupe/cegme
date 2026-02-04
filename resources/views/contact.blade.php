@@ -64,7 +64,7 @@
             style="margin-top: 60px;">
             <h1 class="mb-6"
                 style="font-size: 60px; font-weight: 700; color: rgb(255, 255, 255); margin-bottom: 24px; text-align: center; line-height: 72px;">
-                Contactez-Nous
+                Contactez-nous
             </h1>
             <p class="mx-auto max-w-3xl"
                 style="font-size: 20px; color: rgb(229, 231, 235); text-align: center; line-height: 32.5px;">
@@ -151,7 +151,7 @@
                 <div class="text-center mb-8" style="margin-bottom: 32px; text-align: center;">
                     <h2 class="text-4xl font-bold mb-4"
                         style="font-size: 36px; font-weight: 700; color: rgb(17, 24, 39); margin-bottom: 16px;">
-                        Envoyez-nous un Message
+                        Envoyez-nous un message
                     </h2>
                     <p class="text-lg text-gray-600"
                         style="font-size: 16px; color: rgb(75, 85, 99); margin-bottom: 0px;">

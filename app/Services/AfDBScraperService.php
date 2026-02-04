@@ -246,6 +246,9 @@ class AfDBScraperService implements IterativeScraperInterface
 
             try {
                 $html = Browsershot::url($url)
+                    ->setChromePath('/usr/bin/google-chrome')
+                    ->setNodeBinary('/usr/bin/node')
+                    ->setNpmBinary('/usr/bin/npm')
                     ->waitUntilNetworkIdle()
                     ->timeout(90)
                     ->setOption('args', [
@@ -349,8 +352,10 @@ class AfDBScraperService implements IterativeScraperInterface
                 Log::debug('AfDB Scraper: Using Browsershot to fetch page', ['url' => $url]);
 
                 $html = Browsershot::url($url)
+                    ->setChromePath('/usr/bin/google-chrome')
+                    ->setNodeBinary('/usr/bin/node')
                     ->waitUntilNetworkIdle()
-                    ->timeout(30) // Réduit à 30s pour plus de réactivité
+                    ->timeout(90) // Augmenté à 90s pour plus de stabilité
                     ->setOption('args', [
                         '--no-sandbox',
                         '--disable-setuid-sandbox',
@@ -1323,6 +1328,9 @@ class AfDBScraperService implements IterativeScraperInterface
                 Log::debug('AfDB Scraper: Using Browsershot to fetch detail page for deadline', ['url' => $url]);
 
                 $html = Browsershot::url($url)
+                    ->setChromePath('/usr/bin/google-chrome')
+                    ->setNodeBinary('/usr/bin/node')
+                    ->ignoreHttpsErrors()
                     ->waitUntilNetworkIdle()
                     ->timeout(30)
                     ->setOption('args', [
@@ -1331,6 +1339,7 @@ class AfDBScraperService implements IterativeScraperInterface
                         '--disable-dev-shm-usage',
                         '--disable-accelerated-2d-canvas',
                         '--disable-gpu',
+                        '--ignore-certificate-errors',
                     ])
                     ->userAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
                     ->bodyHtml();
