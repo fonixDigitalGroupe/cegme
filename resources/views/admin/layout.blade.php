@@ -334,6 +334,7 @@
     </script>
 </head>
 <body>
+    @include('partials.page-loader')
     <!-- Header -->
     <header class="header">
         <div style="display: flex; align-items: center; justify-content: space-between;">

@@ -107,6 +107,7 @@
 
 <body class="bg-white text-[#1b1b18] min-h-screen" x-data="{ activeFilter: 'all', searchQuery: '' }"
     style="background-color: #ffffff !important;">
+    @include('partials.page-loader')
     <!-- Header from Contact/Services/Realisations Page -->
     <x-site-header />
 

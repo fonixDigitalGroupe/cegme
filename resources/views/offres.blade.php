@@ -116,16 +116,13 @@
             background-color: #f8f9fa;
         }
 
-        .offres-table tbody tr:nth-child(even) {
+        .offres-table tbody tr:nth-child(even),
+        .offres-table tbody tr:nth-child(odd) {
             background-color: #ffffff;
         }
 
-        .offres-table tbody tr:nth-child(odd) {
-            background-color: #f8f9fa;
-        }
-
-        .offres-table tbody tr:nth-child(odd):hover {
-            background-color: #e9ecef;
+        .offres-table tbody tr:hover {
+            background-color: #f8f9fa !important;
         }
 
         .offres-table tbody tr:last-child td {
@@ -223,6 +220,7 @@
 </head>
 
 <body>
+    @include('partials.page-loader')
     <x-site-header />
 
     <!-- Hero Section - Page Header -->
@@ -248,18 +246,35 @@
             <!-- Filtres -->
             <div class="filters-container"
                 style="background-color: #ffffff; border: 1px solid #dee2e6; border-radius: 4px; padding: 1.5rem; margin-bottom: 2rem;">
-                <form method="GET" action="{{ route('appels-offres.index') }}" class="filters-form"
+                
+                <form method="GET" action="{{ route('appels-offres.index') }}" class="filters-form" id="filter-form"
                     style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; align-items: end;">
+                    <input type="hidden" name="status" value="{{ $status ?? 'en_cours' }}">
                     <!-- Type de marché -->
                     <div class="filter-group">
                         <label for="market_type"
                             style="display: block; font-size: 0.875rem; font-weight: 600; color: #495057; margin-bottom: 0.5rem;">Type
                             de marché</label>
-                        <select name="market_type" id="market_type"
+                        <select name="market_type" id="market_type" onchange="this.form.submit()"
                             style="width: 100%; padding: 0.625rem 0.75rem; border: 1px solid #dee2e6; border-radius: 4px; font-size: 0.875rem; color: #495057; background-color: #ffffff;">
                             <option value="">Tous</option>
                             <option value="bureau_d_etude" {{ request('market_type') === 'bureau_d_etude' ? 'selected' : '' }}>Bureau d'études</option>
                             <option value="consultant_individuel" {{ request('market_type') === 'consultant_individuel' ? 'selected' : '' }}>Consultant individuel</option>
+                        </select>
+                    </div>
+
+                    <!-- Zone / Région -->
+                    <div class="filter-group">
+                        <label for="sub_region"
+                            style="display: block; font-size: 0.875rem; font-weight: 600; color: #495057; margin-bottom: 0.5rem;">Zone / Région</label>
+                        <select name="sub_region" id="sub_region" onchange="this.form.submit()"
+                            style="width: 100%; padding: 0.625rem 0.75rem; border: 1px solid #dee2e6; border-radius: 4px; font-size: 0.875rem; color: #495057; background-color: #ffffff;">
+                            <option value="">Toute l'Afrique</option>
+                            @foreach($africanRegions as $key => $region)
+                                <option value="{{ $key }}" {{ request('sub_region') === $key ? 'selected' : '' }}>
+                                    {{ $region['label'] }}
+                                </option>
+                            @endforeach
                         </select>
                     </div>
 
@@ -268,38 +283,60 @@
                         <label for="activity_pole_id"
                             style="display: block; font-size: 0.875rem; font-weight: 600; color: #495057; margin-bottom: 0.5rem;">Pôle
                             d'activité</label>
-                        <select name="activity_pole_id" id="activity_pole_id"
+                        <select name="activity_pole_id" id="activity_pole_id" onchange="this.form.submit()"
                             style="width: 100%; padding: 0.625rem 0.75rem; border: 1px solid #dee2e6; border-radius: 4px; font-size: 0.875rem; color: #495057; background-color: #ffffff;">
                             <option value="">Tous</option>
                             @foreach($activityPoles ?? [] as $pole)
                                 @if(is_object($pole))
-                                    <option value="{{ $pole->id }}" {{ request('activity_pole_id') == $pole->id ? 'selected' : '' }}>
+                                    <option value="{{ $pole->id }}" 
+                                        data-keywords="{{ $pole->keywords->pluck('keyword')->implode(', ') }}"
+                                        {{ request('activity_pole_id') == $pole->id ? 'selected' : '' }}>
                                         {{ $pole->name }}
                                     </option>
                                 @endif
                             @endforeach
                         </select>
+                        <script>
+                            document.getElementById('activity_pole_id').addEventListener('change', function() {
+                                var selectedOption = this.options[this.selectedIndex];
+                                var keywords = selectedOption.getAttribute('data-keywords');
+                                var keywordInput = document.getElementById('keyword');
+                                if (keywords) {
+                                    keywordInput.value = keywords;
+                                } else {
+                                    keywordInput.value = ''; // Optionnel : vider si "Tous"
+                                }
+                                this.form.submit();
+                            });
+                        </script>
                     </div>
 
                     <!-- Mot-clé -->
                     <div class="filter-group">
                         <label for="keyword"
                             style="display: block; font-size: 0.875rem; font-weight: 600; color: #495057; margin-bottom: 0.5rem;">Mot-clé</label>
-                        <input type="text" name="keyword" id="keyword" value="{{ request('keyword') }}"
-                            placeholder="Rechercher..."
-                            style="width: 100%; padding: 0.625rem 0.75rem; border: 1px solid #dee2e6; border-radius: 4px; font-size: 0.875rem; color: #495057;">
+                        <input type="text" name="keyword" id="keyword" value="{{ request('keyword') }}" readonly
+                            placeholder="Sélectionnez un pôle..."
+                            style="width: 100%; padding: 0.625rem 0.75rem; border: 1px solid #dee2e6; border-radius: 4px; font-size: 0.875rem; color: #6c757d; background-color: #e9ecef; cursor: not-allowed;">
                     </div>
 
-                    <!-- Boutons -->
-                    <div class="filter-actions" style="display: flex; gap: 0.5rem;">
-                        <button type="submit"
-                            style="padding: 0.625rem 1.5rem; background: linear-gradient(180deg, #0a9678 0%, #10b981 100%); color: #ffffff; border: none; border-radius: 4px; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
-                            Filtrer
-                        </button>
-                        <a href="{{ route('appels-offres.index') }}"
-                            style="padding: 0.625rem 1.5rem; background-color: #6c757d; color: #ffffff; border: none; border-radius: 4px; font-size: 0.875rem; font-weight: 600; text-decoration: none; display: inline-block; transition: all 0.2s;">
-                            Réinitialiser
-                        </a>
+
+
+                    <!-- Status Toggle -->
+                    <div class="filter-group">
+                        <label
+                            style="display: block; font-size: 0.875rem; font-weight: 600; color: #495057; margin-bottom: 0.5rem;">Statut</label>
+                        <div style="display: flex; background-color: #ffffff; border: 1px solid #dee2e6; border-radius: 4px; overflow: hidden;">
+                            <button type="submit" name="status" value="en_cours" form="filter-form"
+                                style="flex: 1; padding: 0.625rem 0.75rem; border: none; font-size: 0.875rem; cursor: pointer; transition: all 0.2s; {{ ($status ?? 'en_cours') == 'en_cours' ? 'background-color: #0a9678; color: #ffffff; font-weight: 600;' : 'background-color: #ffffff; color: #495057;' }}">
+                                En cours
+                            </button>
+                            <div style="width: 1px; background-color: #dee2e6;"></div>
+                            <button type="submit" name="status" value="cloture" form="filter-form"
+                                style="flex: 1; padding: 0.625rem 0.75rem; border: none; font-size: 0.875rem; cursor: pointer; transition: all 0.2s; {{ ($status ?? 'en_cours') == 'cloture' ? 'background-color: #ef4444; color: #ffffff; font-weight: 600;' : 'background-color: #ffffff; color: #495057;' }}">
+                                Clôturés
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -324,7 +361,9 @@
                                 <tr>
                                     <td>
                                         @if($offre->source)
-                                            <span style="color: #1a1a1a; font-size: 0.875rem;">{{ $offre->source }}</span>
+                                            <span style="color: #1a1a1a; font-size: 0.875rem;">
+                                                {{ \App\Services\TranslationService::translateSource($offre->source) }}
+                                            </span>
                                         @else
                                             <span style="color: #9ca3af;">-</span>
                                         @endif
@@ -332,9 +371,13 @@
                                     <td>
                                         @if($offre->lien_source)
                                             <a href="{{ $offre->lien_source }}" target="_blank" rel="noopener noreferrer"
-                                                class="offre-title">{{ $offre->titre }}</a>
+                                                class="offre-title">
+                                                {{ \App\Services\TranslationService::translateTitle($offre->titre) }}
+                                            </a>
                                         @else
-                                            <div class="offre-title">{{ $offre->titre }}</div>
+                                            <div class="offre-title">
+                                                {{ \App\Services\TranslationService::translateTitle($offre->titre) }}
+                                            </div>
                                         @endif
                                     </td>
                                     <td>
@@ -343,7 +386,9 @@
                                             $paysToDisplay = $offre->filtered_pays ?? $offre->pays;
                                         @endphp
                                         @if($paysToDisplay)
-                                            <span style="color: #1a1a1a; font-size: 0.875rem;">{{ $paysToDisplay }}</span>
+                                            <span style="color: #1a1a1a; font-size: 0.875rem;">
+                                                {{ \App\Services\AfricanCountriesService::translateCountry($paysToDisplay) }}
+                                            </span>
                                         @else
                                             <span style="color: #9ca3af;">-</span>
                                         @endif
@@ -354,7 +399,7 @@
                                                 {{ $offre->date_publication->format('d/m/Y') }}
                                             </span>
                                         @else
-                                            <span style="color: #9ca3af;">-</span>
+                                            <span style="color: #9ca3af; font-style: italic; font-size: 0.8rem;">Non définie</span>
                                         @endif
                                     </td>
                                     <td>
@@ -367,7 +412,7 @@
                                                 @endif
                                             </span>
                                         @else
-                                            <span style="color: #9ca3af;">-</span>
+                                            <span style="color: #9ca3af; font-style: italic; font-size: 0.8rem;">Non définie</span>
                                         @endif
                                     </td>
                                     <td>
@@ -398,30 +443,7 @@
                             <a href="{{ $offres->previousPageUrl() }}" class="pagination-button">Préc</a>
                         @endif
 
-                        @if($offres->currentPage() > 1)
-                            <a href="{{ $offres->url(1) }}" class="pagination-button">1</a>
-                        @endif
-
-                        @if($offres->currentPage() > 3)
-                            <span class="pagination-button disabled">...</span>
-                        @endif
-
-                        @for($i = max(1, $offres->currentPage() - 1); $i <= min($offres->lastPage(), $offres->currentPage() + 1); $i++)
-                            @if($i == $offres->currentPage())
-                                <span class="pagination-button active">{{ $i }}</span>
-                            @else
-                                <a href="{{ $offres->url($i) }}" class="pagination-button">{{ $i }}</a>
-                            @endif
-                        @endfor
-
-                        @if($offres->currentPage() < $offres->lastPage() - 2)
-                            <span class="pagination-button disabled">...</span>
-                        @endif
-
-                        @if($offres->currentPage() < $offres->lastPage() && $offres->lastPage() > 1)
-                            <a href="{{ $offres->url($offres->lastPage()) }}"
-                                class="pagination-button">{{ $offres->lastPage() }}</a>
-                        @endif
+                        <span class="pagination-button active">{{ $offres->currentPage() }}</span>
 
                         @if($offres->hasMorePages())
                             <a href="{{ $offres->nextPageUrl() }}" class="pagination-button">Suiv</a>

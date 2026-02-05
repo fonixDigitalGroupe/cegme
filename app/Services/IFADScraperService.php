@@ -7,6 +7,7 @@ use DOMDocument;
 use DOMXPath;
 use Illuminate\Support\Facades\Log;
 use Spatie\Browsershot\Browsershot;
+use App\Services\MarketTypeClassifier;
 
 class IFADScraperService implements IterativeScraperInterface
 {
@@ -184,6 +185,7 @@ class IFADScraperService implements IterativeScraperInterface
             'detail_url' => $link,
             'link_type' => 'detail',
             'notice_type' => 'Appel à propositions',
+            'market_type' => MarketTypeClassifier::classify($this->cleanTitle($titre ?? '')),
             'created_at' => now(),
             'updated_at' => now(),
         ];

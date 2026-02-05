@@ -219,6 +219,7 @@
 </head>
 
 <body>
+    @include('partials.page-loader')
     <!-- Header -->
     <header class="w-full bg-white sticky top-0 z-50"
         style="position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000; background-color: rgb(255, 255, 255); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">

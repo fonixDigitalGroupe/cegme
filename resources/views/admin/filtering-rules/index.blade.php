@@ -14,7 +14,7 @@
             <div style="display: flex; align-items: center; gap: 0.5rem;">
                 <label style="font-size: 0.875rem; font-weight: 500; color: #374151;">Fréquence:</label>
                 <select id="scraping-frequency"
-                    style="padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 4px; font-size: 0.875rem; color: #374151; background-color: #ffffff; cursor: pointer;">
+                    style="min-width: 200px; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 4px; font-size: 0.875rem; color: #374151; background-color: #ffffff; cursor: pointer;">
                     <option value="1min">Toutes les 1 minute</option>
                     <option value="30min">Toutes les 30 minutes</option>
                     <option value="1hour">Toutes les 1 heure</option>
@@ -23,10 +23,10 @@
             </div>
 
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-                <label style="font-size: 0.875rem; font-weight: 500; color: #374151;">Statut:</label>
+                <label style="font-size: 0.875rem; font-weight: 500; color: #000000;">Statut:</label>
                 <label style="display: inline-flex; align-items: center; cursor: pointer;">
                     <input type="checkbox" id="scraping-active"
-                        style="width: 18px; height: 18px; cursor: pointer; margin-right: 0.5rem;">
+                        style="width: 18px; height: 18px; cursor: pointer; margin-right: 0.5rem; accent-color: #10b981;">
                     <span id="scraping-status-text" style="font-size: 0.875rem; color: #6b7280;">Inactif</span>
                 </label>
             </div>
@@ -36,7 +36,7 @@
                 Enregistrer
             </button>
 
-            <div id="schedule-info" style="font-size: 0.8125rem; color: #6b7280; margin-left: auto;">
+            <div id="schedule-info" style="font-size: 0.8125rem; color: #374151; margin-left: auto; border: 1px solid #d1d5db; background-color: #f9fafb; padding: 0.5rem 0.75rem; border-radius: 4px; font-weight: 500;">
                 <span id="next-run-text"></span>
             </div>
         </div>
@@ -48,6 +48,10 @@
             <button id="start-scraping-simple" type="button"
                 style="background-color: #3b82f6; color: white; border: none; padding: 0.625rem 1.25rem; font-weight: 500; font-size: 0.875rem; border-radius: 4px; cursor: pointer;">
                 Lancer le scraping
+            </button>
+            <button id="cancel-scraping-simple" type="button"
+                style="display: none; background-color: #ef4444; color: white; border: none; padding: 0.625rem 1.25rem; font-weight: 500; font-size: 0.875rem; border-radius: 4px; cursor: pointer;">
+                Arrêter le scraping
             </button>
             <a href="{{ route('admin.filtering-rules.create') }}" class="btn"
                 style="background-color: #00C853; color: white; border: none; padding: 0.625rem 1.25rem; font-weight: 500; font-size: 0.875rem; border-radius: 4px; text-decoration: none; display: inline-flex; align-items: center;">
@@ -74,15 +78,7 @@
                     <th
                         style="padding: 0.75rem 1rem; text-align: left; font-size: 0.8125rem; font-weight: 600; color: #374151;">
                         Source</th>
-                    <th
-                        style="padding: 0.75rem 1rem; text-align: left; font-size: 0.8125rem; font-weight: 600; color: #374151;">
-                        Type de marché</th>
-                    <th
-                        style="padding: 0.75rem 1rem; text-align: left; font-size: 0.8125rem; font-weight: 600; color: #374151;">
-                        Pays</th>
-                    <th
-                        style="padding: 0.75rem 1rem; text-align: left; font-size: 0.8125rem; font-weight: 600; color: #374151;">
-                        Pôles d'activité</th>
+
                     <th
                         style="padding: 0.75rem 1rem; text-align: left; font-size: 0.8125rem; font-weight: 600; color: #374151;">
                         Statut</th>
@@ -96,29 +92,7 @@
                     <tr style="border-bottom: 1px solid #e5e7eb;">
                         <td style="padding: 0.75rem 1rem; font-size: 0.875rem; color: #374151;">{{ $rule->name }}</td>
                         <td style="padding: 0.75rem 1rem; font-size: 0.875rem; color: #374151;">{{ $rule->source }}</td>
-                        <td style="padding: 0.75rem 1rem; font-size: 0.875rem; color: #374151;">
-                            @if($rule->market_type === 'bureau_d_etude')
-                                Bureau d'études
-                            @elseif($rule->market_type === 'consultant_individuel')
-                                Consultant individuel
-                            @else
-                                <span style="color: #9ca3af;">Tous</span>
-                            @endif
-                        </td>
-                        <td style="padding: 0.75rem 1rem; font-size: 0.875rem; color: #374151;">
-                            @if($rule->countries->count() > 0)
-                                {{ $rule->countries->pluck('country')->join(', ') }}
-                            @else
-                                <span style="color: #9ca3af;">Tous</span>
-                            @endif
-                        </td>
-                        <td style="padding: 0.75rem 1rem; font-size: 0.875rem; color: #374151;">
-                            @if($rule->activityPoles->count() > 0)
-                                {{ $rule->activityPoles->pluck('name')->join(', ') }}
-                            @else
-                                <span style="color: #9ca3af;">Aucun</span>
-                            @endif
-                        </td>
+
                         <td style="padding: 0.75rem 1rem; font-size: 0.875rem;">
                             @if($rule->is_active)
                                 <span style="color: #10b981; font-weight: 500;">✓ Actif</span>
@@ -166,7 +140,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" style="padding: 2rem; text-align: center; color: #9ca3af;">
+                        <td colspan="4" style="padding: 2rem; text-align: center; color: #9ca3af;">
                             Aucune règle de filtrage configurée. <a href="{{ route('admin.filtering-rules.create') }}"
                                 style="color: #3b82f6;">Créer la première règle</a>
                         </td>
@@ -191,6 +165,13 @@
         </div>
         <p id="scraping-details" style="margin-top: 0.75rem; font-size: 0.8125rem; color: #6b7280;"></p>
 
+        <div style="margin-top: 1.25rem; display: flex; justify-content: flex-end;">
+            <button id="cancel-scraping-large" type="button"
+                style="display: none; background-color: #ef4444; color: white; border: none; padding: 0.5rem 1rem; font-weight: 600; font-size: 0.875rem; border-radius: 4px; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                ⚠ Arrêter le scraping en cours
+            </button>
+        </div>
+
         <div id="recent-findings"
             style="margin-top: 1rem; border-top: 1px solid #f3f4f6; padding-top: 1rem; display: none;">
             <h4
@@ -205,6 +186,8 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const btn = document.getElementById('start-scraping-simple');
+            const cancelBtn = document.getElementById('cancel-scraping-simple');
+            const cancelBtnLarge = document.getElementById('cancel-scraping-large');
             const progContainer = document.getElementById('scraping-progress-container');
             const progBar = document.getElementById('scraping-progress-bar');
             const progPercentage = document.getElementById('scraping-percentage');
@@ -226,10 +209,25 @@
                     btn.style.opacity = '0.85';
                     btn.textContent = 'Scraping en cours...';
                     progContainer.style.display = 'block';
+                    if (cancelBtn) {
+                        cancelBtn.style.display = 'inline-block';
+                        cancelBtn.disabled = false;
+                        cancelBtn.textContent = 'Arrêter le scraping';
+                    }
+                    if (cancelBtnLarge) {
+                        cancelBtnLarge.style.display = 'inline-block';
+                        cancelBtnLarge.disabled = false;
+                    }
                 } else {
                     btn.disabled = false;
                     btn.style.opacity = '1';
                     btn.textContent = 'Lancer le scraping';
+                    if (cancelBtn) {
+                        cancelBtn.style.display = 'none';
+                    }
+                    if (cancelBtnLarge) {
+                        cancelBtnLarge.style.display = 'none';
+                    }
                     // On laisse la barre visible un moment ou on la cache si succès
                 }
             }
@@ -275,14 +273,21 @@
                                 if (progress.status === 'completed' || progress.status === 'failed' || progress.status === 'cancelled') {
                                     stopPolling();
                                     setRunningState(false);
+                                    window._autoTriggerInProgress = false; // Reset pour le prochain cycle
+                                    
+                                    // Rafraîchir l'horaire pour le prochain cycle
+                                    loadSchedule();
+
                                     if (progress.status === 'completed') {
                                         progLabel.textContent = 'Terminé !';
                                         progBar.style.width = '100%';
                                         progBar.style.backgroundColor = '#10b981';
-                                        // On ne met pas d'alert si c'était déjà en cours au chargement
                                     } else {
                                         progLabel.textContent = 'Échec ou annulation';
                                         progBar.style.backgroundColor = '#ef4444';
+                                        if (progress.status === 'cancelled') {
+                                            progDetails.textContent = 'Annulé par l\'utilisateur';
+                                        }
                                     }
                                 }
                             }
@@ -291,7 +296,65 @@
                 }, 1500);
             }
 
-            btn.addEventListener('click', function () {
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', function() {
+                    handleCancel();
+                });
+            }
+
+            if (cancelBtnLarge) {
+                cancelBtnLarge.addEventListener('click', function() {
+                    handleCancel();
+                });
+            }
+
+            function handleCancel() {
+                if (!jobId || !confirm('Arrêter le scraping en cours ?')) return;
+                
+                const buttons = [cancelBtn, cancelBtnLarge];
+                buttons.forEach(b => {
+                    if (b) {
+                        b.disabled = true;
+                        b.textContent = 'Arrêt...';
+                    }
+                });
+                
+                fetch('{{ route("admin.scraping.cancel") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({ job_id: jobId })
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        progDetails.textContent = 'Arrêt demandé...';
+                    } else {
+                        alert('Erreur: ' + (data.message || 'Impossible d\'arrêter'));
+                        buttons.forEach(b => {
+                            if (b) {
+                                b.disabled = false;
+                                b.textContent = 'Arrêter le scraping';
+                            }
+                        });
+                    }
+                })
+                .catch(e => {
+                    console.error(e);
+                    buttons.forEach(b => {
+                        if (b) {
+                            b.disabled = false;
+                            b.textContent = 'Arrêter le scraping';
+                        }
+                    });
+                });
+            }
+
+            function startScrapingSession() {
+                if (polling) return;
+
                 // Réinitialiser UI
                 progBar.style.width = '0%';
                 progBar.style.backgroundColor = '#3b82f6';
@@ -315,7 +378,7 @@
                     .then(r => r.json())
                     .then(data => {
                         if (!data.success) {
-                            alert(data.message || 'Erreur au démarrage');
+                            if (!window._isAutoTrigger) alert(data.message || 'Erreur au démarrage');
                             setRunningState(false);
                             return;
                         }
@@ -323,16 +386,26 @@
                     })
                     .catch(err => {
                         console.error(err);
-                        alert('Erreur lors de la communication avec le serveur');
+                        if (!window._isAutoTrigger) alert('Erreur lors de la communication avec le serveur');
                         setRunningState(false);
                     });
+            }
+
+            btn.addEventListener('click', function () {
+                window._isAutoTrigger = false;
+                startScrapingSession();
             });
 
             // Vérifier s'il y a un job en cours au chargement
             function checkCurrentJob() {
+                // Si on surveille déjà un job, pas besoin de vérifier
+                if (polling) return;
+
                 fetch('{{ route("admin.scraping.current-job-id") }}')
                     .then(r => r.json())
                     .then(data => {
+                        if (polling) return; // Sécurité supplémentaire
+
                         if (data.success && data.job_id) {
                             startPolling(data.job_id);
                         }
@@ -341,6 +414,8 @@
             }
 
             checkCurrentJob();
+            // Vérifier périodiquement pour détecter le lancement automatique
+            setInterval(checkCurrentJob, 5000);
 
             // === GESTION DU SCRAPING AUTOMATIQUE ===
             const frequencySelect = document.getElementById('scraping-frequency');
@@ -365,10 +440,11 @@
             }
 
             // Mettre à jour le texte du statut
+            // Mettre à jour le texte du statut
             function updateStatusText(isActive) {
                 if (isActive) {
                     statusText.textContent = 'Actif';
-                    statusText.style.color = '#10b981';
+                    statusText.style.color = '#000000';
                     statusText.style.fontWeight = '600';
                 } else {
                     statusText.textContent = 'Inactif';
@@ -378,14 +454,59 @@
             }
 
             // Mettre à jour le texte de la prochaine exécution
+            let nextRunDate = null;
             function updateNextRunText(nextRunAt, isActive) {
                 if (!isActive || !nextRunAt) {
+                    nextRunDate = null;
                     nextRunText.textContent = '';
                     return;
                 }
-                const date = new Date(nextRunAt);
-                nextRunText.textContent = 'Prochaine exécution: ' + date.toLocaleString('fr-FR');
+                nextRunDate = new Date(nextRunAt);
+                updateCountdown(); // Appel immédiat
             }
+
+            function updateCountdown() {
+                if (!nextRunDate || !activeCheckbox.checked) {
+                    nextRunText.textContent = '';
+                    return;
+                }
+                
+                if (polling) {
+                    nextRunText.textContent = 'Scraping en cours...';
+                    return;
+                }
+
+                const now = new Date();
+                const diff = nextRunDate - now;
+                
+                if (diff <= 0) {
+                    // Déclenchement par navigateur immédiat si pas de CRON détecté
+                    if (!polling && !window._autoTriggerInProgress) {
+                        window._autoTriggerInProgress = true;
+                        window._isAutoTrigger = true;
+                        nextRunText.innerHTML = '<span style="color: #3b82f6; font-weight: 600;">Lancement automatique par le navigateur...</span>';
+                        startScrapingSession();
+                    } else if (!polling) {
+                        nextRunText.innerHTML = '<span style="color: #3b82f6; font-weight: 600;">Lancement imminent...</span>';
+                    }
+                    checkCurrentJob(); 
+                    return;
+                }
+
+                const s = Math.floor((diff / 1000) % 60);
+                const m = Math.floor((diff / 1000 / 60) % 60);
+                const h = Math.floor((diff / (1000 * 60 * 60)));
+
+                let parts = [];
+                if (h > 0) parts.push(h + "h");
+                if (m > 0 || h > 0) parts.push(m + "m");
+                parts.push(s + "s");
+
+                nextRunText.textContent = 'Prochaine exécution dans : ' + parts.join(' ');
+            }
+
+            // Mettre à jour le compte à rebours chaque seconde
+            setInterval(updateCountdown, 1000);
 
             // Événement checkbox
             activeCheckbox.addEventListener('change', function () {

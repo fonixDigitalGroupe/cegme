@@ -7,6 +7,7 @@ use DOMDocument;
 use DOMXPath;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use App\Services\MarketTypeClassifier;
 
 class BDEACScraperService implements IterativeScraperInterface
 {
@@ -169,7 +170,7 @@ class BDEACScraperService implements IterativeScraperInterface
             $dom = new DOMDocument();
             libxml_use_internal_errors(true);
             // Hack to handle encoding properly
-            @$dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
+            @$dom->loadHTML('<?xml encoding="UTF-8">' . $html);
             libxml_clear_errors();
             $xpath = new DOMXPath($dom);
 
@@ -234,9 +235,14 @@ class BDEACScraperService implements IterativeScraperInterface
                 $linkElement = $titleNode->item(0);
                 $titre = trim($linkElement->textContent);
                 $lien = $linkElement->getAttribute('href');
+            } else {
+                 Log::warning("BDEAC Scraper: No title found for item");
             }
 
-            if (!$titre || !$lien) return null;
+            if (!$titre || !$lien) {
+                Log::warning("BDEAC Scraper: Skipping item (missing title/link)", ['titre' => $titre, 'lien' => $lien]);
+                return null;
+            }
 
             // Dates
             $datePublication = null;
@@ -263,6 +269,7 @@ class BDEACScraperService implements IterativeScraperInterface
                 'detail_url' => $this->normalizeUrl($lien),
                 'link_type' => 'detail',
                 'notice_type' => 'Appel d\'offres', 
+                'market_type' => MarketTypeClassifier::classify($titre),
                 'updated_at' => now(), 
             ];
 

@@ -120,6 +120,7 @@
             return sectorMatch && yearMatch;
         }
     }" style="background-color: #ffffff !important;">
+    @include('partials.page-loader')
     <x-site-header />
 
     <!-- Hero Section - Page Header -->

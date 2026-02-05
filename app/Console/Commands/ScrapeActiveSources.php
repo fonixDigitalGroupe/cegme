@@ -61,8 +61,15 @@ class ScrapeActiveSources extends Command
         if (!$this->option('no-truncate')) {
             $this->info('🗑️  Vidage de la table offres...');
             $progressService->updateSource($jobId, 'Vidage de la base', 0);
-            DB::table('offres')->delete();
-            $this->info("✓ Table vidée avec succès");
+            
+            try {
+                DB::table('offres')->truncate();
+                $this->info("✓ Table vidée avec succès (TRUNCATE)");
+            } catch (\Exception $e) {
+                // Fallback si truncate échoue (ex: SQLite ou contraintes)
+                DB::table('offres')->delete();
+                $this->info("✓ Table vidée avec succès (DELETE)");
+            }
             $this->newLine();
         } else {
             $this->info('⚠ Mode --no-truncate : conservation des données existantes');
@@ -182,6 +189,12 @@ class ScrapeActiveSources extends Command
             }
 
             $this->newLine();
+        }
+
+        // Appliquer les filtres si demandé
+        if ($this->option('apply-filters')) {
+            $progressService->updateSource($jobId, 'Application des filtres', count($activeSources));
+            $this->applyFiltering();
         }
 
         // Marquer comme terminé dans l'UI

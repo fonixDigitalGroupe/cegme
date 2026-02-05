@@ -42,11 +42,10 @@ class ScrapingSchedule extends Model
             return false;
         }
 
-        if (!$this->last_run_at) {
+        if (!$this->next_run_at) {
             return true;
         }
 
-        $minutesSinceLastRun = now()->diffInMinutes($this->last_run_at);
-        return $minutesSinceLastRun >= $this->getFrequencyInMinutes();
+        return now()->greaterThanOrEqualTo($this->next_run_at);
     }
 }

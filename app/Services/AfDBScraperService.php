@@ -463,18 +463,7 @@ class AfDBScraperService implements IterativeScraperInterface
                         'lien' => $offre['lien_source'],
                     ]);
 
-                    $validOffres[] = $offre;
-                } catch (\Exception $e) {
-                    Log::debug('AfDB Scraper: Error processing item', [
-                        'error' => $e->getMessage(),
-                    ]);
-                    continue;
-                }
-            }
-
-            // Traiter les offres et les sauvegarder immédiatement
-            if (!empty($validOffres)) {
-                foreach ($validOffres as $offre) {
+                    // Sauvegarder immédiatement l'offre
                     try {
                         $existing = Offre::where('source', 'African Development Bank')
                             ->where(function ($q) use ($offre) {
@@ -484,21 +473,24 @@ class AfDBScraperService implements IterativeScraperInterface
                             ->first();
 
                         if ($existing) {
+                            Log::info("AfDB Scraper: Updating existing offer: " . $offre['titre']);
                             $existing->update([
                                 'pays' => $offre['pays'] ?? $existing->pays,
                                 'date_limite_soumission' => $offre['date_limite_soumission'] ?? $existing->date_limite_soumission,
                                 'updated_at' => now(),
                             ]);
                         } else {
+                            Log::info("AfDB Scraper: Creating new offer: " . $offre['titre']);
                             $offre['created_at'] = now();
                             $offre['updated_at'] = now();
-                            Offre::create($offre);
+                            $created = Offre::create($offre);
+                            Log::info("AfDB Scraper: Offer created with ID: " . $created->id);
                             $count++;
                         }
 
                         // Ajouter au buffer pour le feedback UI
                         $findingsBuffer[] = $offre;
-                        if (count($findingsBuffer) >= 10) {
+                        if (count($findingsBuffer) >= 5) { // Réduit à 5 pour feedback plus rapide
                             if ($progressService && $this->jobId) {
                                 $progressService->addFindings($this->jobId, $findingsBuffer);
                             }
@@ -511,6 +503,12 @@ class AfDBScraperService implements IterativeScraperInterface
                             'error' => $e->getMessage()
                         ]);
                     }
+
+                } catch (\Exception $e) {
+                    Log::debug('AfDB Scraper: Error processing item', [
+                        'error' => $e->getMessage(),
+                    ]);
+                    continue;
                 }
             }
 

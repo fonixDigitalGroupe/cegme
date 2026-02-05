@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Offre;
 use App\Models\ActivityPole;
 use App\Services\OfferFilteringService;
+use App\Services\AfricanCountriesService;
 use Illuminate\Http\Request;
 
 class OffreController extends Controller
@@ -18,30 +19,14 @@ class OffreController extends Controller
         $marketType = $request->get('market_type');
         $activityPoleId = $request->get('activity_pole_id');
         $keyword = $request->get('keyword');
+        $status = $request->get('status', 'en_cours'); // Default to 'en_cours'
 
-        // Récupérer TOUTES les offres sauf DGMarket (même les offres expirées)
-        $query = Offre::query()
-            ->where('source', '!=', 'DGMarket');
+        // Récupérer TOUTES les offres (même les offres expirées)
+        $query = Offre::query();
 
         // Appliquer les filtres
         if ($marketType) {
-            // Filtrer par type de marché (basé sur le titre et l'acheteur)
-            $query->where(function ($q) use ($marketType) {
-                $text = '%';
-                if ($marketType === 'bureau_d_etude') {
-                    $keywords = ['bureau d\'étude', 'bureau d\'études', 'cabinet', 'consulting', 'étude', 'études'];
-                    foreach ($keywords as $kw) {
-                        $q->orWhere('titre', 'like', '%' . $kw . '%')
-                            ->orWhere('acheteur', 'like', '%' . $kw . '%');
-                    }
-                } elseif ($marketType === 'consultant_individuel') {
-                    $keywords = ['consultant individuel', 'individual consultant', 'expert individuel', 'individual expert'];
-                    foreach ($keywords as $kw) {
-                        $q->orWhere('titre', 'like', '%' . $kw . '%')
-                            ->orWhere('acheteur', 'like', '%' . $kw . '%');
-                    }
-                }
-            });
+            $query->where('market_type', $marketType);
         }
 
         if ($activityPoleId) {
@@ -59,11 +44,39 @@ class OffreController extends Controller
         }
 
         if ($keyword) {
-            // Filtrer par mot-clé
-            $query->where(function ($q) use ($keyword) {
-                $q->where('titre', 'like', '%' . $keyword . '%')
-                    ->orWhere('acheteur', 'like', '%' . $keyword . '%')
-                    ->orWhere('pays', 'like', '%' . $keyword . '%');
+            // Filtrer par mot-clé (supporte plusieurs mots séparés par virgule)
+            $keywordsList = array_map('trim', explode(',', $keyword));
+            
+            $query->where(function ($q) use ($keywordsList) {
+                foreach ($keywordsList as $k) {
+                    if (!empty($k)) {
+                        $q->orWhere('titre', 'like', '%' . $k . '%')
+                          ->orWhere('acheteur', 'like', '%' . $k . '%')
+                          ->orWhere('pays', 'like', '%' . $k . '%');
+                    }
+                }
+            });
+        }
+
+        // Filtrage géographique
+        $subRegion = $request->get('sub_region');
+        $regions = AfricanCountriesService::getAfricanRegions();
+
+        if ($subRegion && isset($regions[$subRegion])) {
+            // Filtrer par sous-région spécifique
+            $regionKeywords = $regions[$subRegion]['keywords'];
+            $query->where(function ($q) use ($regionKeywords) {
+                foreach ($regionKeywords as $kw) {
+                    $q->orWhere('pays', 'like', '%' . $kw . '%');
+                }
+            });
+        } else {
+            // Sinon, filtrer par pays africains uniquement (OBLIGATOIRE par défaut)
+            $africanKeywords = AfricanCountriesService::getAfricanCountriesKeywords();
+            $query->where(function ($q) use ($africanKeywords) {
+                foreach ($africanKeywords as $kw) {
+                    $q->orWhere('pays', 'like', '%' . $kw . '%');
+                }
             });
         }
 
@@ -82,13 +95,32 @@ class OffreController extends Controller
         // Compter avant le filtre de date
         $countBeforeDateFilter = $filteredOffres->count();
 
-        // Filtrer uniquement par pays non nul (afficher TOUTES les offres, même expirées)
-        $filteredOffres = $filteredOffres->filter(function ($offre) {
+        // Filtrer par statut (Date)
+        $now = now();
+        $filteredOffres = $filteredOffres->filter(function ($offre) use ($status, $now) {
             // Pays ne doit pas être null ou vide
             if (empty($offre->pays)) {
                 return false;
             }
-            return true;
+
+            $deadline = null;
+            if (!empty($offre->date_limite_soumission)) {
+                try {
+                    $deadline = is_string($offre->date_limite_soumission) 
+                        ? \Carbon\Carbon::parse($offre->date_limite_soumission) 
+                        : $offre->date_limite_soumission;
+                } catch (\Exception $e) {
+                    // Ignore parsing errors
+                }
+            }
+
+            if ($status === 'cloture') {
+                // Clôturé: Date limite passée
+                return $deadline && $deadline->lt($now);
+            } else {
+                // En cours: Date limite future ou aujourd'hui, ou pas de date
+                return !$deadline || $deadline->gte($now);
+            }
         });
 
         // Compter après le filtre de date
@@ -103,9 +135,9 @@ class OffreController extends Controller
             ]);
         }
 
-        // Trier par date limite de soumission (du plus récent au plus ancien)
+        // Trier par date limite de soumission (du plus proche au plus lointain)
         // Les offres sans date sont placées à la fin
-        $filteredOffres = $filteredOffres->sortByDesc(function ($offre) {
+        $filteredOffres = $filteredOffres->sortBy(function ($offre) {
             try {
                 if (!empty($offre->date_limite_soumission)) {
                     if (is_object($offre->date_limite_soumission) && method_exists($offre->date_limite_soumission, 'format')) {
@@ -116,8 +148,8 @@ class OffreController extends Controller
             } catch (\Exception $e) {
                 // En cas d'erreur de parsing, placer à la fin
             }
-            // Les offres sans date sont placées à la fin (date très ancienne)
-            return '1900-01-01';
+            // Les offres sans date sont placées à la fin (date très lointaine)
+            return '9999-12-31';
         });
 
         // Paginer les résultats filtrés
@@ -133,7 +165,10 @@ class OffreController extends Controller
 
         // Récupérer les pôles d'activité pour les filtres
         $activityPoles = ActivityPole::with('keywords')->get();
+        
+        // Régions pour le filtre
+        $africanRegions = AfricanCountriesService::getAfricanRegions();
 
-        return view('offres', compact('offres', 'activityPoles', 'marketType', 'activityPoleId', 'keyword'));
+        return view('offres', compact('offres', 'activityPoles', 'marketType', 'activityPoleId', 'keyword', 'status', 'africanRegions', 'subRegion'));
     }
 }

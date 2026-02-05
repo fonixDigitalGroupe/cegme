@@ -17,6 +17,7 @@ class Offre extends Model
         'detail_url',
         'project_id',
         'notice_type',
+        'market_type',
         'date_publication',
     ];
 

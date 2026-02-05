@@ -67,6 +67,7 @@
 </head>
 
 <body class="bg-white text-[#1b1b18] min-h-screen" style="background-color: #ffffff !important;">
+    @include('partials.page-loader')
     <x-site-header />
 
 

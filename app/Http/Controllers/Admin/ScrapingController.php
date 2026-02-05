@@ -60,13 +60,44 @@ class ScrapingController extends Controller
         // Initialiser la progression
         $progressService->initialize($jobId, count($activeSources));
 
-        // Lancer le scraping en arrière-plan après la réponse
-        // Enregistrer la fonction shutdown pour exécuter après la réponse
-        register_shutdown_function(function () use ($jobId, $activeSources, $noTruncate) {
-            $progressService = app(\App\Services\ScrapingProgressService::class);
-            $controller = new self();
-            $controller->executeScrapingRoundRobin($jobId, $activeSources, $noTruncate, $progressService);
-        });
+        // Vider la table d'abord (Sauf si demandé explicitement de garder)
+        if (!$noTruncate) {
+            $progressService->updateSource($jobId, 'Vidage de la base de données...', 0);
+            try {
+                \Illuminate\Support\Facades\DB::table('offres')->truncate();
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\DB::table('offres')->delete();
+            }
+        }
+
+        // Mettre à jour l'horaire de la prochaine exécution si le mode auto est actif
+        $schedule = \App\Models\ScrapingSchedule::first();
+        if ($schedule && $schedule->is_active) {
+            $schedule->update([
+                'last_run_at' => now(),
+                'next_run_at' => now()->addMinutes($schedule->getFrequencyInMinutes()),
+            ]);
+        }
+
+        // Lancer le scraping en arrière-plan via la commande CLI pour ne pas bloquer le serveur web
+        $phpPath = PHP_BINARY;
+        $artisanPath = base_path('artisan');
+        $command = escapeshellarg($phpPath) . ' ' . escapeshellarg($artisanPath) . ' app:scrape-active-sources --apply-filters --job-id=' . escapeshellarg($jobId);
+        
+        if ($noTruncate) {
+            $command .= ' --no-truncate';
+        }
+
+        if (PHP_OS_FAMILY === 'Windows') {
+            pclose(popen("start /B " . $command, "r"));
+        } else {
+            exec($command . " > /dev/null 2>&1 &");
+        }
+
+        // Fermer la session pour éviter de bloquer d'autres requêtes du même utilisateur
+        if (session_id()) {
+            session_write_close();
+        }
 
         return response()->json([
             'success' => true,
@@ -255,8 +286,8 @@ class ScrapingController extends Controller
                 $sourceCount = 0; // Offres "traitées" (selon scraper)
                 $foundCount = 0; // Offres REELLEMENT trouvées (ajoutées ou mises à jour)
                 $lotCount = 0;
-                $maxLots = 50; // Sécurité: max 50 lots (env. 500 items checkés) pour éviter boucle infinie
-                $targetOffers = 50; // Objectif: récupérer environ 50 offres validées
+                $maxLots = 100; // Sécurité: max 100 lots pour permettre plus de pagination
+                $targetOffers = 150; // Objectif: récupérer environ 150 offres validées (au moins 10 pages)
 
                 // Boucle: Tant qu'il y a des pages ET qu'on n'a pas atteint l'objectif ET qu'on n'a pas dépassé la sécurité
                 while ($hasMore && $foundCount < $targetOffers && $lotCount < $maxLots) {
@@ -357,6 +388,7 @@ class ScrapingController extends Controller
             'AFD' => app(\App\Services\AFDScraperService::class),
             'IFAD' => app(\App\Services\IFADScraperService::class),
             'BDEAC' => app(\App\Services\BDEACScraperService::class),
+            'DGMarket' => app(\App\Services\DGMarketScraperService::class),
             default => null,
         };
     }

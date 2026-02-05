@@ -22,6 +22,7 @@
 </head>
 
 <body class="font-sans antialiased flex flex-col min-h-screen">
+    @include('partials.page-loader')
     <div class="min-h-screen bg-gray-100 flex flex-col">
         <x-site-header />
 

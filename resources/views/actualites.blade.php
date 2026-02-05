@@ -61,6 +61,7 @@
 </head>
 
 <body class="bg-white text-[#1b1b18] min-h-screen" style="background-color: #ffffff !important;">
+    @include('partials.page-loader')
     <x-site-header />
 
     <!-- Hero Section - Page Header -->
@@ -259,10 +260,10 @@
                             <div
                                 style="display: flex; justify-content: center; align-items: center; width: 100%; padding: 0;">
                                 <iframe
-                                    src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2FCEGME.BG%2F&tabs=timeline&width=700&height=600&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true"
+                                    src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2FCEGME.BG%2F&tabs=timeline&width=700&height=600&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId"
                                     width="700" height="600" class="facebook-iframe"
                                     style="border:none;overflow:hidden;width:100%;max-width:700px;height:600px;margin:0 auto;display:block;"
-                                    scrolling="no" frameborder="0" allowfullscreen="true" loading="eager"
+                                    scrolling="no" frameborder="0" allowfullscreen="true"
                                     allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>
                             </div>
 

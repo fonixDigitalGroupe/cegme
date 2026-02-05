@@ -35,41 +35,7 @@
         </select>
     </div>
 
-    <div style="margin-bottom: 1.5rem;">
-        <label for="market_type" style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.5rem;">Type de marché</label>
-        <select id="market_type" name="market_type" style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 4px; font-size: 0.875rem;">
-            <option value="">Aucun (tous les types)</option>
-            <option value="bureau_d_etude" {{ old('market_type', $filteringRule->market_type) === 'bureau_d_etude' ? 'selected' : '' }}>Bureau d'études</option>
-            <option value="consultant_individuel" {{ old('market_type', $filteringRule->market_type) === 'consultant_individuel' ? 'selected' : '' }}>Consultant individuel</option>
-        </select>
-    </div>
 
-    <div style="margin-bottom: 1.5rem;">
-        <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.5rem;">Pays autorisés (optionnel)</label>
-        <div id="countries-container">
-            @foreach($filteringRule->countries as $country)
-                <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
-                    <input type="text" name="countries[]" value="{{ $country->country }}" style="flex: 1; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 4px; font-size: 0.875rem;">
-                    <button type="button" onclick="this.parentElement.remove()" style="padding: 0.5rem 1rem; background-color: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer;">-</button>
-                </div>
-            @endforeach
-            <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
-                <input type="text" name="countries[]" placeholder="Nom du pays" style="flex: 1; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 4px; font-size: 0.875rem;">
-                <button type="button" onclick="addCountryField()" style="padding: 0.5rem 1rem; background-color: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer;">+</button>
-            </div>
-        </div>
-        <small style="color: #6b7280; font-size: 0.75rem;">Laissez vide pour accepter tous les pays</small>
-    </div>
-
-    <div style="margin-bottom: 1.5rem;">
-        <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.5rem;">Pôles d'activité (optionnel)</label>
-        @foreach($activityPoles as $pole)
-            <label style="display: flex; align-items: center; margin-bottom: 0.5rem; cursor: pointer;">
-                <input type="checkbox" name="activity_pole_ids[]" value="{{ $pole->id }}" {{ $filteringRule->activityPoles->contains($pole->id) ? 'checked' : '' }} style="margin-right: 0.5rem;">
-                <span>{{ $pole->name }} ({{ $pole->keywords->count() }} mots-clés)</span>
-            </label>
-        @endforeach
-    </div>
 
     <div style="margin-bottom: 1.5rem;">
         <label style="display: flex; align-items: center; cursor: pointer;">
@@ -84,17 +50,6 @@
     </div>
 </form>
 
-<script>
-function addCountryField() {
-    const container = document.getElementById('countries-container');
-    const div = document.createElement('div');
-    div.style.cssText = 'display: flex; gap: 0.5rem; margin-bottom: 0.5rem;';
-    div.innerHTML = `
-        <input type="text" name="countries[]" placeholder="Nom du pays" style="flex: 1; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 4px; font-size: 0.875rem;">
-        <button type="button" onclick="this.parentElement.remove()" style="padding: 0.5rem 1rem; background-color: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer;">-</button>
-    `;
-    container.appendChild(div);
-}
-</script>
+
 @endsection
 

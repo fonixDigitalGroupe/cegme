@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Offre;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use App\Services\MarketTypeClassifier;
 
 class WorldBankScraperService implements IterativeScraperInterface
 {
@@ -241,6 +242,7 @@ class WorldBankScraperService implements IterativeScraperInterface
                 'link_type' => 'detail',
                 'notice_type' => $doc['notice_type'] ?? 'Avis de passation de marchés',
                 'project_id' => $projectId,
+                'market_type' => MarketTypeClassifier::classify($this->cleanTitle($titreComplet)),
                 'date_publication' => $datePublication,
                 'created_at' => now(),
                 'updated_at' => now(),

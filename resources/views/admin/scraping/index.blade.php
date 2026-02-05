@@ -85,7 +85,7 @@
                 Lancer le scraping
             </button>
             <button id="cancel-scraping-btn" style="display: none; background-color: #ef4444; color: white; border: none; padding: 0.625rem 1.25rem; font-weight: 500; font-size: 0.875rem; border-radius: 4px; cursor: pointer;">
-                Annuler
+                Arrêter le scraping
             </button>
         </div>
     @else
@@ -402,7 +402,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             cancelBtn.disabled = true;
-            cancelBtn.textContent = 'Annulation...';
+            cancelBtn.textContent = 'Arrêt en cours...';
 
             fetch('{{ route("admin.scraping.cancel") }}', {
                 method: 'POST',
@@ -415,22 +415,51 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    cancelBtn.textContent = 'Annulé';
-                    progressMessage.textContent = 'Annulation en cours...';
+                    cancelBtn.textContent = 'Arrêté';
+                    progressMessage.textContent = 'Arrêt en cours...';
                 } else {
                     alert('Erreur : ' + (data.message || 'Impossible d\'annuler le scraping'));
                     cancelBtn.disabled = false;
-                    cancelBtn.textContent = 'Annuler';
+                    cancelBtn.textContent = 'Arrêter le scraping';
                 }
             })
             .catch(error => {
                 console.error('Erreur lors de l\'annulation:', error);
                 alert('Erreur lors de l\'annulation du scraping');
                 cancelBtn.disabled = false;
-                cancelBtn.textContent = 'Annuler';
+                cancelBtn.textContent = 'Arrêter le scraping';
             });
         });
     }
+    // Vérifier s'il y a un job en cours au chargement
+    fetch('{{ route("admin.scraping.current-job") }}', {
+        method: 'GET',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.job_id) {
+            console.log('Job en cours trouvé:', data.job_id);
+            jobId = data.job_id;
+            
+            // Restaurer l'interface
+            startBtn.disabled = true;
+            startBtn.textContent = 'Scraping en cours...';
+            
+            progressContainer.style.display = 'block';
+            if (cancelBtn) {
+                cancelBtn.style.display = 'inline-block';
+                cancelBtn.disabled = false;
+                cancelBtn.textContent = 'Arrêter le scraping'; // Renommer pour être plus clair
+            }
+            
+            startPolling();
+        }
+    })
+    .catch(error => console.error('Erreur lors de la vérification du job:', error));
+
 });
 </script>
 @endsection

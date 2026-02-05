@@ -64,6 +64,7 @@
             window.addEventListener('hashchange', () => this.setTabFromHash());
         }
     }" style="background-color: #ffffff !important;">
+    @include('partials.page-loader')
     <x-site-header />
 
     <!-- Hero Section - Page Header -->

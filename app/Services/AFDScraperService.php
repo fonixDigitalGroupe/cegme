@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use DOMDocument;
 use DOMXPath;
+use App\Services\MarketTypeClassifier;
 
 class AFDScraperService implements IterativeScraperInterface
 {
@@ -832,6 +833,8 @@ class AFDScraperService implements IterativeScraperInterface
             // Extraire le pays (chercher dans les textes de l'élément)
             $pays = $this->extractCountry($item, $xpath);
 
+            $marketType = MarketTypeClassifier::classify($titre . ' ' . $item->textContent);
+
             // Extraire la date limite depuis la liste (tentative rapide)
             $dateLimite = $this->extractDeadline($item, $xpath);
 
@@ -861,6 +864,8 @@ class AFDScraperService implements IterativeScraperInterface
                 return null;
             }
 
+            $marketType = MarketTypeClassifier::classify($titre . ' ' . $item->textContent);
+
             return [
                 'titre' => $titre,
                 'acheteur' => $acheteur,
@@ -868,6 +873,8 @@ class AFDScraperService implements IterativeScraperInterface
                 'date_limite_soumission' => $dateLimite,
                 'lien_source' => $lien,
                 'source' => 'AFD',
+                'notice_type' => 'Appel à projets',
+                'market_type' => $marketType,
             ];
 
         } catch (\Exception $e) {
