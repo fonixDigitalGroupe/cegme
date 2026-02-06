@@ -51,7 +51,7 @@ class ScrapingProgressService
 
         $progress['current'] = $current;
         $progress['current_source'] = $sourceName;
-        $progress['percentage'] = $progress['total'] > 0 ? (int) ((($current - 1) / $progress['total']) * 100) : 0;
+        $progress['percentage'] = $progress['total'] > 0 ? max(0, (int) ((($current - 1) / $progress['total']) * 100)) : 0;
         $progress['message'] = "Scraping de {$sourceName}... ({$current}/{$progress['total']})";
 
         Cache::put(self::CACHE_PREFIX . $jobId, $progress, self::CACHE_DURATION);

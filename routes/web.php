@@ -86,6 +86,7 @@ Route::middleware(['auth', 'adminOrEditor'])->prefix('admin')->name('admin.')->g
     Route::post('/scraping/cancel', [\App\Http\Controllers\Admin\ScrapingController::class, 'cancel'])->name('scraping.cancel');
     Route::post('/scraping/truncate', [\App\Http\Controllers\Admin\ScrapingController::class, 'truncate'])->name('scraping.truncate');
     Route::get('/scraping/current-job-id', [\App\Http\Controllers\Admin\ScrapingController::class, 'getCurrentJobId'])->name('scraping.current-job-id');
+    Route::post('/scraping/scrape-source', [\App\Http\Controllers\Admin\ScrapingController::class, 'scrapeSource'])->name('scraping.scrape-source');
 
     // Scraping automatique programmé
     Route::post('/scraping/schedule/update', [\App\Http\Controllers\Admin\ScrapingScheduleController::class, 'updateSchedule'])->name('scraping.schedule.update');

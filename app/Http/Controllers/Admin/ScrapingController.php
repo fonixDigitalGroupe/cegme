@@ -204,6 +204,145 @@ class ScrapingController extends Controller
     }
 
     /**
+     * Scrappe une seule source (mode compatible OVH)
+     * Cette méthode est appelée par l'UI pour chaque source individuellement
+     */
+    public function scrapeSource(Request $request, ScrapingProgressService $progressService)
+    {
+        $source = $request->input('source');
+        $jobId = $request->input('job_id');
+        $sourceIndex = $request->input('source_index', 1);
+        $totalSources = $request->input('total_sources', 1);
+        $truncateFirst = $request->boolean('truncate_first', false);
+
+        if (!$source) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Source manquante',
+            ], 400);
+        }
+
+        // Si pas de jobId, en générer un nouveau
+        if (!$jobId) {
+            $jobId = ScrapingProgressService::generateJobId();
+            $progressService->initialize($jobId, $totalSources);
+        }
+
+        // Vider la table si c'est la première source
+        if ($truncateFirst) {
+            $progressService->updateSource($jobId, 'Vidage de la base de données...', 0);
+            try {
+                DB::table('offres')->truncate();
+            } catch (\Exception $e) {
+                DB::table('offres')->delete();
+            }
+        }
+
+        // Fermer la session pour éviter de bloquer d'autres requêtes
+        if (session_id()) {
+            session_write_close();
+        }
+
+        // Augmenter les limites
+        @set_time_limit(120); // 2 minutes max par source
+        @ini_set('max_execution_time', '120');
+
+        try {
+            $progressService->updateSource($jobId, $source, $sourceIndex);
+
+            $scraper = $this->createScraper($source);
+            if (!$scraper) {
+                $progressService->markSourceFailed($jobId, $source, "Scraper non trouvé pour: {$source}");
+                return response()->json([
+                    'success' => false,
+                    'message' => "Scraper non trouvé pour: {$source}",
+                    'job_id' => $jobId,
+                ]);
+            }
+
+            $scraper->setJobId($jobId);
+            $scraper->initialize();
+
+            $foundCount = 0;
+            $lotCount = 0;
+            $maxLots = 50;
+            $targetOffers = 100;
+            $hasMore = true;
+
+            while ($hasMore && $foundCount < $targetOffers && $lotCount < $maxLots) {
+                if ($progressService->isCancelled($jobId)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Scraping annulé',
+                        'job_id' => $jobId,
+                        'cancelled' => true,
+                    ]);
+                }
+
+                try {
+                    $lotCount++;
+                    $result = $scraper->scrapeBatch(5);
+                    $hasMore = $result['has_more'];
+                    
+                    $batchFindingsCount = isset($result['findings']) ? count($result['findings']) : 0;
+                    $foundCount += $batchFindingsCount;
+
+                    if (!empty($result['findings'])) {
+                        $progressService->addFindings($jobId, $result['findings']);
+                    }
+
+                    $progressService->updateProgress($jobId, [
+                        'message' => "Scraping de {$source}... {$foundCount} offres pertinentes trouvées",
+                        'source_progress' => $foundCount
+                    ]);
+
+                } catch (\Exception $e) {
+                    Log::error("Erreur durant le scraping de {$source}", ['error' => $e->getMessage()]);
+                    if ($lotCount >= $maxLots) {
+                        $progressService->markSourceFailed($jobId, $source, $e->getMessage());
+                        break;
+                    }
+                }
+            }
+
+            $progressService->markSourceCompleted($jobId, $source, $foundCount);
+
+            // Si c'était la dernière source, marquer comme terminé
+            if ($sourceIndex >= $totalSources) {
+                // Appliquer les filtres post-scraping
+                try {
+                    $idsToKeep = ScraperHelper::getIdsMatchingActiveFilters();
+                    if ($idsToKeep->isNotEmpty()) {
+                        DB::table('offres')->whereNotIn('id', $idsToKeep->all())->delete();
+                    }
+                } catch (\Exception $e) {
+                    Log::error('Erreur lors du filtrage post-scraping', ['error' => $e->getMessage()]);
+                }
+                
+                $progressService->complete($jobId);
+            }
+
+            return response()->json([
+                'success' => true,
+                'job_id' => $jobId,
+                'source' => $source,
+                'found_count' => $foundCount,
+                'is_last' => $sourceIndex >= $totalSources,
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error("Erreur lors du scraping de {$source}", ['error' => $e->getMessage()]);
+            $progressService->markSourceFailed($jobId, $source, $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'job_id' => $jobId,
+            ]);
+        }
+    }
+
+    /**
      * Vide immédiatement la table offres (utilisé par le bouton dédié)
      */
     public function truncate(Request $request)

@@ -198,6 +198,9 @@ document.addEventListener('DOMContentLoaded', function() {
     let jobId = null;
     let pollingInterval = null;
 
+    // Liste des sources actives (passée depuis le backend)
+    const activeSources = @json($activeSources);
+
     startBtn.addEventListener('click', function() {
         // Désactiver le bouton
         startBtn.disabled = true;
@@ -211,7 +214,7 @@ document.addEventListener('DOMContentLoaded', function() {
         progressBar.style.width = '0%';
         progressBarText.textContent = '';
         progressText.textContent = '0%';
-        progressCount.textContent = '0 / 0';
+        progressCount.textContent = '0 / ' + activeSources.length;
         totalOffres.textContent = '0 offres';
         progressMessage.textContent = 'Initialisation...';
         failedSourcesList.innerHTML = '';
@@ -224,34 +227,143 @@ document.addEventListener('DOMContentLoaded', function() {
             cancelBtn.disabled = false;
         }
 
-        // Lancer le scraping
-        fetch('{{ route("admin.scraping.start") }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-            body: JSON.stringify({})
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                jobId = data.job_id;
-                // Commencer le polling
-                startPolling();
-            } else {
-                alert('Erreur : ' + (data.message || 'Une erreur est survenue'));
-                startBtn.disabled = false;
-                startBtn.textContent = 'Lancer';
-            }
-        })
-        .catch(error => {
-            console.error('Erreur:', error);
-            alert('Erreur lors du lancement du scraping');
-            startBtn.disabled = false;
-            startBtn.textContent = 'Lancer';
-        });
+        // MODE OVH COMPATIBLE : Scraper les sources une par une
+        scrapeSourcesSequentially(activeSources);
     });
+
+    /**
+     * Scrappe les sources une par une (mode compatible OVH)
+     */
+    async function scrapeSourcesSequentially(sources) {
+        let currentJobId = null;
+        let cancelled = false;
+        
+        for (let i = 0; i < sources.length; i++) {
+            if (cancelled) break;
+            
+            const source = sources[i];
+            const sourceIndex = i + 1;
+            const isFirst = (i === 0);
+            const isLast = (i === sources.length - 1);
+            
+            // Mettre à jour l'affichage
+            const percentage = Math.round((i / sources.length) * 100);
+            progressBar.style.width = percentage + '%';
+            progressBarText.textContent = percentage > 5 ? percentage + '%' : '';
+            progressText.textContent = percentage + '%';
+            progressCount.textContent = sourceIndex + ' / ' + sources.length;
+            progressMessage.textContent = 'Scraping de ' + source + '...';
+            
+            // Ajouter à la liste des sources en cours
+            updateSourcesList(source, 'running', sources.filter((s, idx) => idx < i).map(s => ({name: s, status: 'completed'})));
+            
+            try {
+                const response = await fetch('{{ route("admin.scraping.scrape-source") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({
+                        source: source,
+                        job_id: currentJobId,
+                        source_index: sourceIndex,
+                        total_sources: sources.length,
+                        truncate_first: isFirst
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.cancelled) {
+                    cancelled = true;
+                    break;
+                }
+                
+                if (data.success) {
+                    currentJobId = data.job_id;
+                    jobId = currentJobId;
+                    
+                    // Mettre à jour le compteur d'offres
+                    totalOffres.textContent = (data.found_count || 0) + ' offres (' + source + ')';
+                }
+                
+            } catch (error) {
+                console.error('Erreur lors du scraping de ' + source + ':', error);
+                // Continuer avec les autres sources
+            }
+        }
+        
+        // Terminé
+        if (!cancelled) {
+            progressBar.style.width = '100%';
+            progressBarText.textContent = '100%';
+            progressText.textContent = '100%';
+            progressCount.textContent = sources.length + ' / ' + sources.length;
+            progressMessage.textContent = 'Scraping terminé avec succès !';
+            progressBar.style.background = 'linear-gradient(90deg, #10b981 0%, #059669 100%)';
+            
+            // Afficher toutes les sources comme terminées
+            updateSourcesList(null, null, sources.map(s => ({name: s, status: 'completed'})));
+        } else {
+            progressMessage.textContent = 'Scraping annulé';
+            progressBar.style.background = '#f59e0b';
+        }
+        
+        // Réactiver le bouton
+        startBtn.disabled = false;
+        startBtn.textContent = 'Lancer le scraping';
+        if (cancelBtn) {
+            cancelBtn.style.display = 'none';
+        }
+        
+        // Recharger le nombre d'offres depuis la base
+        updateTotalOffres();
+    }
+    
+    function updateSourcesList(currentSource, currentStatus, completedSources) {
+        let html = '';
+        
+        // Sources complétées
+        if (completedSources && completedSources.length > 0) {
+            completedSources.forEach(src => {
+                html += `
+                    <div style="padding: 0.75rem; background-color: #d1fae5; border-left: 4px solid #10b981; border-radius: 6px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-weight: 600; color: #065f46;">✓ ${src.name}</span>
+                            <span style="font-size: 0.75rem; color: #047857;">Terminé</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        
+        // Source en cours
+        if (currentSource && currentStatus === 'running') {
+            html += `
+                <div style="padding: 0.75rem; background-color: #dbeafe; border-left: 4px solid #3b82f6; border-radius: 6px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: 600; color: #1e40af;">⏳ ${currentSource}</span>
+                        <span style="font-size: 0.75rem; color: #1e40af;">En cours...</span>
+                    </div>
+                </div>
+            `;
+        }
+        
+        sourcesList.innerHTML = html;
+    }
+    
+    async function updateTotalOffres() {
+        try {
+            const response = await fetch('{{ route("admin.scraping.progress") }}?job_id=' + jobId);
+            const data = await response.json();
+            if (data.success && data.progress && data.progress.total_offres !== undefined) {
+                totalOffres.textContent = data.progress.total_offres + ' offres au total';
+            }
+        } catch (e) {
+            console.error('Erreur mise à jour offres:', e);
+        }
+    }
 
     function startPolling() {
         if (pollingInterval) {
