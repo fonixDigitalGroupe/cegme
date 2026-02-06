@@ -26,6 +26,7 @@ class ScrapeActiveSources extends Command
 
     public function handle()
     {
+        set_time_limit(0); // Empêche le timeout PHP pour les longs processus
         $this->info('=== SCRAPING INTELLIGENT DES SOURCES ACTIVES ===');
         $this->newLine();
 
@@ -60,15 +61,25 @@ class ScrapeActiveSources extends Command
         // Vider la table par défaut (sauf si --no-truncate est spécifié)
         if (!$this->option('no-truncate')) {
             $this->info('🗑️  Vidage de la table offres...');
+            Log::info('ScrapeActiveSources: Début du vidage de la table offres');
             $progressService->updateSource($jobId, 'Vidage de la base', 0);
             
             try {
-                DB::table('offres')->truncate();
-                $this->info("✓ Table vidée avec succès (TRUNCATE)");
-            } catch (\Exception $e) {
-                // Fallback si truncate échoue (ex: SQLite ou contraintes)
+                // Utilisation de delete() au lieu de truncate() pour éviter les verrous de table en prod
                 DB::table('offres')->delete();
+                
+                // Reset auto-increment si possible, mais pas critique
+                try {
+                    DB::statement("ALTER TABLE offres AUTO_INCREMENT = 1");
+                } catch (\Exception $e) {
+                    // Ignorer si pas supporté ou erreur de droit
+                }
+                
                 $this->info("✓ Table vidée avec succès (DELETE)");
+                Log::info('ScrapeActiveSources: Table offres vidée avec succès');
+            } catch (\Exception $e) {
+                Log::error('ScrapeActiveSources: Erreur lors du vidage de la table: ' . $e->getMessage());
+                $this->error("Erreur lors du vidage: " . $e->getMessage());
             }
             $this->newLine();
         } else {
