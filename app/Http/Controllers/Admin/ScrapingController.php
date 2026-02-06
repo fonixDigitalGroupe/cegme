@@ -79,24 +79,25 @@ class ScrapingController extends Controller
             ]);
         }
 
-        // Lancer le scraping en arrière-plan via la commande CLI pour ne pas bloquer le serveur web
-        $phpPath = PHP_BINARY;
-        $artisanPath = base_path('artisan');
-        $command = escapeshellarg($phpPath) . ' ' . escapeshellarg($artisanPath) . ' app:scrape-active-sources --apply-filters --job-id=' . escapeshellarg($jobId);
+        // PATCH OVH: Exécuter directement le scraping au lieu d'utiliser exec()
+        // Sur OVH mutualisé, exec() et proc_open() sont souvent désactivés
+        // On exécute donc le scraping de manière synchrone (dans la même requête)
         
-        if ($noTruncate) {
-            $command .= ' --no-truncate';
-        }
-
-        if (PHP_OS_FAMILY === 'Windows') {
-            pclose(popen("start /B " . $command, "r"));
-        } else {
-            exec($command . " > /dev/null 2>&1 &");
-        }
-
         // Fermer la session pour éviter de bloquer d'autres requêtes du même utilisateur
         if (session_id()) {
             session_write_close();
+        }
+
+        // Augmenter les limites pour éviter les timeouts
+        @set_time_limit(300); // 5 minutes max
+        @ini_set('max_execution_time', '300');
+        
+        // Lancer le scraping directement
+        try {
+            $this->executeScrapingRoundRobin($jobId, $activeSources, $noTruncate, $progressService);
+        } catch (\Exception $e) {
+            Log::error('Erreur lors du scraping', ['error' => $e->getMessage()]);
+            $progressService->fail($jobId, $e->getMessage());
         }
 
         return response()->json([
@@ -104,6 +105,7 @@ class ScrapingController extends Controller
             'job_id' => $jobId,
             'total_sources' => count($activeSources),
             'sources' => $activeSources,
+            'note' => 'Scraping exécuté en mode synchrone (compatible OVH)'
         ]);
     }
 
