@@ -53,9 +53,10 @@
             background-color: #ffffff;
             border: 1px solid #dee2e6;
             border-radius: 4px;
-            overflow: hidden;
+            overflow-x: auto; /* Permettre le défilement horizontal */
             margin-bottom: 2rem;
             box-shadow: 0 0 1px rgba(0, 0, 0, 0.05);
+            -webkit-overflow-scrolling: touch; /* Pour un défilement fluide sur iOS */
         }
 
         .table-title {
