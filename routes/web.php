@@ -98,4 +98,24 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
 });
 
+// Fallback route to serve storage images if symlink is not available
+// IMPORTANT: This route should only be used if you cannot create a symlink on your server
+// If the public/storage symlink exists, this route will be ignored
+Route::get('storage/{path}', function ($path) {
+    $file = storage_path('app/public/' . $path);
+    
+    if (!file_exists($file)) {
+        abort(404);
+    }
+    
+    // Get the file's mime type
+    $mimeType = mime_content_type($file);
+    
+    // Return the file with proper headers
+    return response()->file($file, [
+        'Content-Type' => $mimeType,
+        'Cache-Control' => 'public, max-age=31536000', // Cache for 1 year
+    ]);
+})->where('path', '.*')->name('storage.fallback');
+
 require __DIR__ . '/auth.php';
