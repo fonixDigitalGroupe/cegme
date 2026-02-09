@@ -363,7 +363,7 @@
                     </a>
                     <div class="dropdown-menu">
                         <a href="{{ route('admin.filtering-rules.index') }}" class="dropdown-item {{ request()->routeIs('admin.filtering-rules.*') ? 'active' : '' }}">
-                            Règles de filtrage
+                            Sources de filtrage
                         </a>
                         <a href="{{ route('admin.activity-poles.index') }}" class="dropdown-item {{ request()->routeIs('admin.activity-poles.*') ? 'active' : '' }}">
                             Pôles d'activité

@@ -3,9 +3,10 @@
 @section('title', 'Modifier un pôle d\'activité')
 
 @section('content')
-<div style="margin-bottom: 1.5rem;">
-    <h1 style="font-size: 1.5rem; font-weight: 600; color: #1a1a1a; margin: 0;">Modifier un pôle d'activité</h1>
-</div>
+<div style="max-width: 600px; margin: 0 auto;">
+    <div style="margin-bottom: 1.5rem; text-align: center;">
+        <h1 style="font-size: 1.5rem; font-weight: 600; color: #1a1a1a; margin: 0;">Modifier un pôle d'activité</h1>
+    </div>
 
 @if($errors->any())
     <div style="padding: 1rem; background-color: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; border-radius: 4px; margin-bottom: 1.5rem;">
@@ -45,7 +46,6 @@
                 <button type="button" onclick="addKeywordField()" style="padding: 0.5rem 1rem; background-color: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer;">+</button>
             </div>
         </div>
-        <small style="color: #6b7280; font-size: 0.75rem;">Les mots-clés seront recherchés dans le titre, la description et l'acheteur des offres</small>
     </div>
 
     <div style="display: flex; gap: 0.5rem;">
@@ -53,6 +53,7 @@
         <a href="{{ route('admin.activity-poles.index') }}" style="padding: 0.625rem 1.25rem; background-color: #6b7280; color: white; border: none; border-radius: 4px; font-weight: 500; text-decoration: none; display: inline-block;">Annuler</a>
     </div>
 </form>
+</div>
 
 <script>
 function addKeywordField() {

@@ -6,70 +6,18 @@ class AfricanCountriesService
 {
     /**
      * Retourne la liste des pays africains (Français et Anglais)
-     * ainsi que les termes génériques liés à l'Afrique.
+     * basés sur les régions actives (Centrale et Ouest).
      */
     public static function getAfricanCountriesKeywords(): array
     {
-        return [
-            // Termes génériques
-            'Africa', 'Afrique',
-            
-            // Pays (Français / Anglais)
-            'Algérie', 'Algeria',
-            'Angola',
-            'Bénin', 'Benin',
-            'Botswana',
-            'Burkina Faso',
-            'Burundi',
-            'Cameroun', 'Cameroon',
-            'Cap-Vert', 'Cape Verde', 'Cabo Verde',
-            'Centrafrique', 'République Centrafricaine', 'Central African Republic',
-            'Comores', 'Comoros',
-            'Congo', // Couvre Congo-Brazzaville et RDC
-            'Côte d\'Ivoire', 'Ivory Coast',
-            'Djibouti',
-            'Égypte', 'Egypt',
-            'Dup', // Erythrée (Typo check ?) -> Erythrée
-            'Érythrée', 'Eritrea',
-            'Eswatini', 'Swaziland',
-            'Éthiopie', 'Ethiopia',
-            'Gabon',
-            'Gambie', 'Gambia',
-            'Ghana',
-            'Guinée', 'Guinea',
-            'Guinée-Bissau', 'Guinea-Bissau',
-            'Guinée Équatoriale', 'Equatorial Guinea',
-            'Kenya',
-            'Lesotho',
-            'Liberia',
-            'Libye', 'Libya',
-            'Madagascar',
-            'Malawi',
-            'Mali',
-            'Maroc', 'Morocco',
-            'Maurice', 'Mauritius',
-            'Mauritanie', 'Mauritania',
-            'Mozambique',
-            'Namibie', 'Namibia',
-            'Niger',
-            'Nigeria',
-            'Ouganda', 'Uganda',
-            'Rwanda',
-            'Sao Tomé-et-Principe', 'São Tomé and Príncipe',
-            'Sénégal', 'Senegal',
-            'Seychelles',
-            'Sierra Leone',
-            'Somalie', 'Somalia',
-            'Soudan', 'Sudan',
-            'Soudan du Sud', 'South Sudan',
-            'Tanzanie', 'Tanzania',
-            'Tchad', 'Chad',
-            'Togo',
-            'Tunisie', 'Tunisia',
-            'Zambie', 'Zambia',
-            'Zimbabwe',
-            'Sahara Occidental', 'Western Sahara'
-        ];
+        $regions = self::getAfricanRegions();
+        $keywords = ['Africa', 'Afrique'];
+
+        foreach ($regions as $region) {
+            $keywords = array_merge($keywords, $region['keywords']);
+        }
+
+        return array_values(array_unique($keywords));
     }
     /**
      * Traduit le nom d'un pays africain en français.
@@ -157,7 +105,7 @@ class AfricanCountriesService
     }
 
     /**
-     * Retourne les définitions des sous-régions pour le filtrage.
+     * Retourne les définitions des régions pour le filtrage (uniquement Centrale et Ouest).
      */
     public static function getAfricanRegions(): array
     {
@@ -187,7 +135,7 @@ class AfricanCountriesService
                     'Côte d\'Ivoire', 'Ivory Coast',
                     'Gambie', 'Gambia',
                     'Ghana',
-                    'Guinée', 'Guinea', // Attention aux autres Guinées
+                    'Guinée', 'Guinea',
                     'Guinée-Bissau', 'Guinea-Bissau',
                     'Liberia',
                     'Mali',
@@ -198,19 +146,55 @@ class AfricanCountriesService
                     'Togo',
                     'Afrique de l\'Ouest', 'West Africa'
                 ]
-            ],
-            'benin' => [
-                'label' => 'Bénin',
-                'keywords' => [
-                    'Bénin', 'Benin'
-                ]
-            ],
-            'togo' => [
-                'label' => 'Togo',
-                'keywords' => [
-                    'Togo'
-                ]
             ]
         ];
+    }
+
+    /**
+     * Retourne tous les mots-clés (fr/en) pour un pays donné par son nom traduit.
+     */
+    public static function getKeywordsForCountry(string $translatedName): array
+    {
+        $regions = self::getAfricanRegions();
+        $keywords = [];
+        
+        foreach ($regions as $region) {
+            foreach ($region['keywords'] as $kw) {
+                if (self::translateCountry($kw) === $translatedName) {
+                    $keywords[] = $kw;
+                }
+            }
+        }
+        
+        // Si aucun match trouvé (peu probable), retourner au moins le nom lui-même
+        if (empty($keywords)) {
+            return [$translatedName];
+        }
+        
+        return array_unique($keywords);
+    }
+
+    /**
+     * Retourne une liste plate de tous les pays des régions actives
+     */
+    public static function getAfricanCountriesFlat(): array
+    {
+        $regions = self::getAfricanRegions();
+        $allCountries = [];
+
+        foreach ($regions as $region) {
+            foreach ($region['keywords'] as $kw) {
+                if ($kw !== $region['label'] && !str_contains($kw, 'Africa') && !str_contains($kw, 'Afrique')) {
+                    $translated = self::translateCountry($kw);
+                    if (!empty($translated)) {
+                        $allCountries[] = $translated;
+                    }
+                }
+            }
+        }
+
+        $allCountries = array_unique($allCountries);
+        sort($allCountries);
+        return array_values($allCountries);
     }
 }

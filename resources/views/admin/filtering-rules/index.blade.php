@@ -1,20 +1,14 @@
 @extends('admin.layout')
 
-@section('title', 'Règles de filtrage des offres')
+@section('title', 'Sources de filtrage des offres')
 
 @section('content')
     <!-- Configuration du scraping automatique -->
-    <div
-        style="padding: 1.5rem; margin-bottom: 2rem; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);">
-        <h2
-            style="font-size: 1.125rem; font-weight: 600; color: #1a1a1a; margin-bottom: 1.25rem;">
-            Scraping Automatique
-        </h2>
-        <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                <label style="font-size: 0.875rem; font-weight: 500; color: #374151;">Fréquence:</label>
-                <select id="scraping-frequency"
-                    style="min-width: 200px; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 4px; font-size: 0.875rem; color: #374151; background-color: #ffffff; cursor: pointer;">
+    <div style="margin-bottom: 2rem; padding: 1rem; background-color: #ffffff; border: 1px solid #d1d5db; border-radius: 4px;">
+        <div style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 200px;">
+                <label for="scraping-frequency" style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.5rem;">Fréquence de scraping:</label>
+                <select id="scraping-frequency" style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 4px; font-size: 0.875rem; color: #374151; background-color: #ffffff; cursor: pointer;">
                     <option value="1min">Toutes les 1 minute</option>
                     <option value="30min">Toutes les 30 minutes</option>
                     <option value="1hour">Toutes les 1 heure</option>
@@ -22,28 +16,28 @@
                 </select>
             </div>
 
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                <label style="font-size: 0.875rem; font-weight: 500; color: #000000;">Statut:</label>
-                <label style="display: inline-flex; align-items: center; cursor: pointer;">
-                    <input type="checkbox" id="scraping-active"
-                        style="width: 18px; height: 18px; cursor: pointer; margin-right: 0.5rem; accent-color: #10b981;">
-                    <span id="scraping-status-text" style="font-size: 0.875rem; color: #6b7280;">Inactif</span>
+            <div style="min-width: 150px;">
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.5rem;">Statut:</label>
+                <label style="display: flex; align-items: center; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 4px; background-color: #ffffff; cursor: pointer; height: 38px;">
+                    <input type="checkbox" id="scraping-active" style="width: 16px; height: 16px; cursor: pointer; margin-right: 0.5rem; accent-color: #10b981;">
+                    <span id="scraping-status-text" style="font-size: 0.875rem; color: #6b7280; font-weight: 500;">Inactif</span>
                 </label>
             </div>
 
-            <button id="save-schedule" type="button"
-                style="background-color: #10b981; color: white; border: none; padding: 0.5rem 1rem; font-weight: 500; font-size: 0.875rem; border-radius: 4px; cursor: pointer;">
-                Enregistrer
-            </button>
+            <div style="display: flex; gap: 0.5rem;">
+                <button id="save-schedule" type="button" style="padding: 0.5rem 1rem; background-color: #ffffff; color: #374151; border: 1px solid #d1d5db; border-radius: 4px; font-size: 0.875rem; font-weight: 500; cursor: pointer;" onmouseover="this.style.backgroundColor='#f9fafb';" onmouseout="this.style.backgroundColor='#ffffff';">
+                    Enregistrer la config
+                </button>
+            </div>
 
-            <div id="schedule-info" style="font-size: 0.8125rem; color: #374151; margin-left: auto; border: 1px solid #d1d5db; background-color: #f9fafb; padding: 0.5rem 0.75rem; border-radius: 4px; font-weight: 500;">
+            <div id="schedule-info" style="font-size: 0.8125rem; color: #374151; margin-left: auto; border: 1px solid #d1d5db; background-color: #f9fafb; padding: 0.5rem 0.75rem; border-radius: 4px; font-weight: 500; height: 38px; display: flex; align-items: center;">
                 <span id="next-run-text"></span>
             </div>
         </div>
     </div>
 
     <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
-        <h1 style="font-size: 1.5rem; font-weight: 600; color: #1a1a1a; margin: 0;">Règles de filtrage des offres</h1>
+        <h1 style="font-size: 1.5rem; font-weight: 600; color: #1a1a1a; margin: 0;">Sources de filtrage des offres</h1>
         <div style="display: flex; gap: 0.5rem;">
             <button id="start-scraping-simple" type="button"
                 style="background-color: #3b82f6; color: white; border: none; padding: 0.625rem 1.25rem; font-weight: 500; font-size: 0.875rem; border-radius: 4px; cursor: pointer;">
@@ -55,7 +49,7 @@
             </button>
             <a href="{{ route('admin.filtering-rules.create') }}" class="btn"
                 style="background-color: #00C853; color: white; border: none; padding: 0.625rem 1.25rem; font-weight: 500; font-size: 0.875rem; border-radius: 4px; text-decoration: none; display: inline-flex; align-items: center;">
-                + Nouvelle règle
+                + Nouvelle source
             </a>
         </div>
     </div>
@@ -150,37 +144,28 @@
         </table>
     </div>
 
-    <!-- Barre de progression (déplacée après le tableau) -->
+    <!-- Barre de progression -->
     <div id="scraping-progress-container"
-        style="display: none; margin-top: 1.5rem; background-color: #ffffff; border: 1px solid #d1d5db; border-radius: 8px; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        style="display: none; margin-top: 1.5rem; background-color: #ffffff; border: 1px solid #d1d5db; border-radius: 4px; padding: 1rem;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
             <span id="scraping-status-label"
                 style="font-weight: 600; color: #374151; font-size: 0.9375rem;">Initialisation...</span>
             <span id="scraping-percentage" style="font-weight: 700; color: #3b82f6; font-size: 0.9375rem;">0%</span>
         </div>
-        <div style="width: 100%; background-color: #e5e7eb; border-radius: 9999px; height: 10px; overflow: hidden;">
+        <div style="width: 100%; background-color: #e5e7eb; border-radius: 4px; height: 8px; overflow: hidden;">
             <div id="scraping-progress-bar"
-                style="width: 0%; height: 100%; background-color: #3b82f6; transition: width 0.4s ease; border-radius: 9999px;">
+                style="width: 0%; height: 100%; background-color: #3b82f6; transition: width 0.4s ease;">
             </div>
         </div>
-        <p id="scraping-details" style="margin-top: 0.75rem; font-size: 0.8125rem; color: #6b7280;"></p>
+        <p id="scraping-details" style="margin-top: 0.75rem; font-size: 0.8125rem; color: #6b7280; font-family: 'Inter', sans-serif;"></p>
 
-        <div style="margin-top: 1.25rem; display: flex; justify-content: flex-end;">
+        <div style="margin-top: 1rem; display: flex; justify-content: flex-end;">
             <button id="cancel-scraping-large" type="button"
-                style="display: none; background-color: #ef4444; color: white; border: none; padding: 0.5rem 1rem; font-weight: 600; font-size: 0.875rem; border-radius: 4px; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
-                ⚠ Arrêter le scraping en cours
+                style="display: none; background-color: #ef4444; color: white; border: none; padding: 0.5rem 1rem; font-weight: 600; font-size: 0.8125rem; border-radius: 4px; cursor: pointer;">
+                ⚠ Arrêter le scraping
             </button>
         </div>
 
-        <div id="recent-findings"
-            style="margin-top: 1rem; border-top: 1px solid #f3f4f6; padding-top: 1rem; display: none;">
-            <h4
-                style="font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.025em; color: #9ca3af; margin-bottom: 0.5rem; font-weight: 700;">
-                Dernières trouvailles :</h4>
-            <ul id="findings-list" style="list-style: none; padding: 0; margin: 0; max-height: 120px; overflow-y: auto;">
-                <!-- Rempli en JS -->
-            </ul>
-        </div>
     </div>
 
     <script>
@@ -193,8 +178,6 @@
             const progPercentage = document.getElementById('scraping-percentage');
             const progLabel = document.getElementById('scraping-status-label');
             const progDetails = document.getElementById('scraping-details');
-            const findingsContainer = document.getElementById('recent-findings');
-            const findingsList = document.getElementById('findings-list');
 
             if (!btn) return;
 
@@ -258,17 +241,6 @@
                                 progLabel.textContent = progress.current_source ? 'Source : ' + progress.current_source : 'Initialisation...';
                                 progDetails.textContent = progress.message;
 
-                                // Afficher les trouvailles
-                                if (progress.recent_findings && progress.recent_findings.length > 0) {
-                                    findingsContainer.style.display = 'block';
-                                    findingsList.innerHTML = progress.recent_findings.map(f => `
-                                                <li style="font-size: 0.8125rem; color: #4b5563; padding: 0.25rem 0; border-bottom: 1px solid #f9fafb;">
-                                                    <span style="font-weight: 500; color: #111827;">[${f.found_at}]</span> 
-                                                    <span style="color: #3b82f6;">${f.source}</span>: ${f.titre.substring(0, 80)}${f.titre.length > 80 ? '...' : ''} 
-                                                    <span style="color: #6b7280;">(${f.pays})</span>
-                                                </li>
-                                            `).join('');
-                                }
 
                                 if (progress.status === 'completed' || progress.status === 'failed' || progress.status === 'cancelled') {
                                     stopPolling();
@@ -361,8 +333,6 @@
                 progPercentage.textContent = '0%';
                 progLabel.textContent = 'Lancement...';
                 progDetails.textContent = '';
-                findingsList.innerHTML = '';
-                findingsContainer.style.display = 'none';
 
                 setRunningState(true);
 

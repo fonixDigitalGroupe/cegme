@@ -13,7 +13,8 @@ class IFADScraperService implements IterativeScraperInterface
 {
     private const BASE_URL = 'https://www.ifad.org/fr/appels-a-proposition';
 
-    private ?string $jobId = null;
+    private int $currentPage = 0;
+    private array $pendingOffers = [];
     private bool $isExhausted = false;
 
     public function setJobId(?string $jobId): void
@@ -23,79 +24,128 @@ class IFADScraperService implements IterativeScraperInterface
 
     public function initialize(): void
     {
+        $this->currentPage = 0;
         $this->isExhausted = false;
+        $this->pendingOffers = [];
     }
 
     public function reset(): void
     {
-        $this->isExhausted = false;
+        $this->initialize();
     }
 
-    public function scrapeBatch(int $limit = 50): array
+    public function scrapeBatch(int $limit = 10): array
     {
+        Log::info("IFAD Scraper: Début scrapeBatch(limit=$limit)");
+        $insertedCount = 0;
+        $findings = [];
+        $maxPages = max(1, min((int) env('IFAD_MAX_PAGES', 10), 10));
+
+        // 1. Servir les offres en attente si présentes
+        if (!empty($this->pendingOffers)) {
+            Log::info("IFAD Scraper: Serving " . min(count($this->pendingOffers), $limit) . " pending offers.");
+            $batch = array_splice($this->pendingOffers, 0, $limit);
+            foreach ($batch as $offre) {
+                if ($this->saveOffre($offre)) {
+                    $insertedCount++;
+                }
+                $findings[] = $offre;
+            }
+            return [
+                'count' => $insertedCount,
+                'has_more' => !empty($this->pendingOffers) || ($this->currentPage < $maxPages && !$this->isExhausted),
+                'findings' => $findings,
+            ];
+        }
+
         if ($this->isExhausted) {
             return ['count' => 0, 'has_more' => false, 'findings' => []];
         }
 
-        Log::info('IFAD Scraper: Début du scraping complet avec pagination');
+        // 2. Scrapper une nouvelle page tant qu'on n'a pas rempli le batch
+        // USER REQUEST: parcourie 10 page aux maxe
 
-        $findings = [];
-        $insertedCount = 0;
-
-        try {
-            Log::info('IFAD Scraper: Fetching Page 1');
-            $html = Browsershot::url(self::BASE_URL)
-                ->setChromePath('/usr/bin/google-chrome')
-                ->setNodeBinary('/usr/bin/node')
-                ->ignoreHttpsErrors()
-                ->noSandbox()
-                ->waitUntilNetworkIdle()
-                ->waitForSelector('.general-feature-card') 
-                ->timeout(240)
-                ->userAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
-                ->bodyHtml();
-
-            $dom = new DOMDocument();
-            libxml_use_internal_errors(true);
-            @$dom->loadHTML('<?xml encoding="UTF-8">' . $html);
-            libxml_clear_errors();
-            $xpath = new DOMXPath($dom);
+        while (count($findings) < $limit && $this->currentPage < $maxPages && !$this->isExhausted) {
             
-            $rows = $xpath->query("//div[contains(@class, 'general-feature-card')]");
-            Log::info("IFAD Scraper: Cards found on Page 1: " . $rows->length);
-
-            foreach ($rows as $row) {
-                try {
-                    $offre = $this->extractOffreData($row, $xpath);
-
-                    if (!$offre || empty($offre['titre']) || empty($offre['lien_source']))
-                        continue;
-
-                    if ($this->saveOffre($offre)) {
-                        $insertedCount++;
-                    }
-                    $findings[] = $offre;
-
-                    if (count($findings) >= $limit) break;
-
-                } catch (\Exception $e) {
-                    continue;
-                }
+            $url = self::BASE_URL;
+            if ($this->currentPage >= 0) {
+                $cur = $this->currentPage + 1;
+                $url .= (strpos($url, '?') === false ? '?' : '&') . "_com_ifad_portal_portlet_search_results_SearchResultsPortlet_cur={$cur}&_com_ifad_portal_portlet_search_results_SearchResultsPortlet_delta=100";
             }
 
-            $this->isExhausted = true;
+            Log::info("IFAD Scraper: Fetching Page " . ($this->currentPage + 1) . " - " . $url);
 
-            return [
-                'count' => $insertedCount,
-                'has_more' => false, 
-                'findings' => $findings,
-            ];
+            try {
+                // Increase timeout and add wait for dynamic content
+                $html = Browsershot::url($url)
+                    ->setChromePath('/usr/bin/google-chrome')
+                    ->setNodeBinary('/usr/bin/node')
+                    ->ignoreHttpsErrors()
+                    ->noSandbox()
+                    ->waitUntilNetworkIdle()
+                    ->waitForSelector('.general-feature-card') 
+                    ->timeout(240)
+                    ->userAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
+                    ->bodyHtml();
 
-        } catch (\Exception $e) {
-            Log::error('IFAD Scraper: Exception', ['error' => $e->getMessage()]);
-            $this->isExhausted = true;
-            return ['count' => 0, 'has_more' => false, 'findings' => []];
+                $dom = new DOMDocument();
+                libxml_use_internal_errors(true);
+                @$dom->loadHTML('<?xml encoding="UTF-8">' . $html);
+                libxml_clear_errors();
+                $xpath = new DOMXPath($dom);
+                
+                $rows = $xpath->query("//div[contains(@class, 'general-feature-card')]");
+                Log::info("IFAD Scraper: Cards found on Page " . ($this->currentPage + 1) . ": " . $rows->length);
+
+                if ($rows->length === 0) {
+                    Log::info("IFAD Scraper: No cards found on page " . ($this->currentPage + 1) . ". Marking as exhausted.");
+                    $this->isExhausted = true;
+                    break;
+                }
+
+                $pageOffers = [];
+                foreach ($rows as $row) {
+                    $offre = $this->extractOffreData($row, $xpath);
+                    if ($offre && !empty($offre['titre']) && !empty($offre['lien_source'])) {
+                        $pageOffers[] = $offre;
+                    } else {
+                        Log::debug("IFAD Scraper: Skipping invalid/empty offer data.");
+                    }
+                }
+
+                if (empty($pageOffers)) {
+                    Log::info("IFAD Scraper: All offers on page " . ($this->currentPage + 1) . " were invalid. Marking as exhausted.");
+                    $this->isExhausted = true;
+                    break;
+                }
+
+                $this->pendingOffers = array_merge($this->pendingOffers, $pageOffers);
+                $this->currentPage++;
+
+                // Servir ce qu'on peut
+                $needed = $limit - count($findings);
+                if ($needed > 0 && !empty($this->pendingOffers)) {
+                    $batch = array_splice($this->pendingOffers, 0, $needed);
+                    foreach ($batch as $offre) {
+                        if ($this->saveOffre($offre)) {
+                            $insertedCount++;
+                        }
+                        $findings[] = $offre;
+                    }
+                }
+
+            } catch (\Exception $e) {
+                Log::error('IFAD Scraper: Error on page ' . ($this->currentPage + 1), ['error' => $e->getMessage()]);
+                $this->isExhausted = true;
+                break;
+            }
         }
+
+        return [
+            'count' => $insertedCount,
+            'has_more' => !empty($this->pendingOffers) || ($this->currentPage < $maxPages && !$this->isExhausted),
+            'findings' => $findings,
+        ];
     }
 
     private function saveOffre(array $offreData): bool
@@ -107,15 +157,17 @@ class IFADScraperService implements IterativeScraperInterface
 
             if (!$exists) {
                 Offre::insert($offreData);
+                Log::info("IFAD Scraper: Inserted new offer: " . $offreData['titre']);
                 return true;
             } else {
                  Offre::where('source', 'IFAD')
                     ->where('lien_source', $offreData['lien_source'])
                     ->update([
                         'updated_at' => now(),
-                        // Update date if we found one now and didn't before
-                        'date_limite_soumission' => $offreData['date_limite_soumission'] ?? null
+                        'date_limite_soumission' => $offreData['date_limite_soumission'] ?? null,
+                        'date_publication' => $offreData['date_publication'] ?? null,
                     ]);
+                 Log::debug("IFAD Scraper: Updated existing offer: " . $offreData['titre']);
             }
         } catch (\Exception $e) {
             Log::error('IFAD Scraper: DB Error', ['error' => $e->getMessage()]);
@@ -162,16 +214,29 @@ class IFADScraperService implements IterativeScraperInterface
 
         if (!$link) return null;
 
-        // DATE
-        // Structure: .article-metadata p:last-child (ou p[2]) -> "6 mai 2024"
-        $date = null;
-        $dateNode = $xpath->query(".//div[contains(@class, 'article-metadata')]/p[last()]", $row)->item(0);
+        // DATES
+        $datePublication = null;
+        $dateLimite = null;
         
-        if ($dateNode) {
-            $dateStr = trim($dateNode->textContent);
-            // Vérifier si c'est une date (contient des chiffres)
-            if (preg_match('/\d/', $dateStr)) {
-                $date = $this->parseDate($dateStr);
+        $metadataNodes = $xpath->query(".//div[contains(@class, 'article-metadata')]/p", $row);
+        foreach ($metadataNodes as $node) {
+            $text = trim($node->textContent);
+            if (stripos($text, 'Publié le') !== false || stripos($text, 'Posted on') !== false) {
+                $datePublication = $this->parseDate(preg_replace('/(Publié le|Posted on|:)/i', '', $text));
+            }
+            if (stripos($text, 'Date limite') !== false || stripos($text, 'Deadline') !== false || stripos($text, 'Closing date') !== false) {
+                $dateLimite = $this->parseDate(preg_replace('/(Date limite|Deadline|Closing date|:)/i', '', $text));
+            }
+        }
+
+        // Fallback: si une seule date est présente sans label explicite
+        if (!$datePublication && !$dateLimite) {
+            $dateNode = $xpath->query(".//div[contains(@class, 'article-metadata')]/p[last()]", $row)->item(0);
+            if ($dateNode) {
+                $dateStr = trim($dateNode->textContent);
+                if (preg_match('/\d/', $dateStr)) {
+                    $datePublication = $this->parseDate($dateStr);
+                }
             }
         }
 
@@ -179,7 +244,8 @@ class IFADScraperService implements IterativeScraperInterface
             'titre' => $this->cleanTitle($titre ?? 'Sans titre'),
             'acheteur' => 'IFAD',
             'pays' => 'International',
-            'date_limite_soumission' => $date,
+            'date_limite_soumission' => $dateLimite,
+            'date_publication' => $datePublication,
             'lien_source' => $link,
             'source' => 'IFAD',
             'detail_url' => $link,
@@ -330,6 +396,20 @@ class IFADScraperService implements IterativeScraperInterface
     public function scrape(): array
     {
         $this->initialize();
-        return $this->scrapeBatch(50);
+        $totalCount = 0;
+        
+        while (true) {
+            $batch = $this->scrapeBatch(50);
+            $totalCount += $batch['count'];
+            if (!$batch['has_more']) break;
+        }
+
+        return [
+            'count' => $totalCount,
+            'stats' => [
+                'total_notices_kept' => $totalCount,
+                'total_pages_scraped' => $this->currentPage
+            ]
+        ];
     }
 }

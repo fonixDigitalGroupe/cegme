@@ -7,6 +7,7 @@ use App\Services\OfferFilteringService;
 use App\Services\ScraperHelper;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Services\AFDScraperService;
 use App\Services\AfDBScraperService;
 use App\Services\WorldBankScraperService;
@@ -90,121 +91,62 @@ class ScrapeActiveSources extends Command
         $this->info('Sources à traiter: ' . implode(', ', $activeSources));
         $this->newLine();
 
+        // Utiliser un pool de processus pour paralléliser
+        // On limite à 2 sources simultanées pour préserver la RAM (surtout avec Browsershot)
         $totalFoundGlobal = 0;
+        $totalSources = count($activeSources);
+        $results = [];
 
-        foreach ($activeSources as $index => $source) {
-            $currentSourceNum = $index + 1;
-            $this->info("--- Démarrage: {$source} ({$currentSourceNum}/" . count($activeSources) . ") ---");
+        $this->info("Lancement du scraping parallèle (lots de 2 sources)...");
 
-            // Mettre à jour la progression UI
-            $progressService->updateSource($jobId, $source, $currentSourceNum);
+        $chunks = array_chunk($activeSources, 2);
+        $binary = \Illuminate\Console\Application::formatCommandString('invoke-serialized-closure');
 
-            try {
-                $scraper = $this->getScraperForSource($source);
+        foreach ($chunks as $chunkIndex => $chunk) {
+            $this->info("Traitement du lot " . ($chunkIndex + 1) . "/" . count($chunks) . " (" . implode(', ', $chunk) . ")...");
+            
+            $pool = \Illuminate\Support\Facades\Process::pool(function ($pool) use ($chunk, $jobId, $totalSources, $activeSources, $binary) {
+                foreach ($chunk as $source) {
+                    $index = array_search($source, $activeSources);
+                    $task = static fn() => (new \App\Services\StandaloneScraperRunner())->run($source, $jobId, $index + 1, $totalSources);
+                    
+                    $pool->as($source)
+                        ->path(base_path())
+                        ->timeout(600) // 10 minutes par source
+                        ->env([
+                            'LARAVEL_INVOKABLE_CLOSURE' => base64_encode(serialize(new \Laravel\SerializableClosure\SerializableClosure($task))),
+                        ])
+                        ->command($binary);
+                }
+            });
 
-                if (!$scraper) {
-                    $this->warn("⚠ Aucun scraper disponible pour {$source}");
-                    $progressService->markSourceFailed($jobId, $source, "Scraper non trouvé");
+            $responses = $pool->start()->wait();
+
+            foreach ($responses as $source => $response) {
+                if ($response->failed()) {
+                    $this->error("✗ Erreur sur {$source}: " . ($response->errorOutput() ?: "Timeout ou erreur inconnue"));
+                    $results[] = 0;
                     continue;
                 }
 
-                if (!($scraper instanceof IterativeScraperInterface)) {
-                    // Fallback pour les scrapers non itératifs (s'il y en a)
-                    $this->warn("⚠ {$source} ne supporte pas le mode itératif strict. Exécution standard...");
-                    $result = $scraper->scrape();
-                    $count = $result['count'] ?? 0;
-                    $this->info("✓ Terminé: {$count} offres traitées (Standard)");
-                    $totalFoundGlobal += $count;
-                    $progressService->markSourceCompleted($jobId, $source, $count);
-                    continue;
-                }
-
-                // Initialisation
-                $scraper->setJobId($jobId);
-                $scraper->initialize();
-
-                $foundCount = 0;
-                $lotCount = 0;
-                $maxLots = 50; // Sécurité ~500 items
-                $targetOffers = 50; // Objectif Cible
-                $hasMore = true;
-
-                $bar = $this->output->createProgressBar($targetOffers);
-                $bar->setFormatDefinition('custom', ' %current%/%max% [%bar%] %message%');
-                $bar->setFormat('custom');
-                $bar->setMessage("Recherche d'offres...");
-                $bar->start();
-
-                $emptyBatchCount = 0; // Compteur de lots vides consécutifs
-                $maxEmptyBatches = 5; // Si 5 lots consécutifs sans résultat, on passe à la source suivante
-
-                while ($hasMore && $foundCount < $targetOffers && $lotCount < $maxLots) {
-                    // Vérifier si annulé via UI
-                    if ($progressService->isCancelled($jobId)) {
-                        $this->warn('❌ Scraping annulé par l\'utilisateur.');
-                        $bar->finish();
-                        return Command::SUCCESS;
-                    }
-
-                    $lotCount++;
-                    // Batch size réduit pour feedback rapide
-                    $result = $scraper->scrapeBatch(2);
-
-                    $hasMore = $result['has_more'];
-                    $batchFindingsCount = isset($result['findings']) ? count($result['findings']) : 0;
-                    $foundCount += $batchFindingsCount;
-
-                    // Mettre à jour les trouvailles en temps réel dans l'UI
-                    if (!empty($result['findings'])) {
-                        $progressService->addFindings($jobId, $result['findings']);
-                    }
-
-                    // Mettre à jour le message de progression UI
-                    $progressService->updateProgress($jobId, [
-                        'message' => "Scraping de {$source}... {$foundCount} offres trouvées (Lot {$lotCount})",
-                        'source_progress' => $foundCount
-                    ]);
-
-                    // Vérifier si le lot est vide pour skip si trop long
-                    if ($batchFindingsCount === 0) {
-                        $emptyBatchCount++;
-                        if ($emptyBatchCount >= $maxEmptyBatches) {
-                            $this->warn("  ⚠ Aucun résultat après {$emptyBatchCount} tentatives, passage à la source suivante...");
-                            break;
-                        }
-                    } else {
-                        $emptyBatchCount = 0;
-                    }
-
-                    $bar->advance($batchFindingsCount);
-                    $bar->setMessage("Lot {$lotCount}: +{$batchFindingsCount} offres");
-                }
-
-                $bar->finish();
-                $this->newLine();
-
-                if ($foundCount >= $targetOffers) {
-                    $this->info("✓ Objectif atteint ({$foundCount} offres) pour {$source}");
-                } elseif (!$hasMore) {
-                    $this->info("✓ Source épuisée ({$foundCount} offres trouvées) pour {$source}");
+                $output = json_decode($response->output(), true);
+                if ($output && $output['successful']) {
+                    $count = unserialize($output['result']);
+                    $results[] = (int) $count;
+                    $this->info("✓ {$source}: {$count} offres trouvées");
                 } else {
-                    $this->warn("⚠ Arrêt sécurité après {$lotCount} lots ({$foundCount} offres) pour {$source}");
+                    $errorMsg = $output['message'] ?? 'Erreur inconnue';
+                    $this->error("✗ Erreur sur {$source}: {$errorMsg}");
+                    $results[] = 0;
                 }
-
-                $totalFoundGlobal += $foundCount;
-                $progressService->markSourceCompleted($jobId, $source, $foundCount);
-
-            } catch (\Exception $e) {
-                $this->error("✗ Erreur sur {$source}: " . $e->getMessage());
-                $progressService->markSourceFailed($jobId, $source, $e->getMessage());
             }
-
-            $this->newLine();
         }
+
+        $totalFoundGlobal = array_sum($results);
 
         // Appliquer les filtres si demandé
         if ($this->option('apply-filters')) {
-            $progressService->updateSource($jobId, 'Application des filtres', count($activeSources));
+            $progressService->updateSource($jobId, 'Application des filtres', $totalSources);
             $this->applyFiltering();
         }
 

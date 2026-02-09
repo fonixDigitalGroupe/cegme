@@ -52,27 +52,25 @@ class MarketTypeClassifier
         }
 
         // 3. Additional/Weak Keywords for Consultant Individuel
-        // If it's not a firm, these imply an individual (Specialist, Expert, etc.)
-        $weakConsultantKeywords = [
+        // If it's not a firm, these imply an individual (Specialist, Expert, Consultant, etc.)
+        $individualTerms = [
             'spécialiste', 
             'specialist',
-            'expert ', // Space to avoid matching 'expertise' too easily? Or rely on regex?
-            ' expert',
-            'uncodified individual' // sometimes used?
+            'particulier',
+            'expert',
+            'consultant',
+            'personne physique'
         ];
         
-        // Check for 'specialiste' / 'specialist'
-        if (mb_strpos($text, 'spécialiste') !== false || mb_strpos($text, 'specialist') !== false) {
-            return self::TYPE_CONSULTANT_INDIVIDUEL;
+        foreach ($individualTerms as $term) {
+            if (preg_match('/\b' . preg_quote($term, '/') . '\b/iu', $text)) {
+                return self::TYPE_CONSULTANT_INDIVIDUEL;
+            }
         }
 
-        // Check for 'expert' but try to avoid partial matches if possible (simple heuristic)
-        // We look for " expert " or start/end of string
-        // preg_match is safer for word boundaries
-        if (preg_match('/\bexpert\b/u', $text)) {
-            return self::TYPE_CONSULTANT_INDIVIDUEL;
-        }
-
+        // If we reach here and it's not classified, we'll assume it's more likely a bureau d'étude
+        // in the context of the user's "opposite" requirement, but the classifier should stay neutral
+        // and return null, leaving the logic to the Controller's filter.
         return null;
     }
 }

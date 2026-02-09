@@ -19,6 +19,7 @@ class OffreController extends Controller
         $marketType = $request->get('market_type');
         $activityPoleId = $request->get('activity_pole_id');
         $keyword = $request->get('keyword');
+        $sourceFilter = $request->get('source_filter'); // New source filter
         $status = $request->get('status', 'en_cours'); // Default to 'en_cours'
 
         // Récupérer TOUTES les offres (même les offres expirées)
@@ -26,11 +27,61 @@ class OffreController extends Controller
 
         // Appliquer les filtres
         if ($marketType) {
-            $query->where('market_type', $marketType);
+            if ($marketType === 'consultant_individuel') {
+                $query->where('market_type', 'consultant_individuel');
+            } elseif ($marketType === 'bureau_d_etude') {
+                // Bureau d'étude est le "contraire" de consultant individuel
+                // On prend tout ce qui est marqué bureau_d_etude OU qui n'est pas marqué consultant_individuel
+                $query->where(function($q) {
+                    $q->where('market_type', 'bureau_d_etude')
+                      ->orWhereNull('market_type')
+                      ->orWhere('market_type', '!=', 'consultant_individuel');
+                });
+            }
         }
 
+        if ($sourceFilter) {
+            $query->where('source', $sourceFilter);
+        }
+
+        // Les mots-clés sont maintenant gérés soit par le pôle d'activité soit par le pays.
+        // On a supprimé le champ générique 'keyword' pour plus de clarté.
+
+        // Filtrage géographique
+        $subRegion = $request->get('sub_region');
+        $regions = AfricanCountriesService::getAfricanRegions();
+
+        if ($subRegion) {
+            if (isset($regions[$subRegion])) {
+                // Filtrer par sous-région spécifique (ex: central_africa)
+                $regionKeywords = $regions[$subRegion]['keywords'];
+                $query->where(function ($q) use ($regionKeywords) {
+                    foreach ($regionKeywords as $kw) {
+                        $q->orWhere('pays', 'like', '%' . $kw . '%');
+                    }
+                });
+            } else {
+                // Filtrer par pays spécifique (ex: Cameroun)
+                // On utilise tous les variants (Cameroun, Cameroon, etc.)
+                $countryKeywords = AfricanCountriesService::getKeywordsForCountry($subRegion);
+                $query->where(function ($q) use ($countryKeywords) {
+                    foreach ($countryKeywords as $kw) {
+                        $q->orWhere('pays', 'like', '%' . $kw . '%');
+                    }
+                });
+            }
+        } else {
+            // Sinon, filtrer par pays africains uniquement (OBLIGATOIRE par défaut)
+            $africanKeywords = AfricanCountriesService::getAfricanCountriesKeywords();
+            $query->where(function ($q) use ($africanKeywords) {
+                foreach ($africanKeywords as $kw) {
+                    $q->orWhere('pays', 'like', '%' . $kw . '%');
+                }
+            });
+        }
+
+        // Appliquer le pôle d'activité APRÈS le filtrage géographique (AND)
         if ($activityPoleId) {
-            // Filtrer par pôle d'activité (via les mots-clés)
             $activityPole = ActivityPole::with('keywords')->find($activityPoleId);
             if ($activityPole && $activityPole->keywords->isNotEmpty()) {
                 $keywords = $activityPole->keywords->pluck('keyword')->toArray();
@@ -41,43 +92,6 @@ class OffreController extends Controller
                     }
                 });
             }
-        }
-
-        if ($keyword) {
-            // Filtrer par mot-clé (supporte plusieurs mots séparés par virgule)
-            $keywordsList = array_map('trim', explode(',', $keyword));
-            
-            $query->where(function ($q) use ($keywordsList) {
-                foreach ($keywordsList as $k) {
-                    if (!empty($k)) {
-                        $q->orWhere('titre', 'like', '%' . $k . '%')
-                          ->orWhere('acheteur', 'like', '%' . $k . '%')
-                          ->orWhere('pays', 'like', '%' . $k . '%');
-                    }
-                }
-            });
-        }
-
-        // Filtrage géographique
-        $subRegion = $request->get('sub_region');
-        $regions = AfricanCountriesService::getAfricanRegions();
-
-        if ($subRegion && isset($regions[$subRegion])) {
-            // Filtrer par sous-région spécifique
-            $regionKeywords = $regions[$subRegion]['keywords'];
-            $query->where(function ($q) use ($regionKeywords) {
-                foreach ($regionKeywords as $kw) {
-                    $q->orWhere('pays', 'like', '%' . $kw . '%');
-                }
-            });
-        } else {
-            // Sinon, filtrer par pays africains uniquement (OBLIGATOIRE par défaut)
-            $africanKeywords = AfricanCountriesService::getAfricanCountriesKeywords();
-            $query->where(function ($q) use ($africanKeywords) {
-                foreach ($africanKeywords as $kw) {
-                    $q->orWhere('pays', 'like', '%' . $kw . '%');
-                }
-            });
         }
 
         $allOffres = $query->get();
@@ -166,9 +180,20 @@ class OffreController extends Controller
         // Récupérer les pôles d'activité pour les filtres
         $activityPoles = ActivityPole::with('keywords')->get();
         
-        // Régions pour le filtre
+        // Régions et Pays pour le filtre
         $africanRegions = AfricanCountriesService::getAfricanRegions();
+        $africanCountries = AfricanCountriesService::getAfricanCountriesFlat();
+        
+        // Liste des sources pour le filtre
+        $sources = [
+            'African Development Bank',
+            'World Bank',
+            'AFD',
+            'BDEAC',
+            'DGMarket',
+            'IFAD',
+        ];
 
-        return view('offres', compact('offres', 'activityPoles', 'marketType', 'activityPoleId', 'keyword', 'status', 'africanRegions', 'subRegion'));
+        return view('offres', compact('offres', 'activityPoles', 'marketType', 'activityPoleId', 'keyword', 'status', 'africanRegions', 'subRegion', 'africanCountries', 'sources', 'sourceFilter'));
     }
 }

@@ -111,9 +111,9 @@ use Illuminate\Support\Facades\Storage;
         </div>
 
         <!-- Actions -->
-        <div style="display: flex; gap: 0.75rem; justify-content: flex-end; padding-top: 1rem; border-top: 1px solid #e5e7eb;">
-            <a href="{{ route('admin.posts.index') }}" style="padding: 0.625rem 1.25rem; background-color: #6b7280; color: white; border: none; border-radius: 4px; font-size: 0.875rem; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;" onmouseover="this.style.backgroundColor='#4b5563';" onmouseout="this.style.backgroundColor='#6b7280';">Annuler</a>
-            <button type="submit" style="padding: 0.625rem 1.25rem; background-color: #00C853; color: white; border: none; border-radius: 4px; font-size: 0.875rem; font-weight: 500; cursor: pointer; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;" onmouseover="this.style.backgroundColor='#00B04A';" onmouseout="this.style.backgroundColor='#00C853';">Mettre à jour l'article</button>
+        <div style="display: flex; gap: 1rem; padding-top: 1rem; border-top: 1px solid #e5e7eb;">
+            <button type="submit" style="padding: 0.75rem 1.75rem; background-color: #00C853; color: white; border: none; border-radius: 6px; font-weight: 600; font-size: 0.875rem; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.backgroundColor='#00a946'" onmouseout="this.style.backgroundColor='#00C853'">Mettre à jour l'article</button>
+            <a href="{{ route('admin.posts.index') }}" style="padding: 0.75rem 1.75rem; background-color: #6b7280; color: white; border: none; border-radius: 6px; font-weight: 600; font-size: 0.875rem; text-decoration: none; display: inline-block; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#4b5563'" onmouseout="this.style.backgroundColor='#6b7280'">Annuler</a>
         </div>
         </div>
     </form>

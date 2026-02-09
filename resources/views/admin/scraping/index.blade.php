@@ -80,13 +80,29 @@
             </div>
         </div>
         
-        <div style="margin-bottom: 2rem; display: flex; gap: 0.5rem; align-items: center;">
-            <button id="start-scraping-btn" style="background-color: #3b82f6; color: white; border: none; padding: 0.625rem 1.25rem; font-weight: 500; font-size: 0.875rem; border-radius: 4px; cursor: pointer;">
-                Lancer le scraping
-            </button>
-            <button id="cancel-scraping-btn" style="display: none; background-color: #ef4444; color: white; border: none; padding: 0.625rem 1.25rem; font-weight: 500; font-size: 0.875rem; border-radius: 4px; cursor: pointer;">
-                Arrêter le scraping
-            </button>
+        <div style="margin-bottom: 2rem; display: flex; flex-direction: column; gap: 1rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; background-color: #f3f4f6; padding: 0.75rem; border-radius: 6px; border-left: 4px solid #3b82f6;">
+                <input type="checkbox" id="async-mode" {{ app()->environment('local') ? 'checked' : '' }} style="width: 1.125rem; height: 1.125rem; cursor: pointer;">
+                <label for="async-mode" style="font-size: 0.875rem; color: #374151; font-weight: 600; cursor: pointer;">
+                    🚀 Exécuter en arrière-plan (Recommandé en local)
+                </label>
+                <div style="font-size: 0.75rem; color: #6b7280; margin-left: 0.5rem;">
+                    Empêche le site de se bloquer pendant le scraping.
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <button id="start-scraping-btn" style="background-color: #3b82f6; color: white; border: none; padding: 0.625rem 1.25rem; font-weight: 500; font-size: 0.875rem; border-radius: 4px; cursor: pointer;">
+                    Lancer le scraping
+                </button>
+                <button id="cancel-scraping-btn" style="display: none; background-color: #ef4444; color: white; border: none; padding: 0.625rem 1.25rem; font-weight: 500; font-size: 0.875rem; border-radius: 4px; cursor: pointer;">
+                    Arrêter le scraping
+                </button>
+            </div>
+            
+            <p id="mode-notice" style="font-size: 0.75rem; color: #6b7280;">
+                {{ app()->environment('local') ? "💡 En local, le mode 'Arrière-plan' est conseillé pour éviter de figer PHP." : "💡 Sur OVH, le mode séquentiel est préférable si les processus PHP sont limités." }}
+            </p>
         </div>
     @else
         <div class="alert alert-warning">
@@ -202,6 +218,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const activeSources = @json($activeSources);
 
     startBtn.addEventListener('click', function() {
+        const isAsync = document.getElementById('async-mode').checked;
+        
         // Désactiver le bouton
         startBtn.disabled = true;
         startBtn.textContent = 'Lancement...';
@@ -227,9 +245,48 @@ document.addEventListener('DOMContentLoaded', function() {
             cancelBtn.disabled = false;
         }
 
-        // MODE OVH COMPATIBLE : Scraper les sources une par une
-        scrapeSourcesSequentially(activeSources);
+        if (isAsync) {
+            // MODE ARRIÈRE-PLAN
+            startBackgroundScraping();
+        } else {
+            // MODE OVH COMPATIBLE : Scraper les sources une par une
+            scrapeSourcesSequentially(activeSources);
+        }
     });
+
+    /**
+     * Lance le scraping en arrière-plan
+     */
+    async function startBackgroundScraping() {
+        try {
+            const response = await fetch('{{ route("admin.scraping.start") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({
+                    async: true
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                jobId = data.job_id;
+                progressMessage.textContent = 'Scraping lancé en arrière-plan...';
+                startPolling();
+            } else {
+                alert('Erreur : ' + data.message);
+                startBtn.disabled = false;
+                startBtn.textContent = 'Lancer le scraping';
+            }
+        } catch (error) {
+            console.error('Erreur:', error);
+            alert('Erreur lors du lancement');
+            startBtn.disabled = false;
+        }
+    }
 
     /**
      * Scrappe les sources une par une (mode compatible OVH)

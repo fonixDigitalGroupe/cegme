@@ -56,7 +56,7 @@ class BDEACScraperService implements IterativeScraperInterface
             }
             return [
                 'count' => $insertedCount,
-                'has_more' => !empty($this->pendingOffers) || !$this->isExhausted,
+                'has_more' => !empty($this->pendingOffers) || ($this->currentPage < $maxPages && !$this->isExhausted),
                 'findings' => $findings,
             ];
         }
@@ -81,8 +81,10 @@ class BDEACScraperService implements IterativeScraperInterface
             $this->currentPage++;
 
             // Arrêter si on a atteint le maximum de pages configuré
-            $maxPages = max(1, min((int) env('BDEAC_MAX_PAGES', 5), self::MAX_PAGES));
+            // USER REQUEST: parcourie 10 page aux maxe
+            $maxPages = max(1, min((int) env('BDEAC_MAX_PAGES', 10), 10));
             if ($this->currentPage >= $maxPages) {
+                Log::info("BDEAC Scraper: Reached max pages ({$maxPages}). Marking as exhausted.");
                 $this->isExhausted = true;
             }
             
@@ -109,24 +111,32 @@ class BDEACScraperService implements IterativeScraperInterface
     private function saveOffre(array $offreData): bool
     {
         try {
+            // Check by URL first (most accurate)
             $exists = Offre::where('source', 'BDEAC')
-                ->where(function ($query) use ($offreData) {
-                    $query->where('lien_source', $offreData['lien_source'])
-                        ->orWhere('titre', $offreData['titre']);
-                })
+                ->where('lien_source', $offreData['lien_source'])
                 ->exists();
+
+            // If not found by URL, check by EXACT title to avoid duplicates that might have different query params
+            if (!$exists) {
+                $exists = Offre::where('source', 'BDEAC')
+                    ->where('titre', $offreData['titre'])
+                    ->exists();
+            }
 
             if (!$exists) {
                 $offreData['created_at'] = now();
                 $offreData['updated_at'] = now();
                 Offre::insert($offreData);
+                Log::info("BDEAC Scraper: Inserted new offer: " . $offreData['titre']);
                 return true;
             } else {
+                Log::debug("BDEAC Scraper: Offer already exists (skipped): " . $offreData['titre']);
                 // Update existing offer dates if needed
                 Offre::where('source', 'BDEAC')
                     ->where('lien_source', $offreData['lien_source'])
                     ->update([
                         'date_limite_soumission' => $offreData['date_limite_soumission'] ?? null,
+                        'date_publication' => $offreData['date_publication'] ?? null,
                         'updated_at' => now()
                     ]);
             }
@@ -145,15 +155,14 @@ class BDEACScraperService implements IterativeScraperInterface
             // Pagination: BDEAC usually uses "start" parameter. 
             // 0, 10, 20... assuming 10 items per page.
             $url = self::BASE_URL;
-            if ($page > 0) {
-                 $start = $page * 10; 
-                 $url .= '?start=' . $start;
-            }
+            // Utiliser un pageSize très large pour tout récupérer d'un coup
+            $start = $page * 100; 
+            $url .= "?PortalAction_rh_31044_start={$start}&PortalAction_rh_31044_pageSize=100&PortalAction_rh_31044_sort=pdate&PortalAction_rh_31044_reverse=false";
 
             Log::debug('BDEAC Scraper: Fetching page', ['page' => $page, 'url' => $url]);
 
             $response = Http::withoutVerifying()
-                ->timeout(30)
+                ->timeout(60)
                 ->withHeaders([
                     'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
                     'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
@@ -208,7 +217,7 @@ class BDEACScraperService implements IterativeScraperInterface
     {
         $this->initialize();
         $totalCount = 0;
-        $maxPages = max(1, min((int) env('BDEAC_MAX_PAGES', 5), self::MAX_PAGES));
+        $maxPages = max(1, min((int) env('BDEAC_MAX_PAGES', 10), 10));
 
         for ($i = 0; $i < $maxPages; $i++) {
             $batch = $this->scrapeBatch(100);
@@ -219,7 +228,10 @@ class BDEACScraperService implements IterativeScraperInterface
 
         return [
             'count' => $totalCount,
-            'stats' => ['total_notices_kept' => $totalCount]
+            'stats' => [
+                'total_notices_kept' => $totalCount,
+                'total_pages_scraped' => $this->currentPage
+            ]
         ];
     }
 
@@ -264,6 +276,7 @@ class BDEACScraperService implements IterativeScraperInterface
                 'acheteur' => 'BDEAC',
                 'pays' => $this->detectCountry($titre),
                 'date_limite_soumission' => $dateLimite, 
+                'date_publication' => $datePublication,
                 'lien_source' => $this->normalizeUrl($lien),
                 'source' => 'BDEAC',
                 'detail_url' => $this->normalizeUrl($lien),

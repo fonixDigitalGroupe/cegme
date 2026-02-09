@@ -8,13 +8,14 @@ use Illuminate\Support\Facades\Log;
 use Spatie\Browsershot\Browsershot;
 use DOMDocument;
 use DOMXPath;
+use App\Services\MarketTypeClassifier;
 
 class AfDBScraperService implements IterativeScraperInterface
 {
     /**
-     * URL de base pour les appels d'offres AfDB
+     * URL de base pour les appels d'offres AfDB (Mise à jour selon demande utilisateur)
      */
-    private const BASE_URL = 'https://www.afdb.org/en/projects-and-operations/procurement';
+    private const BASE_URL = 'https://www.afdb.org/fr/documents/project-related-procurement/procurement-notices/invitation-for-bids';
 
     /**
      * Nombre maximum de pages à scraper (sécurité pour éviter les boucles infinies)
@@ -57,7 +58,8 @@ class AfDBScraperService implements IterativeScraperInterface
         $pagesStats = [];
 
         try {
-            $maxPages = max(1, min((int) env('AFDB_MAX_PAGES', 5), self::MAX_PAGES));
+            // USER REQUEST: Respecter la pagination sur 10 page au maximum
+            $maxPages = max(1, min((int) env('AFDB_MAX_PAGES', 10), 10)); // Force 10 max as requested
             while ($page < $maxPages) {
                 Log::debug("AfDB Scraper: Fetching page {$page}");
 
@@ -179,44 +181,12 @@ class AfDBScraperService implements IterativeScraperInterface
                 break;
             }
 
-            // Ajouter les nouvelles offres au buffer
-            $this->pendingOffers = array_merge($this->pendingOffers, $result['offers']);
+            // Note: Les offres sont déjà sauvegardées dans scrapePageForBatch pour un feedback immédiat
+            $count += $result['new_count'] ?? 0;
+            $processed += $result['count'];
+            $findings = array_merge($findings, $result['offers']);
+            
             $this->currentPage++;
-
-            // Traiter le buffer jusqu'à atteindre la limite
-            while (count($this->pendingOffers) > 0 && $processed < $limit) {
-                $offerData = array_shift($this->pendingOffers);
-                $processed++;
-
-                try {
-                    $existing = Offre::where('source', 'African Development Bank')
-                        ->where(function ($q) use ($offerData) {
-                            $q->where('lien_source', $offerData['lien_source'])
-                                ->orWhere('titre', $offerData['titre']);
-                        })
-                        ->first();
-
-                    if ($existing) {
-                        $existing->update([
-                            'pays' => $offerData['pays'] ?? $existing->pays,
-                            'date_limite_soumission' => $offerData['date_limite_soumission'] ?? $existing->date_limite_soumission,
-                            'updated_at' => now(),
-                        ]);
-                    } else {
-                        $offerData['created_at'] = now();
-                        $offerData['updated_at'] = now();
-                        Offre::create($offerData);
-                        $count++;
-                    }
-
-                    $findings[] = $offerData;
-                } catch (\Exception $e) {
-                    Log::error('AfDB Scraper: Error saving offer', [
-                        'titre' => $offerData['titre'] ?? 'N/A',
-                        'error' => $e->getMessage()
-                    ]);
-                }
-            }
         }
 
         $hasMore = !$this->isExhausted || count($this->pendingOffers) > 0;
@@ -235,6 +205,7 @@ class AfDBScraperService implements IterativeScraperInterface
     private function scrapePageForBatch(int $page): array
     {
         $offers = [];
+        $newCount = 0;
 
         try {
             $url = self::BASE_URL;
@@ -244,37 +215,26 @@ class AfDBScraperService implements IterativeScraperInterface
 
             Log::debug("AfDB Scraper: Fetching page for batch", ['page' => $page, 'url' => $url]);
 
-            try {
-                $html = Browsershot::url($url)
-                    ->setChromePath('/usr/bin/google-chrome')
-                    ->setNodeBinary('/usr/bin/node')
-                    ->setNpmBinary('/usr/bin/npm')
-                    ->waitUntilNetworkIdle()
-                    ->timeout(90)
-                    ->setOption('args', [
-                        '--no-sandbox',
-                        '--disable-setuid-sandbox',
-                        '--disable-dev-shm-usage',
-                        '--disable-accelerated-2d-canvas',
-                        '--disable-gpu',
-                        '--disable-blink-features=AutomationControlled',
-                    ])
-                    ->userAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
-                    ->bodyHtml();
+            $html = Browsershot::url($url)
+                ->setChromePath('/usr/bin/google-chrome')
+                ->setNodeBinary('/usr/bin/node')
+                ->ignoreHttpsErrors()
+                ->waitUntilNetworkIdle()
+                ->timeout(60)
+                ->setOption('args', [
+                    '--no-sandbox',
+                    '--disable-setuid-sandbox',
+                    '--disable-dev-shm-usage',
+                    '--disable-accelerated-2d-canvas',
+                    '--disable-gpu',
+                    '--ignore-certificate-errors',
+                ])
+                ->userAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
+                ->bodyHtml();
 
-                if (empty($html)) {
-                    return ['count' => 0, 'offers' => []];
-                }
-
-            } catch (\Exception $e) {
-                Log::error('AfDB Scraper: Browsershot failed', [
-                    'error' => $e->getMessage(),
-                    'url' => $url,
-                ]);
+            if (empty($html)) {
                 return ['count' => 0, 'offers' => []];
             }
-
-            // Parser le HTML
             $dom = new DOMDocument();
             libxml_use_internal_errors(true);
             @$dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
@@ -284,28 +244,34 @@ class AfDBScraperService implements IterativeScraperInterface
             // Extraire les notices
             $items = $this->extractProcurementItems($xpath, $dom);
 
-            // Traiter chaque item
-            $titresVus = [];
             foreach ($items as $item) {
                 try {
                     $offre = $this->extractOffreData($item, $xpath);
 
-                    if (!$offre || empty($offre['titre']) || empty($offre['lien_source'])) {
-                        continue;
-                    }
+                    if ($offre && !empty($offre['titre']) && !empty($offre['lien_source'])) {
+                        // SAVE IMMEDIATELY (Same as scrapePage)
+                        $existing = Offre::where('source', 'African Development Bank')
+                            ->where(function ($q) use ($offre) {
+                                $q->where('lien_source', $offre['lien_source'])
+                                    ->orWhere('titre', $offre['titre']);
+                            })
+                            ->first();
 
-                    // Rejeter les doublons
-                    $titreNormalise = $this->normalizeTitle($offre['titre']);
-                    if (isset($titresVus[$titreNormalise])) {
-                        continue;
+                        if (!$existing) {
+                            Offre::create($offre);
+                            $newCount++;
+                        } else {
+                            $existing->update([
+                                'pays' => $offre['pays'] ?? $existing->pays,
+                                'date_limite_soumission' => $offre['date_limite_soumission'] ?? $existing->date_limite_soumission,
+                                'market_type' => $offre['market_type'] ?? $existing->market_type,
+                                'notice_type' => $offre['notice_type'] ?? $existing->notice_type,
+                                'updated_at' => now(),
+                            ]);
+                        }
+                        $offers[] = $offre;
                     }
-                    $titresVus[$titreNormalise] = true;
-
-                    $offers[] = $offre;
                 } catch (\Exception $e) {
-                    Log::debug('AfDB Scraper: Error processing item', [
-                        'error' => $e->getMessage(),
-                    ]);
                     continue;
                 }
             }
@@ -319,6 +285,7 @@ class AfDBScraperService implements IterativeScraperInterface
 
         return [
             'count' => count($offers),
+            'new_count' => $newCount,
             'offers' => $offers,
         ];
     }
@@ -383,28 +350,28 @@ class AfDBScraperService implements IterativeScraperInterface
                     'url' => $url,
                 ]);
 
-                // Fallback vers HTTP simple si Browsershot échoue
-                $response = Http::withoutVerifying()
+                // Retour à Browsershot car le contenu est chargé via JS
+                $html = Browsershot::url($url)
+                    ->setChromePath('/usr/bin/google-chrome')
+                    ->setNodeBinary('/usr/bin/node')
+                    ->ignoreHttpsErrors()
+                    ->waitUntilNetworkIdle()
                     ->timeout(60)
-                    ->retry(2, 1000)
-                    ->withHeaders([
-                        'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                        'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
-                        'Accept-Language' => 'en-US,en;q=0.9,fr;q=0.8',
+                    ->setOption('args', [
+                        '--no-sandbox',
+                        '--disable-setuid-sandbox',
+                        '--disable-dev-shm-usage',
+                        '--disable-accelerated-2d-canvas',
+                        '--disable-gpu',
+                        '--ignore-certificate-errors',
                     ])
-                    ->get($url);
+                    ->userAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
+                    ->bodyHtml();
 
-                if (!$response->successful()) {
-                    $status = $response->status();
-                    Log::error('AfDB Scraper: HTTP fallback also failed', [
-                        'status' => $status,
-                        'url' => $url,
-                        'page' => $page,
-                    ]);
+                if (empty($html)) {
+                    Log::warning('AfDB Scraper: Browsershot returned empty HTML for list page', ['url' => $url]);
                     return ['count' => 0, 'html' => ''];
                 }
-
-                $html = $response->body();
             }
 
             // Parser le HTML
@@ -461,6 +428,9 @@ class AfDBScraperService implements IterativeScraperInterface
                     Log::debug('AfDB Scraper: Offre acceptée', [
                         'titre' => $offre['titre'],
                         'lien' => $offre['lien_source'],
+                        'pays' => $offre['pays'],
+                        'date_pub' => $offre['date_publication'],
+                        'html_sample_large' => substr($dom->saveHTML($item), 0, 3000)
                     ]);
 
                     // Sauvegarder immédiatement l'offre
@@ -476,6 +446,7 @@ class AfDBScraperService implements IterativeScraperInterface
                             Log::info("AfDB Scraper: Updating existing offer: " . $offre['titre']);
                             $existing->update([
                                 'pays' => $offre['pays'] ?? $existing->pays,
+                                'date_publication' => $offre['date_publication'] ?? $existing->date_publication,
                                 'date_limite_soumission' => $offre['date_limite_soumission'] ?? $existing->date_limite_soumission,
                                 'updated_at' => now(),
                             ]);
@@ -529,7 +500,7 @@ class AfDBScraperService implements IterativeScraperInterface
     }
 
     /**
-     * Extrait les éléments de procurement depuis le DOM
+     * Extrait les éléments de procurement depuis le DOM (Stratégie AFD)
      *
      * @param DOMXPath $xpath
      * @param DOMDocument $dom
@@ -538,196 +509,82 @@ class AfDBScraperService implements IterativeScraperInterface
     private function extractProcurementItems(DOMXPath $xpath, DOMDocument $dom): array
     {
         $items = [];
+        $processedHashes = [];
 
-        // Stratégies multiples pour trouver les notices de procurement
-        // AfDB peut utiliser différentes structures HTML
-
-        // Stratégie 0: Chercher tous les textes qui ressemblent à des titres d'appels d'offres
-        // et trouver leurs conteneurs parents
-        $allTextNodes = $xpath->query("//text()[string-length(normalize-space(.)) > 50]");
-        $processedContainers = [];
-
-        foreach ($allTextNodes as $textNode) {
-            $text = trim($textNode->textContent);
-            $textLower = strtolower($text);
-
-            // Chercher des textes qui ressemblent à des titres d'appels d'offres
-            // (contiennent projet, pays, activité spécifique)
-            if (
-                strlen($text) > 40 && strlen($text) < 500 &&
-                stripos($textLower, 'consultancy services (e-consultant)') === false &&
-                stripos($textLower, 'procurement notice') === false &&
-                stripos($textLower, 'rules and procedures') === false &&
-                (stripos($textLower, 'project') !== false ||
-                    stripos($textLower, 'projet') !== false ||
-                    stripos($textLower, 'program') !== false ||
-                    preg_match('/\b[A-Z]{2,}[A-Z0-9]*\b/', $text))
-            ) { // Code de projet
-
-                // Trouver le conteneur parent
-                $parent = $textNode->parentNode;
-                $maxDepth = 10;
-                $depth = 0;
-
-                while ($parent && $depth < $maxDepth) {
-                    if ($parent->nodeType === XML_ELEMENT_NODE) {
-                        $parentId = spl_object_hash($parent);
-                        if (!isset($processedContainers[$parentId])) {
-                            $links = $xpath->query(".//a[@href]", $parent);
-                            if ($links->length > 0) {
-                                $items[] = $parent;
-                                $processedContainers[$parentId] = true;
-                                break;
-                            }
-                        }
-                    }
-                    $parent = $parent->parentNode;
-                    $depth++;
-                }
-            }
-        }
-
-        // Stratégie 0.5: Chercher par structure de conteneur (plus fiable)
-        // Chercher les éléments qui contiennent à la fois un titre spécifique et un lien
-        $containerSelectors = [
-            "//div[contains(@class, 'procurement')]",
-            "//div[contains(@class, 'notice')]",
-            "//div[contains(@class, 'item')]",
-            "//article",
-            "//li[contains(@class, 'procurement')]",
-            "//tr[contains(@class, 'procurement')]",
-            "//div[contains(@class, 'card')]",
-            "//div[contains(@class, 'row')]//div[contains(@class, 'col')]",
-        ];
-
-        foreach ($containerSelectors as $selector) {
-            try {
-                $containers = $xpath->query($selector);
-                foreach ($containers as $container) {
-                    $containerId = spl_object_hash($container);
-                    if (isset($processedContainers[$containerId])) {
-                        continue; // Déjà traité
-                    }
-
-                    $text = trim($container->textContent);
-                    // Si le conteneur a du texte substantiel et contient un lien
-                    if (strlen($text) > 50) {
-                        $links = $xpath->query(".//a[@href]", $container);
-                        if ($links->length > 0) {
-                            $items[] = $container;
-                            $processedContainers[$containerId] = true;
-                        }
-                    }
-                }
-            } catch (\Exception $e) {
-                continue;
-            }
-        }
-
-        // Stratégie 1: Chercher les liens vers les pages de procurement
-        // Essayer plusieurs patterns de liens possibles
+        // Stratégie "Climb-up" (AFD) : Chercher les liens valides et remonter vers le parent
         $linkPatterns = [
+            "//a[contains(@href, '/documents/')]",
             "//a[contains(@href, '/procurement/')]",
             "//a[contains(@href, 'procurement-notice')]",
-            "//a[contains(@href, '/en/projects-and-operations/procurement/')]",
-            "//a[contains(@href, '/procurement-notices/')]",
-            "//a[contains(@href, 'procurement')]",
-            "//a[contains(@href, '/en/projects-and-operations/')]", // Plus large
-            "//a[contains(@href, '.pdf')]", // PDFs de procurement
         ];
 
-        $allLinks = [];
         foreach ($linkPatterns as $pattern) {
             $links = $xpath->query($pattern);
             foreach ($links as $link) {
-                $allLinks[] = $link;
-            }
-        }
+                $url = $this->normalizeUrl($link->getAttribute('href'));
+                
+                // Valider le lien avant de remonter
+                if (!$this->isValidLink($url)) {
+                    continue;
+                }
 
-        foreach ($allLinks as $link) {
-            $href = $link->getAttribute('href');
-            $text = trim($link->textContent);
+                // Remonter jusqu'à trouver un conteneur significatif (stratégie AFD)
+                $parent = $link;
+                for ($i = 0; $i < 10; $i++) { // Augmenté à 10 pour être sûr de choper la date
+                    $parent = $parent->parentNode;
+                    if (!$parent || $parent->nodeName === 'body') break;
+                    
+                    if ($parent->nodeType === XML_ELEMENT_NODE) {
+                        $hash = spl_object_hash($parent);
+                        $text = trim($parent->textContent);
+                        $class = $parent->getAttribute('class');
+                        $nodeName = strtolower($parent->nodeName);
 
-            // Ignorer les liens de navigation
-            if (
-                stripos($text, 'view all') !== false ||
-                stripos($text, 'see more') !== false ||
-                stripos($text, 'next') !== false ||
-                stripos($text, 'previous') !== false ||
-                strlen($text) < 20
-            ) {
-                continue;
-            }
+                        // Rejeter si c'est manifestement une zone de navigation/langues
+                        if (stripos($text, 'العربية') !== false || stripos($text, 'English') !== false || stripos($text, 'Português') !== false) {
+                            continue;
+                        }
 
-            // Normaliser l'URL
-            $href = $this->normalizeUrl($href);
-
-            // Trouver le conteneur parent qui contient les informations complètes
-            $parent = $link->parentNode;
-            $maxDepth = 5;
-            $depth = 0;
-
-            while ($parent && $depth < $maxDepth) {
-                $parentText = trim($parent->textContent);
-                if (strlen($parentText) > 50) {
-                    // Vérifier si cet élément n'est pas déjà dans la liste
-                    $found = false;
-                    foreach ($items as $existing) {
-                        $existingLinks = $xpath->query(".//a[@href]", $existing);
-                        if ($existingLinks->length > 0 && $existingLinks->item(0)->getAttribute('href') === $href) {
-                            $found = true;
+                        // Identifier un conteneur de ligne (Row container)
+                        $isRow = (
+                            stripos($class, 'views-row') !== false || 
+                            stripos($class, 'col-lg-') !== false ||
+                            stripos($class, 'col-md-') !== false ||
+                            $nodeName === 'tr' || 
+                            $nodeName === 'li' ||
+                            stripos($class, 'item-list') !== false
+                        );
+                        
+                        // Chercher si ce parent contient une date
+                        $hasDate = preg_match('/(\d{1,2})[\s\/-](Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|Janavier|Février|Mars|Avril|Mai|Juin|Juillet|Août|Septembre|Octobre|Novembre|Décembre)[a-z]*\.?[\s\/-](\d{4})/iu', $text);
+                        
+                        if (($isRow || (strlen($text) > 150 && $hasDate)) && !isset($processedHashes[$hash])) {
+                            $items[] = $parent;
+                            $processedHashes[$hash] = true;
                             break;
                         }
                     }
-                    if (!$found) {
-                        $items[] = $parent;
-                    }
-                    break;
                 }
-                $parent = $parent->parentNode;
-                $depth++;
             }
         }
 
-        // Stratégie 2: Chercher par structure de liste/carte
-        $selectors = [
-            "//article[contains(@class, 'procurement')]",
-            "//div[contains(@class, 'procurement-notice')]",
-            "//div[contains(@class, 'procurement-item')]",
-            "//div[contains(@class, 'notice')]",
-            "//li[contains(@class, 'procurement')]",
-            "//tr[contains(@class, 'procurement')]",
-        ];
-
-        foreach ($selectors as $selector) {
-            try {
+        // Si toujours rien, essayer les sélecteurs classiques (fallback)
+        if (count($items) < 3) {
+            $selectors = [
+                "//div[contains(@class, 'views-row')]",
+                "//div[contains(@id, 'block-system-main')]//tr",
+                "//article",
+                "//div[contains(@class, 'card')]"
+            ];
+            foreach ($selectors as $selector) {
                 $nodes = $xpath->query($selector);
                 foreach ($nodes as $node) {
-                    // Vérifier qu'il contient un lien valide
-                    $nodeLinks = $xpath->query(".//a[@href]", $node);
-                    if ($nodeLinks->length > 0) {
-                        $nodeHref = $nodeLinks->item(0)->getAttribute('href');
-                        if (
-                            stripos($nodeHref, 'procurement') !== false ||
-                            stripos($nodeHref, '/en/projects-and-operations/') !== false
-                        ) {
-                            // Vérifier doublon
-                            $found = false;
-                            foreach ($items as $existing) {
-                                $existingLinks = $xpath->query(".//a[@href]", $existing);
-                                if ($existingLinks->length > 0 && $existingLinks->item(0)->getAttribute('href') === $nodeHref) {
-                                    $found = true;
-                                    break;
-                                }
-                            }
-                            if (!$found) {
-                                $items[] = $node;
-                            }
-                        }
+                    $hash = spl_object_hash($node);
+                    if (!isset($processedHashes[$hash]) && strlen(trim($node->textContent)) > 50) {
+                        $items[] = $node;
+                        $processedHashes[$hash] = true;
                     }
                 }
-            } catch (\Exception $e) {
-                continue;
             }
         }
 
@@ -756,13 +613,28 @@ class AfDBScraperService implements IterativeScraperInterface
             foreach ($linkNodes as $link) {
                 $href = $link->getAttribute('href');
                 $linkText = trim($link->textContent);
+                
+                // DEBUG: Log first few items context (skip garbage)
+                static $debugCount = 0;
+                $textContent = trim($item->textContent);
+                if ($debugCount < 10 && stripos($textContent, 'العربية') === false) {
+                    Log::debug('AfDB Scraper Debug: FULL item context', [
+                        'text' => $textContent,
+                        'link' => $href
+                    ]);
+                    $debugCount++;
+                }
+
+                // Ignorer les liens vers d'autres langues
+                if (preg_match('#/(ar|en|pt)/#i', $href) && strpos($href, '/fr/') === false) {
+                     continue;
+                }
 
                 // Ignorer les liens de navigation évidents
                 if (
                     stripos($href, 'javascript:') !== false ||
                     stripos($href, '#') === 0 ||
                     stripos($href, 'mailto:') !== false ||
-                    stripos($linkText, 'view all') !== false ||
                     stripos($linkText, 'see more') !== false ||
                     stripos($linkText, 'next') !== false ||
                     stripos($linkText, 'previous') !== false ||
@@ -770,8 +642,6 @@ class AfDBScraperService implements IterativeScraperInterface
                 ) {
                     continue;
                 }
-
-                // Ignorer les fichiers XML/RSS
                 if (preg_match('/\.(xml|rss|atom)$/i', $href)) {
                     continue;
                 }
@@ -789,6 +659,12 @@ class AfDBScraperService implements IterativeScraperInterface
                 // Si le lien a un texte substantiel (titre de notice), c'est notre notice
                 // Le texte du lien EST le titre, le href EST l'URL de détail
                 if (strlen($linkText) > 20 && strlen($linkText) < 500) {
+                    // VALIDATION STRICTE DU LIEN AVANT TOUTE ANALYSE LENTE
+                    if (!$this->isValidLink($href)) {
+                        Log::debug('AfDB Scraper: Link rejected by isValidLink', ['url' => $href]);
+                        continue;
+                    }
+
                     // Normaliser l'URL mais garder le href exact
                     $hrefNormalized = $this->normalizeUrl($href);
 
@@ -811,35 +687,75 @@ class AfDBScraperService implements IterativeScraperInterface
                 return null;
             }
 
-            // Les titres de navigation ont déjà été filtrés lors de l'extraction du lien
-            // Pas besoin de vérifier à nouveau ici
+            // VALIDATION DU TITRE (STRICTE - User Request)
+            if (!$this->isValidTitle($titre)) {
+                 Log::debug('AfDB Scraper: Titre invalidé (trop court ou générique)', ['titre' => $titre]);
+                 return null;
+            }
 
-            // Extraire le pays/zone géographique
-            $pays = $this->extractCountry($item, $xpath);
+            // RÈGLE PRIORITAIRE: Chercher le pays via les acronymes du titre (Ex: AAO - RCA - ...)
+            // Cela évite les faux positifs trouvés dans le texte (ex: Egypte mentionné dans le footer)
+            $pays = $this->extractCountryFromTitle($titre);
+
+            if (empty($pays)) {
+                // Extraire le pays/zone géographique via le texte de l'élément (fallback)
+                $pays = $this->extractCountry($item, $xpath);
+            }
+
+            // Classification du type de marché (AFD method)
+            $marketType = MarketTypeClassifier::classify($titre . ' ' . $item->textContent);
 
             // Extraire la date de publication
             $datePublication = $this->extractPublicationDate($item, $xpath);
 
-            // Date limite - extraire depuis la page de détail pour avoir la vraie date
-            $dateLimite = $this->extractDeadlineFromDetailPage($lien);
-
-            // Si pas trouvée dans la page de détail, utiliser la date de publication
-            if (empty($dateLimite)) {
-                $dateLimite = $datePublication;
+            // FALLBACK: Si des informations essentielles manquent, aller chercher dans la page de détail
+            if (empty($pays) || empty($datePublication)) {
+                 Log::debug('AfDB Scraper: Missing info, fetching detail page', [
+                     'url' => $lien,
+                     'missing' => array_keys(array_filter([
+                         'pays' => empty($pays),
+                         'pub_date' => empty($datePublication)
+                     ]))
+                 ]);
+                 
+                 $detailData = $this->fetchDetailData($lien);
+                 
+                 if (empty($pays) && !empty($detailData['country'])) {
+                      Log::debug('AfDB Scraper: Country found in detail page', ['pays' => $detailData['country']]);
+                      $pays = $detailData['country'];
+                 }
+                 if (empty($datePublication) && !empty($detailData['publication_date'])) {
+                      Log::debug('AfDB Scraper: Publication date found in detail page', ['date' => $detailData['publication_date']]);
+                      $datePublication = $detailData['publication_date'];
+                 }
+                 if (empty($dateLimite) && !empty($detailData['deadline'])) {
+                      Log::debug('AfDB Scraper: Deadline found in detail page', ['date' => $detailData['deadline']]);
+                      $dateLimite = $detailData['deadline'];
+                 }
             }
 
-            // Acheteur
-            $acheteur = "African Development Bank";
+            // RÈGLE AFDB: Ne pas sauvegarder les offres sans date de publication (demande utilisateur)
+            if (empty($datePublication)) {
+                Log::debug('AfDB Scraper: Offre rejetée (pas de date de publication)', [
+                    'titre' => $titre,
+                    'lien' => $lien
+                ]);
+                return null;
+            }
+
+            // La date limite reste NULL pour AfDB (demande utilisateur)
+            $dateLimite = null;
 
             return [
-                'titre' => $titre,
-                'acheteur' => $acheteur,
+                'titre' => $this->cleanText($titre),
+                'acheteur' => 'African Development Bank',
                 'pays' => $pays,
+                'date_publication' => $datePublication,
                 'date_limite_soumission' => $dateLimite,
-                'lien_source' => $lien, // LIEN OFFICIEL EXACT (href du titre)
+                'lien_source' => $lien,
                 'source' => 'African Development Bank',
-                'detail_url' => $lien, // Même lien (href du titre)
-                'link_type' => 'detail', // Toujours 'detail' car c'est le lien du titre
+                'notice_type' => 'Procurement Notice',
+                'market_type' => $marketType,
             ];
 
         } catch (\Exception $e) {
@@ -912,6 +828,15 @@ class AfDBScraperService implements IterativeScraperInterface
             'Uganda',
             'Zambia',
             'Zimbabwe',
+            // Noms en Français
+            'Algérie', 'Angola', 'Bénin', 'Botswana', 'Burkina Faso', 'Burundi', 'Cameroun', 'Cap-Vert', 
+            'République Centrafricaine', 'Tchad', 'Comores', 'Congo', 'Côte d\'Ivoire', 'Djibouti', 'Égypte', 
+            'Guinée Équatoriale', 'Érythrée', 'Eswatini', 'Éthiopie', 'Gabon', 'Gambie', 'Ghana', 'Guinée', 
+            'Guinée-Bissau', 'Kenya', 'Lesotho', 'Liberia', 'Libye', 'Madagascar', 'Malawi', 'Mali', 
+            'Mauritanie', 'Maurice', 'Maroc', 'Mozambique', 'Namibie', 'Niger', 'Nigeria', 'Rwanda', 
+            'São Tomé et Príncipe', 'Sénégal', 'Seychelles', 'Sierra Leone', 'Somalie', 'Afrique du Sud', 
+            'Soudan du Sud', 'Soudan', 'Tanzanie', 'Togo', 'Tunisie', 'Ouganda', 'Zambie', 'Zimbabwe',
+            'RDC', 'République Démocratique du Congo',
         ];
 
         $zones = [
@@ -922,6 +847,8 @@ class AfDBScraperService implements IterativeScraperInterface
             'North Africa',
             'Sub-Saharan Africa',
             'Africa',
+            'Multinational',
+            'Regional',
         ];
 
         $foundItems = [];
@@ -938,8 +865,15 @@ class AfDBScraperService implements IterativeScraperInterface
             }
         }
 
-        if (!empty($foundItems)) {
-            return implode(', ', array_unique($foundItems));
+        $unique = array_unique($foundItems);
+
+        // Si on trouve trop de pays (> 3), c'est probablement une liste déroulante ou un footer
+        if (count($unique) > 3) {
+            return null;
+        }
+
+        if (!empty($unique)) {
+            return implode(', ', $unique);
         }
 
         return null;
@@ -951,40 +885,18 @@ class AfDBScraperService implements IterativeScraperInterface
     private function extractPublicationDate(\DOMElement $item, DOMXPath $xpath): ?string
     {
         $text = $item->textContent;
-        $html = $item->ownerDocument->saveHTML($item);
+        
+        // Utiliser la méthode centralisée de parsing
+        $date = $this->parseDateFromText($text);
+        if ($date) {
+            return $date;
+        }
 
-        // Patterns de date plus complets (ajouter plus de variations)
-        $patterns = [
-            // Formats américains
-            '/(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{1,2}),\s+(\d{4})/i',
-            '/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\.?\s+(\d{1,2}),?\s+(\d{4})/i',
-            // Formats européens
-            '/(\d{1,2})\/(\d{1,2})\/(\d{4})/',
-            '/(\d{1,2})-(\d{1,2})-(\d{4})/',
-            // Formats ISO
-            '/(\d{4})-(\d{2})-(\d{2})/',
-            // Formats avec mots-clés (deadline, closing, due date)
-            '/(deadline|closing|due|submission)[\s:]+(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{1,2}),?\s+(\d{4})/i',
-            '/(deadline|closing|due|submission)[\s:]+(\d{1,2})\/(\d{1,2})\/(\d{4})/i',
-        ];
-
-        // Chercher dans le texte brut
-        foreach ($patterns as $pattern) {
-            if (preg_match($pattern, $text, $matches)) {
-                try {
-                    $dateStr = $matches[0];
-                    // Nettoyer la chaîne de date
-                    $dateStr = preg_replace('/^(deadline|closing|due|submission)[\s:]+/i', '', $dateStr);
-                    $dateStr = trim($dateStr);
-                    $date = \Carbon\Carbon::parse($dateStr);
-                    // Vérifier que la date n'est pas trop ancienne (rejeter les dates > 5 ans)
-                    if ($date->isFuture() || $date->gt(now()->subYears(5))) {
-                        return $date->format('Y-m-d');
-                    }
-                } catch (\Exception $e) {
-                    continue;
-                }
-            }
+        // Si pas trouvé dans le texte brut, essayer de nettoyer un peu (enlever les labels)
+        $cleanText = preg_replace('/(Date de publication|Published on|Publié le|Date|Publication Date|Deadline)[\s:]+/iu', '', $text);
+        $date = $this->parseDateFromText($cleanText);
+        if ($date) {
+            return $date;
         }
 
         // Chercher aussi dans les attributs HTML (data-date, datetime, etc.)
@@ -994,19 +906,14 @@ class AfDBScraperService implements IterativeScraperInterface
             foreach ($elements as $element) {
                 $dateValue = $element->getAttribute($attr);
                 if (!empty($dateValue)) {
-                    try {
-                        $date = \Carbon\Carbon::parse($dateValue);
-                        if ($date->isFuture() || $date->gt(now()->subYears(5))) {
-                            return $date->format('Y-m-d');
-                        }
-                    } catch (\Exception $e) {
-                        continue;
+                    $dateParsed = $this->parseDateFromText($dateValue);
+                    if ($dateParsed) {
+                        return $dateParsed;
                     }
                 }
             }
         }
 
-        // Si aucune date trouvée, retourner null (sera géré plus haut)
         return null;
     }
 
@@ -1055,12 +962,35 @@ class AfDBScraperService implements IterativeScraperInterface
             'general procurement notice',
             'procurement plan',
             'contract award',
+            'attribution de contrat',
+            'attribution de marché',
+            'attribution de marches',
+            'resultats de l appel d offres',
+            'notification of award',
+            'contract award notice',
+            'beneficial ownership disclosure form',
+            'formulaire de divulgation des bénéficiaires effectifs',
         ];
+
+        // IMPORTANT : On garde les "Plans de passation des marchés" s'ils ont un titre substantiel
+        // car ils contiennent souvent des informations sur les futurs projets.
+        // Mais on rejette les titres purement génériques.
 
         // Vérifier si le titre correspond exactement à un titre interdit
         foreach ($forbiddenTitles as $forbidden) {
             if ($titreLower === strtolower($forbidden)) {
                 return false;
+            }
+        }
+        
+        // Check contains for strong reject patterns
+        foreach ($forbiddenTitles as $forbidden) {
+            if (stripos($titreLower, $forbidden) !== false) {
+                 // Sauf si c'est un plan de passation de marchés (PPM) qui est souvent utile, mais ici on veut strict
+                 if (stripos($titreLower, 'plan de passation') !== false || stripos($titreLower, 'procurement plan') !== false) {
+                     continue; // On garde les PPM pour l'instant
+                 }
+                 return false;
             }
         }
 
@@ -1157,64 +1087,104 @@ class AfDBScraperService implements IterativeScraperInterface
     {
         $urlLower = strtolower($url);
 
-        // LIENS INTERDITS - Plateformes et listes
-        $forbiddenPatterns = [
+        // 1. REJET ABSOLU : Patterns d'information, navigation ou réseaux sociaux
+        $rejectPatterns = [
+            'new-procurement-policy',
+            'procurement-policy',
+            '/about-us/',
+            '/contact-us/',
+            '/terms-and-conditions/',
+            '/privacy-policy/',
+            '/site-map/',
+            '/news/',
+            '/events/',
+            '/multimedia/',
+            '/en/projects-and-operations/project-portfolio',
+            'consultancy-services-dacon',
+            'resources-for-businesses',
+            'resources-for-borrowers',
+            'tools-reports',
+            'frequently-asked-questions',
+            'projects-procurements-services-contacts',
+            'procurement-notices-workflow',
+            'instagram.com',
+            'facebook.com',
+            'twitter.com',
+            'linkedin.com',
+            'youtube.com',
+            'share=',
+            'sharer.php',
+            'intent/tweet',
             'econsultant.afdb.org',
-            '/en/projects-and-operations/procurement', // Page de liste (sans ID)
-            '/en/documents', // Page de documents générique
+            // Catégories à rejeter (Attention: ne pas rejeter les parents)
+            '/contract-awards',
+            '/corporate-procurement',
+            '/general-procurement-notice', 
+            '/specific-procurement-notice',
+            '/expression-of-interest',
+            '/request-for-expression-of-interest',
+            '/consultancy-services',
+            'beneficial-ownership-disclosure-form',
+            'formulaire-de-divulgation-des-beneficiaires-effectifs',
+            'attribution-de-contrat',
+            'attribution-de-marche',
+            'tribunal-administratif', 
+            'administrative-tribunal',
+            'appeals-board',
+            '/board-decisions',
+            '/financial-information',
+            '/environmental-and-social-assessments',
+            '/evaluation-reports',
+            '/project-completion-reports',
+            '/country-strategy-papers',
         ];
 
-        foreach ($forbiddenPatterns as $pattern) {
+        foreach ($rejectPatterns as $pattern) {
             if (stripos($urlLower, $pattern) !== false) {
-                // Vérifier si c'est vraiment une page de liste (sans identifiant)
-                if (stripos($urlLower, '/procurement') !== false) {
-                    // Si l'URL contient un ID ou un chemin spécifique, c'est OK
-                    if (preg_match('/\/procurement\/[^\/\?]+/', $urlLower)) {
-                        continue; // C'est un lien spécifique, pas une liste
-                    }
-                }
                 return false;
             }
         }
 
-        // Rejeter les URLs avec paramètres de recherche/liste
-        if (stripos($urlLower, '/procurement?') !== false || stripos($urlLower, '/procurement#') !== false) {
-            return false;
+        // 2. FILTRAGE DES PAGES DE LISTE GÉNÉRIQUES
+        // On accepte /procurement/ seulement s'il y a un identifiant spécifique (chiffres ou slug long)
+        if (stripos($urlLower, '/procurement') !== false) {
+            // Rejeter la page de liste pure
+            if (preg_match('/\/procurement\/?(\?.*|#.*)?$/', $urlLower)) {
+                return false;
+            }
+            
+            // Rejeter les liens qui ressemblent à des catégories/navigation (pas de chiffres, slug court)
+            // Les vrais avis de marché ont souvent soit un ID numérique, soit un slug très spécifique
+            $path = parse_url($urlLower, PHP_URL_PATH);
+            $segments = explode('/', trim($path, '/'));
+            $lastSegment = end($segments);
+            
+            if (strlen($lastSegment) < 15 && !preg_match('/\d/', $lastSegment)) {
+                return false; // Probablement une page de navigation
+            }
         }
 
-        // Rejeter les fichiers XML/RSS (flux de données, pas des avis)
-        if (preg_match('/\.(xml|rss|atom)$/i', $urlLower)) {
-            return false;
-        }
-
-        // LIENS ACCEPTÉS - Doivent contenir un identifiant ou être un document
+        // 3. ACCEPTATION : Doit être dans la section procurement ou être un document
         $validPatterns = [
-            '/procurement/', // Avec chemin spécifique
-            'procurement-notice', // Notice spécifique
-            '.pdf', // Document PDF
-            '.doc', // Document Word
+            '/procurement/',
+            'procurement-notice',
+            '.pdf',
+            '.doc',
             '.docx',
-            '/en/projects-and-operations/procurement/', // Avec chemin après
+            '/en/projects-and-operations/',
+            '/en/documents/',
+            '/fr/documents/',
+            '/fr/projects-and-operations/',
+            'invitation-for-bids',
         ];
 
-        $hasValidPattern = false;
         foreach ($validPatterns as $pattern) {
             if (stripos($urlLower, $pattern) !== false) {
-                $hasValidPattern = true;
-                break;
+                return true;
             }
         }
 
-        // Si c'est un lien vers afdb.org mais pas vers une plateforme, accepter
-        if (stripos($urlLower, 'afdb.org') !== false && !$hasValidPattern) {
-            // Vérifier qu'il y a un chemin spécifique (pas juste le domaine)
-            $path = parse_url($url, PHP_URL_PATH);
-            if ($path && strlen($path) > 10 && stripos($path, '/procurement') === false) {
-                $hasValidPattern = true; // Lien spécifique vers autre page
-            }
-        }
-
-        return $hasValidPattern;
+        return false;
     }
 
     /**
@@ -1330,7 +1300,7 @@ class AfDBScraperService implements IterativeScraperInterface
                     ->setNodeBinary('/usr/bin/node')
                     ->ignoreHttpsErrors()
                     ->waitUntilNetworkIdle()
-                    ->timeout(30)
+                    ->timeout(60)
                     ->setOption('args', [
                         '--no-sandbox',
                         '--disable-setuid-sandbox',
@@ -1351,8 +1321,8 @@ class AfDBScraperService implements IterativeScraperInterface
                 Log::debug('AfDB Scraper: Browsershot failed, using HTTP fallback', ['url' => $url, 'error' => $e->getMessage()]);
 
                 $response = Http::withoutVerifying()
-                    ->timeout(15)
-                    ->retry(1, 500)
+                    ->timeout(30)
+                    ->retry(2, 1000)
                     ->withHeaders([
                         'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
                         'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -1543,29 +1513,41 @@ class AfDBScraperService implements IterativeScraperInterface
             return null;
         }
 
-        // Patterns de date
+        // Patterns de date (Ordre d'importance)
         $datePatterns = [
-            // Format DD-MMM-YYYY (19-Dec-2025)
-            '/(\d{1,2})[\s-](Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*[\s-](\d{4})/i',
-            // Format DD/MMM/YYYY
-            '/(\d{1,2})\/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\/(\d{4})/i',
-            // Formats américains
+            // Format DD-MMM-YYYY (19-Dec-2025 ou 05-fév-2026)
+            '/(\d{1,2})[\s\/-](Janvier|Février|Mars|Avril|Mai|Juin|Juillet|Août|Septembre|Octobre|Novembre|Décembre|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|Janv|Févr|Fév|Mars|Avri|Avr|Mai|Juin|Juil|Août|Sept|Octo|Nove|Déce|Déc)[a-z]*\.?[\s\/-](\d{4})/iu',
+            // Formats Français complets (19 Décembre 2025)
+            '/(\d{1,2})\s+(Janvier|Février|Mars|Avril|Mai|Juin|Juillet|Août|Septembre|Octobre|Novembre|Décembre)\s+(\d{4})/iu',
+            // Format DD-MM-YYYY
+            '/(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{4})/',
+            // Format YYYY-MM-DD
+            '/(\d{4})[.\/-](\d{1,2})[.\/-](\d{1,2})/',
+            // Formats Anglais complets (December 19, 2025)
             '/(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{1,2}),?\s+(\d{4})/i',
-            '/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\.?\s+(\d{1,2}),?\s+(\d{4})/i',
-            // Formats européens
-            '/(\d{1,2})\/(\d{1,2})\/(\d{4})/',
-            '/(\d{1,2})-(\d{1,2})-(\d{4})/',
-            // Formats ISO
-            '/(\d{4})-(\d{2})-(\d{2})/',
         ];
 
         foreach ($datePatterns as $pattern) {
             if (preg_match($pattern, $text, $matches)) {
                 try {
                     $dateStr = $matches[0];
+                    
+                    // Normalisation des mois pour Carbon
+                    $dateStr = str_ireplace(
+                        ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
+                        ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+                        $dateStr
+                    );
+                    
+                    $dateStr = str_ireplace(
+                        ['Janv', 'Févr', 'Fév', 'Avri', 'Avr', 'Juil', 'Août', 'Sept', 'Octo', 'Nove', 'Déce', 'Déc'],
+                        ['Jan', 'Feb', 'Feb', 'Apr', 'Apr', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Dec'],
+                        $dateStr
+                    );
+
                     $date = \Carbon\Carbon::parse($dateStr);
-                    // Vérifier que la date est dans le futur ou pas trop ancienne (max 2 ans)
-                    if ($date->isFuture() || $date->gt(now()->subYears(2))) {
+                    // Vérifier que la date est cohérente
+                    if ($date->year > 2000 && $date->year < 2100) {
                         return $date->format('Y-m-d');
                     }
                 } catch (\Exception $e) {
@@ -1575,6 +1557,267 @@ class AfDBScraperService implements IterativeScraperInterface
         }
 
         return null;
+    }
+
+    /**
+     * Extrait le pays depuis le titre en utilisant les acronymes connus
+     */
+    private function extractCountryFromTitle(string $title): ?string
+    {
+        $acronyms = [
+            'RCA' => 'République Centrafricaine',
+            'RDC' => 'République Démocratique du Congo',
+            'DRC' => 'Democratic Republic of Congo',
+            'CIV' => 'Côte d\'Ivoire',
+            'GAB' => 'Gabon',
+            'CMR' => 'Cameroun',
+            'SEN' => 'Sénégal',
+            'MLI' => 'Mali',
+            'BFA' => 'Burkina Faso',
+            'NER' => 'Niger',
+            'TCD' => 'Tchad',
+            'GIN' => 'Guinée',
+            'GNB' => 'Guinée-Bissau',
+            'MRT' => 'Mauritanie',
+            'MAR' => 'Maroc',
+            'TUN' => 'Tunisie',
+            'EGY' => 'Égypte',
+            'ALG' => 'Algérie',
+            'ZAF' => 'Afrique du Sud',
+            'UGA' => 'Ouganda',
+            'KEN' => 'Kenya',
+            'TZA' => 'Tanzanie',
+            'ZMB' => 'Zambie',
+            'ZWE' => 'Zimbabwe',
+            'AGO' => 'Angola',
+            'MOZ' => 'Mozambique',
+            'NAM' => 'Namibie',
+            'BWA' => 'Botswana',
+            'LSO' => 'Lesotho',
+            'SWZ' => 'Eswatini',
+            'MDG' => 'Madagascar',
+            'MUS' => 'Maurice',
+            'SYC' => 'Seychelles',
+            'DJI' => 'Djibouti',
+            'SDN' => 'Soudan',
+            'SSD' => 'Soudan du Sud',
+            'ETH' => 'Éthiopie',
+            'ERI' => 'Érythrée',
+            'SOM' => 'Somalie',
+        ];
+
+        foreach ($acronyms as $acronym => $countryName) {
+            // Chercher l'acronyme entouré d'espaces ou tirets
+            if (strpos($title, " $acronym ") !== false || strpos($title, "- $acronym -") !== false) {
+                return $countryName;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Récupère les données manquantes (Pays, Date Pub) depuis la page de détail
+     * 
+     * @param string $url
+     * @return array ['country' => string|null, 'publication_date' => string|null, 'deadline' => string|null]
+     */
+    private function fetchDetailData(string $url): array
+    {
+        $data = [
+            'country' => null,
+            'publication_date' => null,
+            'deadline' => null
+        ];
+        
+        try {
+            // Petit délai
+            usleep(200000); 
+
+            $html = '';
+
+            // 1. Essayer HTTP simple (rapide)
+            try {
+                $response = Http::withoutVerifying()
+                    ->timeout(20)
+                    ->withHeaders([
+                        'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                    ])
+                    ->get($url);
+
+                if ($response->successful()) {
+                    $html = $response->body();
+                } else {
+                    throw new \Exception("HTTP failed with status " . $response->status());
+                }
+            } catch (\Exception $e) {
+                // 2. Fallback avec Browsershot (plus lent mais contourne 403/JS)
+                Log::debug('AfDB Scraper: HTTP failed for detail data, trying Browsershot', ['url' => $url, 'error' => $e->getMessage()]);
+                
+                try {
+                    $html = Browsershot::url($url)
+                        ->setChromePath('/usr/bin/google-chrome')
+                        ->setNodeBinary('/usr/bin/node')
+                        ->ignoreHttpsErrors()
+                        ->waitUntilNetworkIdle()
+                        ->timeout(60)
+                        ->setOption('args', [
+                            '--no-sandbox',
+                            '--disable-setuid-sandbox',
+                            '--disable-dev-shm-usage',
+                            '--disable-accelerated-2d-canvas',
+                            '--disable-gpu',
+                            '--ignore-certificate-errors',
+                        ])
+                        ->userAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
+                        ->bodyHtml();
+                } catch (\Exception $ex) {
+                    Log::warning('AfDB Scraper: Browsershot also failed for detail data', ['url' => $url, 'error' => $ex->getMessage()]);
+                    return $data;
+                }
+            }
+
+            if (empty($html)) {
+                return $data;
+            }
+
+            $dom = new DOMDocument();
+            libxml_use_internal_errors(true);
+            @$dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
+            libxml_clear_errors();
+            $xpath = new DOMXPath($dom);
+
+            // --- Extraction Pays ---
+            // Stratégie 1: Chercher des liens vers des pages pays (/countries/..., /pays/...)
+            $countryLinks = $xpath->query("//a[contains(@href, '/countries/') or contains(@href, '/pays/')]");
+            foreach ($countryLinks as $link) {
+                $text = trim($link->textContent);
+                if (empty($text) || stripos($text, 'All countries') !== false || stripos($text, 'Tous les pays') !== false) {
+                    continue;
+                }
+                
+                $country = $this->extractCountryFromText($text);
+                if ($country) {
+                    $data['country'] = $country;
+                    break; 
+                }
+            }
+
+            // Stratégie 2: Chercher des labels spécifiques (Country:, Pays:)
+            if (empty($data['country'])) {
+                $labels = $xpath->query("//*[contains(text(), 'Country') or contains(text(), 'Pays')]/following-sibling::*");
+                foreach ($labels as $label) {
+                    $country = $this->extractCountryFromText($label->textContent);
+                    if ($country) {
+                        $data['country'] = $country;
+                        break;
+                    }
+                }
+            }
+
+            // Stratégie 3: Chercher dans le texte global
+            if (empty($data['country'])) {
+                $bodyText = $dom->textContent;
+                $data['country'] = $this->extractCountryFromText($bodyText);
+            }
+
+
+            // --- Extraction Dates ---
+            $textContent = $dom->textContent;
+            
+            // Chercher la date de publication
+            $pubLabels = $xpath->query("//*[contains(text(), 'Publication') or contains(text(), 'Publié')]/following-sibling::*");
+            foreach ($pubLabels as $label) {
+                $date = $this->parseDateFromText($label->textContent);
+                if ($date) {
+                    $data['publication_date'] = $date;
+                    break;
+                }
+            }
+
+            // Chercher la date limite (deadline)
+            $deadlineLabels = $xpath->query("//*[contains(text(), 'Deadline') or contains(text(), 'Date limite') or contains(text(), 'Closing')]/following-sibling::*");
+            foreach ($deadlineLabels as $label) {
+                $date = $this->parseDateFromText($label->textContent);
+                if ($date) {
+                    $data['deadline'] = $date;
+                    break;
+                }
+            }
+
+            // Fallback: Parser toutes les dates et essayer d'assigner
+            if (empty($data['publication_date']) || empty($data['deadline'])) {
+                $allDates = $this->extractAllDates($textContent);
+                if (!empty($allDates)) {
+                    sort($allDates); // Plus ancien au plus récent
+                    if (empty($data['publication_date'])) {
+                        $data['publication_date'] = $allDates[0];
+                    }
+                    if (empty($data['deadline'])) {
+                        $data['deadline'] = end($allDates);
+                    }
+                }
+            }
+
+            return $data;
+
+        } catch (\Exception $e) {
+            Log::warning('AfDB Scraper: Error in fetchDetailData', ['url' => $url, 'error' => $e->getMessage()]);
+            return $data;
+        }
+    }
+
+    /**
+     * Nettoie et normalise le texte
+     */
+    private function cleanText(?string $text): string
+    {
+        if ($text === null) return '';
+        
+        $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $text = preg_replace('/\s+/', ' ', $text);
+        $text = trim($text);
+        
+        return $text;
+    }
+
+    /**
+     * Extrait le pays depuis une chaîne de texte
+     */
+    private function extractCountryFromText(string $text): ?string
+    {
+        $tempDoc = new DOMDocument();
+        $tempEl = $tempDoc->createElement('div', $text);
+        return $this->extractCountry($tempEl, new DOMXPath($tempDoc));
+    }
+
+    /**
+     * Extrait toutes les dates valides d'un texte
+     */
+    private function extractAllDates(string $text): array
+    {
+        $dates = [];
+        $patterns = [
+            '/(\d{1,2})[\s-](Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*[\s-](\d{4})/i',
+            '/(\d{1,2})\/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\/(\d{4})/i',
+            '/(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{1,2}),?\s+(\d{4})/i',
+            '/(\d{1,2})\/(\d{1,2})\/(\d{4})/',
+            '/(\d{4})-(\d{2})-(\d{2})/',
+            '/(\d{1,2})\s+(Janvier|Février|Mars|Avril|Mai|Juin|Juillet|Août|Septembre|Octobre|Novembre|Décembre)\s+(\d{4})/iu',
+        ];
+
+        foreach ($patterns as $pattern) {
+            if (preg_match_all($pattern, $text, $matches)) {
+                foreach ($matches[0] as $dateStr) {
+                    $date = $this->parseDateFromText($dateStr);
+                    if ($date) {
+                        $dates[] = $date;
+                    }
+                }
+            }
+        }
+
+        return array_unique($dates);
     }
 }
 

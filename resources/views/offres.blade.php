@@ -251,6 +251,21 @@
                 <form method="GET" action="{{ route('appels-offres.index') }}" class="filters-form" id="filter-form"
                     style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; align-items: end;">
                     <input type="hidden" name="status" value="{{ $status ?? 'en_cours' }}">
+                    <!-- Source -->
+                    <div class="filter-group">
+                        <label for="source_filter"
+                            style="display: block; font-size: 0.875rem; font-weight: 600; color: #495057; margin-bottom: 0.5rem;">Source</label>
+                        <select name="source_filter" id="source_filter" onchange="this.form.submit()"
+                            style="width: 100%; padding: 0.625rem 0.75rem; border: 1px solid #dee2e6; border-radius: 4px; font-size: 0.875rem; color: #495057; background-color: #ffffff;">
+                            <option value="">Toutes les sources</option>
+                            @foreach($sources as $source)
+                                <option value="{{ $source }}" {{ $sourceFilter === $source ? 'selected' : '' }}>
+                                    {{ \App\Services\TranslationService::translateSource($source) }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
                     <!-- Type de marché -->
                     <div class="filter-group">
                         <label for="market_type"
@@ -267,13 +282,20 @@
                     <!-- Zone / Région -->
                     <div class="filter-group">
                         <label for="sub_region"
-                            style="display: block; font-size: 0.875rem; font-weight: 600; color: #495057; margin-bottom: 0.5rem;">Zone / Région</label>
+                            style="display: block; font-size: 0.875rem; font-weight: 600; color: #495057; margin-bottom: 0.5rem;">Zone / Pays</label>
                         <select name="sub_region" id="sub_region" onchange="this.form.submit()"
                             style="width: 100%; padding: 0.625rem 0.75rem; border: 1px solid #dee2e6; border-radius: 4px; font-size: 0.875rem; color: #495057; background-color: #ffffff;">
                             <option value="">Toute l'Afrique</option>
+                            
                             @foreach($africanRegions as $key => $region)
                                 <option value="{{ $key }}" {{ request('sub_region') === $key ? 'selected' : '' }}>
                                     {{ $region['label'] }}
+                                </option>
+                            @endforeach
+
+                            @foreach($africanCountries as $country)
+                                <option value="{{ $country }}" {{ request('sub_region') === $country ? 'selected' : '' }}>
+                                    {{ $country }}
                                 </option>
                             @endforeach
                         </select>
@@ -286,39 +308,16 @@
                             d'activité</label>
                         <select name="activity_pole_id" id="activity_pole_id" onchange="this.form.submit()"
                             style="width: 100%; padding: 0.625rem 0.75rem; border: 1px solid #dee2e6; border-radius: 4px; font-size: 0.875rem; color: #495057; background-color: #ffffff;">
-                            <option value="">Tous</option>
+                            <option value="">Tous les pôles</option>
                             @foreach($activityPoles ?? [] as $pole)
                                 @if(is_object($pole))
                                     <option value="{{ $pole->id }}" 
-                                        data-keywords="{{ $pole->keywords->pluck('keyword')->implode(', ') }}"
                                         {{ request('activity_pole_id') == $pole->id ? 'selected' : '' }}>
                                         {{ $pole->name }}
                                     </option>
                                 @endif
                             @endforeach
                         </select>
-                        <script>
-                            document.getElementById('activity_pole_id').addEventListener('change', function() {
-                                var selectedOption = this.options[this.selectedIndex];
-                                var keywords = selectedOption.getAttribute('data-keywords');
-                                var keywordInput = document.getElementById('keyword');
-                                if (keywords) {
-                                    keywordInput.value = keywords;
-                                } else {
-                                    keywordInput.value = ''; // Optionnel : vider si "Tous"
-                                }
-                                this.form.submit();
-                            });
-                        </script>
-                    </div>
-
-                    <!-- Mot-clé -->
-                    <div class="filter-group">
-                        <label for="keyword"
-                            style="display: block; font-size: 0.875rem; font-weight: 600; color: #495057; margin-bottom: 0.5rem;">Mot-clé</label>
-                        <input type="text" name="keyword" id="keyword" value="{{ request('keyword') }}" readonly
-                            placeholder="Sélectionnez un pôle..."
-                            style="width: 100%; padding: 0.625rem 0.75rem; border: 1px solid #dee2e6; border-radius: 4px; font-size: 0.875rem; color: #6c757d; background-color: #e9ecef; cursor: not-allowed;">
                     </div>
 
 
@@ -349,7 +348,6 @@
                     <table class="offres-table">
                         <thead>
                             <tr>
-                                <th>Source</th>
                                 <th>Intitulé de la Mission</th>
                                 <th>Zone Géographique</th>
                                 <th>Date de publication</th>
@@ -360,15 +358,6 @@
                         <tbody>
                             @foreach($offres as $offre)
                                 <tr>
-                                    <td>
-                                        @if($offre->source)
-                                            <span style="color: #1a1a1a; font-size: 0.875rem;">
-                                                {{ \App\Services\TranslationService::translateSource($offre->source) }}
-                                            </span>
-                                        @else
-                                            <span style="color: #9ca3af;">-</span>
-                                        @endif
-                                    </td>
                                     <td>
                                         @if($offre->lien_source)
                                             <a href="{{ $offre->lien_source }}" target="_blank" rel="noopener noreferrer"

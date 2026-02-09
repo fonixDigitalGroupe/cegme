@@ -44,17 +44,19 @@ class ScrapingProgressService
      */
     public function updateSource(string $jobId, string $sourceName, int $current): void
     {
-        $progress = $this->getProgress($jobId);
-        if (!$progress) {
-            return;
-        }
+        Cache::lock(self::CACHE_PREFIX . $jobId . '_lock', 10)->block(5, function () use ($jobId, $sourceName, $current) {
+            $progress = $this->getProgress($jobId);
+            if (!$progress) {
+                return;
+            }
 
-        $progress['current'] = $current;
-        $progress['current_source'] = $sourceName;
-        $progress['percentage'] = $progress['total'] > 0 ? max(0, (int) ((($current - 1) / $progress['total']) * 100)) : 0;
-        $progress['message'] = "Scraping de {$sourceName}... ({$current}/{$progress['total']})";
+            $progress['current'] = $current;
+            $progress['current_source'] = $sourceName;
+            $progress['percentage'] = $progress['total'] > 0 ? max(0, (int) ((($current - 1) / $progress['total']) * 100)) : 0;
+            $progress['message'] = "Scraping de {$sourceName}... ({$current}/{$progress['total']})";
 
-        Cache::put(self::CACHE_PREFIX . $jobId, $progress, self::CACHE_DURATION);
+            Cache::put(self::CACHE_PREFIX . $jobId, $progress, self::CACHE_DURATION);
+        });
     }
 
     /**
@@ -66,16 +68,18 @@ class ScrapingProgressService
      */
     public function updateProgress(string $jobId, array $data): void
     {
-        $progress = $this->getProgress($jobId);
-        if (!$progress) {
-            return;
-        }
+        Cache::lock(self::CACHE_PREFIX . $jobId . '_lock', 10)->block(5, function () use ($jobId, $data) {
+            $progress = $this->getProgress($jobId);
+            if (!$progress) {
+                return;
+            }
 
-        foreach ($data as $key => $value) {
-            $progress[$key] = $value;
-        }
+            foreach ($data as $key => $value) {
+                $progress[$key] = $value;
+            }
 
-        Cache::put(self::CACHE_PREFIX . $jobId, $progress, self::CACHE_DURATION);
+            Cache::put(self::CACHE_PREFIX . $jobId, $progress, self::CACHE_DURATION);
+        });
     }
 
     /**
@@ -88,18 +92,20 @@ class ScrapingProgressService
      */
     public function markSourceCompleted(string $jobId, string $sourceName, int $offresCount = 0): void
     {
-        $progress = $this->getProgress($jobId);
-        if (!$progress) {
-            return;
-        }
+        Cache::lock(self::CACHE_PREFIX . $jobId . '_lock', 10)->block(5, function () use ($jobId, $sourceName, $offresCount) {
+            $progress = $this->getProgress($jobId);
+            if (!$progress) {
+                return;
+            }
 
-        $progress['completed_sources'][] = [
-            'name' => $sourceName,
-            'offres_count' => $offresCount,
-            'completed_at' => now()->toDateTimeString(),
-        ];
+            $progress['completed_sources'][] = [
+                'name' => $sourceName,
+                'offres_count' => $offresCount,
+                'completed_at' => now()->toDateTimeString(),
+            ];
 
-        Cache::put(self::CACHE_PREFIX . $jobId, $progress, self::CACHE_DURATION);
+            Cache::put(self::CACHE_PREFIX . $jobId, $progress, self::CACHE_DURATION);
+        });
     }
 
     /**
@@ -112,18 +118,20 @@ class ScrapingProgressService
      */
     public function markSourceFailed(string $jobId, string $sourceName, string $errorMessage): void
     {
-        $progress = $this->getProgress($jobId);
-        if (!$progress) {
-            return;
-        }
+        Cache::lock(self::CACHE_PREFIX . $jobId . '_lock', 10)->block(5, function () use ($jobId, $sourceName, $errorMessage) {
+            $progress = $this->getProgress($jobId);
+            if (!$progress) {
+                return;
+            }
 
-        $progress['failed_sources'][] = [
-            'name' => $sourceName,
-            'error' => $errorMessage,
-            'failed_at' => now()->toDateTimeString(),
-        ];
+            $progress['failed_sources'][] = [
+                'name' => $sourceName,
+                'error' => $errorMessage,
+                'failed_at' => now()->toDateTimeString(),
+            ];
 
-        Cache::put(self::CACHE_PREFIX . $jobId, $progress, self::CACHE_DURATION);
+            Cache::put(self::CACHE_PREFIX . $jobId, $progress, self::CACHE_DURATION);
+        });
     }
 
     /**
@@ -134,17 +142,19 @@ class ScrapingProgressService
      */
     public function complete(string $jobId): void
     {
-        $progress = $this->getProgress($jobId);
-        if (!$progress) {
-            return;
-        }
+        Cache::lock(self::CACHE_PREFIX . $jobId . '_lock', 10)->block(5, function () use ($jobId) {
+            $progress = $this->getProgress($jobId);
+            if (!$progress) {
+                return;
+            }
 
-        $progress['status'] = 'completed';
-        $progress['percentage'] = 100;
-        $progress['message'] = 'Scraping terminé avec succès';
-        $progress['completed_at'] = now()->toDateTimeString();
+            $progress['status'] = 'completed';
+            $progress['percentage'] = 100;
+            $progress['message'] = 'Scraping terminé avec succès';
+            $progress['completed_at'] = now()->toDateTimeString();
 
-        Cache::put(self::CACHE_PREFIX . $jobId, $progress, self::CACHE_DURATION);
+            Cache::put(self::CACHE_PREFIX . $jobId, $progress, self::CACHE_DURATION);
+        });
     }
 
     /**
@@ -156,17 +166,19 @@ class ScrapingProgressService
      */
     public function fail(string $jobId, string $errorMessage): void
     {
-        $progress = $this->getProgress($jobId);
-        if (!$progress) {
-            return;
-        }
+        Cache::lock(self::CACHE_PREFIX . $jobId . '_lock', 10)->block(5, function () use ($jobId, $errorMessage) {
+            $progress = $this->getProgress($jobId);
+            if (!$progress) {
+                return;
+            }
 
-        $progress['status'] = 'failed';
-        $progress['message'] = $errorMessage;
-        $progress['error'] = $errorMessage;
-        $progress['failed_at'] = now()->toDateTimeString();
+            $progress['status'] = 'failed';
+            $progress['message'] = $errorMessage;
+            $progress['error'] = $errorMessage;
+            $progress['failed_at'] = now()->toDateTimeString();
 
-        Cache::put(self::CACHE_PREFIX . $jobId, $progress, self::CACHE_DURATION);
+            Cache::put(self::CACHE_PREFIX . $jobId, $progress, self::CACHE_DURATION);
+        });
     }
 
     /**
@@ -177,16 +189,18 @@ class ScrapingProgressService
      */
     public function cancel(string $jobId): void
     {
-        $progress = $this->getProgress($jobId);
-        if (!$progress) {
-            return;
-        }
+        Cache::lock(self::CACHE_PREFIX . $jobId . '_lock', 10)->block(5, function () use ($jobId) {
+            $progress = $this->getProgress($jobId);
+            if (!$progress) {
+                return;
+            }
 
-        $progress['status'] = 'cancelled';
-        $progress['message'] = 'Scraping annulé par l\'utilisateur';
-        $progress['cancelled_at'] = now()->toDateTimeString();
+            $progress['status'] = 'cancelled';
+            $progress['message'] = 'Scraping annulé par l\'utilisateur';
+            $progress['cancelled_at'] = now()->toDateTimeString();
 
-        Cache::put(self::CACHE_PREFIX . $jobId, $progress, self::CACHE_DURATION);
+            Cache::put(self::CACHE_PREFIX . $jobId, $progress, self::CACHE_DURATION);
+        });
     }
 
     /**
@@ -210,35 +224,37 @@ class ScrapingProgressService
      */
     public function addFindings(string $jobId, array $findings): void
     {
-        $progress = $this->getProgress($jobId);
-        if (!$progress) {
-            return;
-        }
+        Cache::lock(self::CACHE_PREFIX . $jobId . '_lock', 10)->block(5, function () use ($jobId, $findings) {
+            $progress = $this->getProgress($jobId);
+            if (!$progress) {
+                return;
+            }
 
-        if (!isset($progress['recent_findings'])) {
-            $progress['recent_findings'] = [];
-        }
+            if (!isset($progress['recent_findings'])) {
+                $progress['recent_findings'] = [];
+            }
 
-        // Ajouter les nouvelles trouvailles au début
-        $newFindings = array_map(function ($f) {
-            return [
-                'titre' => $f['titre'] ?? 'Sans titre',
-                'pays' => $f['pays'] ?? 'N/A',
-                'source' => $f['source'] ?? 'N/A',
-                'date_limite' => $f['date_limite_soumission'] ?? 'N/A',
-                'found_at' => now()->format('H:i:s'),
-            ];
-        }, $findings);
+            // Ajouter les nouvelles trouvailles au début
+            $newFindings = array_map(function ($f) {
+                return [
+                    'titre' => $f['titre'] ?? 'Sans titre',
+                    'pays' => $f['pays'] ?? 'N/A',
+                    'source' => $f['source'] ?? 'N/A',
+                    'date_limite' => $f['date_limite_soumission'] ?? 'N/A',
+                    'found_at' => now()->format('H:i:s'),
+                ];
+            }, $findings);
 
-        $progress['recent_findings'] = array_merge($newFindings, $progress['recent_findings']);
+            $progress['recent_findings'] = array_merge($newFindings, $progress['recent_findings']);
 
-        // Garder seulement les 20 dernières trouvailles pour ne pas exploser le cache
-        $progress['recent_findings'] = array_slice($progress['recent_findings'], 0, 20);
+            // Garder seulement les 20 dernières trouvailles pour ne pas exploser le cache
+            $progress['recent_findings'] = array_slice($progress['recent_findings'], 0, 20);
 
-        // Mettre à jour aussi le nombre total d'offres en base (estimation rapide)
-        $progress['total_offres'] = \App\Models\Offre::count();
+            // Mettre à jour aussi le nombre total d'offres en base (estimation rapide)
+            $progress['total_offres'] = \App\Models\Offre::count();
 
-        Cache::put(self::CACHE_PREFIX . $jobId, $progress, self::CACHE_DURATION);
+            Cache::put(self::CACHE_PREFIX . $jobId, $progress, self::CACHE_DURATION);
+        });
     }
 
     /**

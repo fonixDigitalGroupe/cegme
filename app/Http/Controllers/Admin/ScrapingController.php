@@ -57,18 +57,12 @@ class ScrapingController extends Controller
         // Générer un ID unique pour ce job
         $jobId = ScrapingProgressService::generateJobId();
 
+        // Mode asynchrone (arrière-plan) ?
+        // On l'active par défaut si on est en local ou si explicitement demandé
+        $async = $request->boolean('async', app()->environment('local'));
+
         // Initialiser la progression
         $progressService->initialize($jobId, count($activeSources));
-
-        // Vider la table d'abord (Sauf si demandé explicitement de garder)
-        if (!$noTruncate) {
-            $progressService->updateSource($jobId, 'Vidage de la base de données...', 0);
-            try {
-                \Illuminate\Support\Facades\DB::table('offres')->truncate();
-            } catch (\Exception $e) {
-                \Illuminate\Support\Facades\DB::table('offres')->delete();
-            }
-        }
 
         // Mettre à jour l'horaire de la prochaine exécution si le mode auto est actif
         $schedule = \App\Models\ScrapingSchedule::first();
@@ -79,24 +73,68 @@ class ScrapingController extends Controller
             ]);
         }
 
-        // PATCH OVH: Exécuter directement le scraping au lieu d'utiliser exec()
-        // Sur OVH mutualisé, exec() et proc_open() sont souvent désactivés
-        // On exécute donc le scraping de manière synchrone (dans la même requête)
-        
+        // PATCH OVH / LOCAL: Choisir la stratégie d'exécution
+        // Si asynchrone et possible (local), on lance en tâche de fond
+        // NOTE: Le vidage de la base est géré par la commande elle-même en arrière-plan
+        if ($async) {
+            try {
+                $phpPath = PHP_BINARY;
+                $artisanPath = base_path('artisan');
+                $command = "app:scrape-active-sources --job-id=" . escapeshellarg($jobId);
+                if ($noTruncate) {
+                    $command .= " --no-truncate";
+                }
+                $command .= " --apply-filters";
+
+                // Commande complète pour l'arrière-plan
+                if (PHP_OS_FAMILY === 'Windows') {
+                    pclose(popen("start /B " . escapeshellarg($phpPath) . " " . escapeshellarg($artisanPath) . " " . $command, "r"));
+                } else {
+                    // S'assurer que le chemin est absolu et utiliser nohup pour la robustesse sur Linux
+                    $fullCommand = escapeshellarg($phpPath) . " " . escapeshellarg($artisanPath) . " " . $command . " > /dev/null 2>&1 &";
+                    exec($fullCommand);
+                }
+
+                return response()->json([
+                    'success' => true,
+                    'job_id' => $jobId,
+                    'total_sources' => count($activeSources),
+                    'sources' => $activeSources,
+                    'async' => true,
+                    'message' => 'Scraping lancé en arrière-plan'
+                ]);
+            } catch (\Exception $e) {
+                Log::warning('Échec du lancement en arrière-plan, bascule vers mode synchrone', ['error' => $e->getMessage()]);
+                // On continue en synchrone si l'async échoue
+            }
+        }
+
+        // Mode synchrone (compatible OVH ou fallback local)
+        // Vider la table d'abord (Sauf si demandé explicitement de garder)
+        if (!$noTruncate) {
+            $progressService->updateSource($jobId, 'Vidage de la base de données...', 0);
+            try {
+                // Utiliser DELETE au lieu de TRUNCATE pour éviter les verrous bloquants
+                \Illuminate\Support\Facades\DB::table('offres')->delete();
+            } catch (\Exception $e) {
+                Log::error('Erreur lors du vidage (sync): ' . $e->getMessage());
+            }
+        }
+
         // Fermer la session pour éviter de bloquer d'autres requêtes du même utilisateur
         if (session_id()) {
             session_write_close();
         }
 
         // Augmenter les limites pour éviter les timeouts
-        @set_time_limit(300); // 5 minutes max
-        @ini_set('max_execution_time', '300');
-        
+        @set_time_limit(600); // 10 minutes max en synchrone
+        @ini_set('max_execution_time', '600');
+
         // Lancer le scraping directement
         try {
             $this->executeScrapingRoundRobin($jobId, $activeSources, $noTruncate, $progressService);
         } catch (\Exception $e) {
-            Log::error('Erreur lors du scraping', ['error' => $e->getMessage()]);
+            Log::error('Erreur lors du scraping synchrone', ['error' => $e->getMessage()]);
             $progressService->fail($jobId, $e->getMessage());
         }
 

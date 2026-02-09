@@ -57,12 +57,19 @@ class FilteringRuleController extends Controller
         try {
             $activityPoles = ActivityPole::with('keywords')->get();
         } catch (\Illuminate\Database\QueryException $e) {
-            // Si la table n'existe pas encore, logguer et renvoyer une collection vide
             \Log::warning('FilteringRuleController@create: table activity_poles manquante', ['error' => $e->getMessage()]);
             $activityPoles = collect();
         }
 
-        return view('admin.filtering-rules.create', compact('sources', 'activityPoles'));
+        $africanRegions = \App\Services\AfricanCountriesService::getAfricanRegions();
+        $allAfricanCountries = \App\Services\AfricanCountriesService::getAfricanCountriesKeywords();
+        
+        // Filtrer pour n'avoir que les pays (pas les termes génériques comme "Africa")
+        $allAfricanCountries = array_filter($allAfricanCountries, function($c) {
+            return !in_array($c, ['Africa', 'Afrique']);
+        });
+
+        return view('admin.filtering-rules.create', compact('sources', 'activityPoles', 'africanRegions', 'allAfricanCountries'));
     }
 
     /**
@@ -145,8 +152,15 @@ class FilteringRuleController extends Controller
         ];
 
         $activityPoles = ActivityPole::with('keywords')->get();
+        $africanRegions = \App\Services\AfricanCountriesService::getAfricanRegions();
+        $allAfricanCountries = \App\Services\AfricanCountriesService::getAfricanCountriesKeywords();
+        
+        // Filtrer pour n'avoir que les pays
+        $allAfricanCountries = array_filter($allAfricanCountries, function($c) {
+            return !in_array($c, ['Africa', 'Afrique']);
+        });
 
-        return view('admin.filtering-rules.edit', compact('filteringRule', 'sources', 'activityPoles'));
+        return view('admin.filtering-rules.edit', compact('filteringRule', 'sources', 'activityPoles', 'africanRegions', 'allAfricanCountries'));
     }
 
     /**
